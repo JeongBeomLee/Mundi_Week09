@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include "Source/Runtime/Engine/Components/SceneComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -10,6 +11,7 @@ UScriptManager::UScriptManager()
 
 UScriptManager::~UScriptManager()
 {
+    Shutdown();
 }
 
 void UScriptManager::Initialize()
@@ -20,57 +22,40 @@ void UScriptManager::Initialize()
      */
     Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
 
-    // 전역으로 lua에 타입을 등록
+    /* 전역으로 lua에 타입을 등록 */
+    // FName 등록
+    sol::usertype<FName> NameType = Lua.new_usertype<FName>(
+        "FName",
+        sol::constructors<FName(), FName(const char*), FName(const FString&)>());
+    NameType["ToString"] = &FName::ToString;
 
+    // USceneComponent 등록
+    sol::usertype<USceneComponent> SceneComponentType = Lua.new_usertype<USceneComponent>(
+        "USceneComponent",
+        sol::constructors<USceneComponent()>());
+    SceneComponentType["GetSceneId"] = &USceneComponent::GetSceneId;
+    
+    // AActor 등록
+    sol::usertype<AActor> ActorType = Lua.new_usertype<AActor>(
+        "AActor",
+        sol::constructors<AActor()>());
+    ActorType["Name"] = &AActor::Name;
+    ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
+    
+    
     // 전역으로 lua에 값을 등록
 
     // 경로에 있는 모든 lua 파일들을 모두 environment화하여 cache
-    for (auto& entry : fs::directory_iterator(ScriptsFilePath))
+    for (const fs::directory_entry& entry : fs::directory_iterator(SCRIPT_FILE_PATH))
     {
         if (!entry.is_regular_file()) continue;
         if (entry.path().extension() != ".lua") continue;
-
-        FString Path = entry.path().string();
+        
         FString FileName = entry.path().filename().string();
 
         try {
-            // 새 environment 생성 (globals 기반)
-            sol::environment Env(Lua, sol::create, Lua.globals());
-
-            // 스크립트 실행
-            sol::load_result scriptLoad = Lua.load_file(Path);
-            if (!scriptLoad.valid()) {
-                sol::error err = scriptLoad;
-                FString ErrorMessage = "[Script Manager] Lua Load Error" + FileName + ": " + err.what();
-                UE_LOG(ErrorMessage.c_str());
-                continue;
-            }
-
-            sol::protected_function_result result = scriptLoad(Env);
-            if (!result.valid()) {
-                sol::error err = result;
-                FString ErrorMessage = "[Script Manager] Lua Runtime Error" + FileName + ": " + err.what();
-                UE_LOG(ErrorMessage.c_str());
-                continue;
-            }
-
-            // table 반환 여부 확인
-            sol::table ScriptTable;
-            sol::object returned = Env["_G"]; // 혹은 스크립트가 return table이면 result 반환값 사용 가능
-            if (returned.is<sol::table>()) {
-                ScriptTable = returned.as<sol::table>();
-            }
-            
-            FLuaTemplateFunctions LuaTemplateFunction =
-                GetTemplateFunctionFromScript(Env);
-
             // 맵에 저장
-            ScriptsByName[FileName] = new FScript{
-                FileName,
-                Env,
-                ScriptTable,
-                FLuaTemplateFunctions()
-            };
+            ScriptsByName[FileName] = GetOrCreate(FileName);
 
             FString SuccessMessage =
                 FString("[Script Manager] Script ") + FileName + " Loaded Successfully.";
@@ -82,6 +67,11 @@ void UScriptManager::Initialize()
             UE_LOG(ErrorMessage.c_str());
         }
     }
+}
+
+void UScriptManager::Shutdown()
+{
+    lua_close(Lua);
 }
 
 UScriptManager& UScriptManager::GetInstance()
@@ -114,4 +104,64 @@ FLuaTemplateFunctions UScriptManager::GetTemplateFunctionFromScript(
     AssignFunction(LuaTemplateFunctions.EndPlay, "EndPlay");
     AssignFunction(LuaTemplateFunctions.OnOverlap, "OnOverlap");
     AssignFunction(LuaTemplateFunctions.Tick, "Tick");
+}
+
+FScript* UScriptManager::GetOrCreate(FString InPath)
+{
+    fs::path Path(SCRIPT_FILE_PATH + InPath);
+    FString FileName = Path.filename().string();
+
+    // 캐시에 존재하면 반환
+    if (!(ScriptsByName.find(FileName) == ScriptsByName.end()))
+    {
+        return ScriptsByName[FileName];
+    }
+
+    /*
+     *  경로에 파일이 존재하지 않으면
+     *  template.lua를 복제하여 스크립트를 생성한다.
+     */
+    if (!fs::exists(Path))
+    {
+        Path = fs::path(FileName);
+
+        fs::copy_file(DEFAULT_FILE_PATH, Path, fs::copy_options::overwrite_existing);
+    }
+    
+    // 새 environment 생성 (globals 기반)
+    sol::environment Env(Lua, sol::create, Lua.globals());
+
+    // 스크립트 실행
+    sol::load_result scriptLoad = Lua.load_file(Path.string());
+    if (!scriptLoad.valid()) {
+        sol::error Err = scriptLoad;
+        throw Err;
+    }
+
+    sol::protected_function_result result = scriptLoad(Env);
+    if (!result.valid()) {
+        sol::error Err = result;
+        throw Err;
+    }
+
+    // table 반환 여부 확인
+    sol::table ScriptTable;
+    // 혹은 스크립트가 return table이면 result 반환값 사용 가능
+    sol::object returned = Env["_G"];
+    if (returned.is<sol::table>()) {
+        ScriptTable = returned.as<sol::table>();
+    }
+
+    // LuaTemplateFunction 생성
+    FLuaTemplateFunctions LuaTemplateFunction =
+        GetTemplateFunctionFromScript(Env);
+
+    FScript* NewScript = new FScript;
+
+    NewScript->ScriptName = FileName;
+    NewScript->Env = Env;
+    NewScript->Table = ScriptTable;
+    NewScript->LuaTemplateFunctions = LuaTemplateFunction;
+
+    return NewScript;
 }
