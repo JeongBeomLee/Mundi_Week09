@@ -312,7 +312,11 @@ void UWorld::AddActorToLevel(AActor* Actor)
 		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.BeginPlay();
 		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.EndPlay();
 		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.OnOverlap();
-		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.Tick();
+		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.Tick(
+			sol::env_key,
+			UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->Env,
+			1.6f
+		);
 	}
 }
 

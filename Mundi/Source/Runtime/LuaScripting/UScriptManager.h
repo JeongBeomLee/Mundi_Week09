@@ -51,15 +51,13 @@ private:
     FLuaTemplateFunctions GetTemplateFunctionFromScript(
         sol::environment& InEnv
     );
-    FScript* GetOrCreate(FString InPath, AActor* InActor);
+    FScript* GetOrCreate(FString InPath);
 private:
     const static inline FString SCRIPT_FILE_PATH{"Scripts/"};
     const static inline FString DEFAULT_FILE_PATH{"Scripts/template.lua"};
 private:
     sol::state Lua;
     
-    // 이름 기반 접근
-    TMap<FString, FScript*> ScriptsByName; 
     // 소유자 기반 접근
     TMap<AActor*, TArray<FScript*>> ScriptsByOwner;
 };
