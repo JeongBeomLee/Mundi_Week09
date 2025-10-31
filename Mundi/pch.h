@@ -74,6 +74,10 @@
 // nlohmann
 #include "nlohmann/json.hpp"
 
+// lua
+#define SOL_ALL_SAFETIES_ON 1
+#include <sol/sol.hpp>
+
 //Manager
 #include "Renderer.h"
 #include "InputManager.h"

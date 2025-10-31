@@ -127,7 +127,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Source\Runtime\Core\Object;$(ProjectDir)Source\Runtime\Core\Math;$(ProjectDir)Source\Runtime\Core\Containers;$(ProjectDir)Source\Runtime\Core\Misc;$(ProjectDir)Source\Runtime\Core\Memory;$(ProjectDir)Source\Runtime\Engine\GameFramework;$(ProjectDir)Source\Runtime\Engine\Components;$(ProjectDir)Source\Runtime\Engine\Collision;$(ProjectDir)Source\Runtime\Engine\Spatial;$(ProjectDir)Source\Runtime\RHI;$(ProjectDir)Source\Runtime\Renderer;$(ProjectDir)Source\Runtime\AssetManagement;$(ProjectDir)Source\Runtime\InputCore;$(ProjectDir)Source\Editor;$(ProjectDir)Source\Slate;$(ProjectDir)ThirdParty;$(ProjectDir)ThirdParty\DirectXTex\Include;$(ProjectDir)ThirdParty\sol</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Source\Runtime\Core\Object;$(ProjectDir)Source\Runtime\Core\Math;$(ProjectDir)Source\Runtime\Core\Containers;$(ProjectDir)Source\Runtime\Core\Misc;$(ProjectDir)Source\Runtime\Core\Memory;$(ProjectDir)Source\Runtime\Engine\GameFramework;$(ProjectDir)Source\Runtime\Engine\Components;$(ProjectDir)Source\Runtime\Engine\Collision;$(ProjectDir)Source\Runtime\Engine\Spatial;$(ProjectDir)Source\Runtime\RHI;$(ProjectDir)Source\Runtime\Renderer;$(ProjectDir)Source\Runtime\AssetManagement;$(ProjectDir)Source\Runtime\InputCore;$(ProjectDir)Source\Editor;$(ProjectDir)Source\Slate;$(ProjectDir)ThirdParty;$(ProjectDir)ThirdParty\DirectXTex\Include;$(ProjectDir)ThirdParty\sol;$(ProjectDir)ThirdParty\lua\Include</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -141,6 +141,7 @@
       <Command>if "$(Configuration)"=="Release" (
     robocopy "$(ProjectDir)Data" "$(OutDir)Data" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
     robocopy "$(ProjectDir)Shaders" "$(OutDir)Shaders" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
+    robocopy "$(ProjectDir)Scripts" "$(OutDir)Scripts" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
     robocopy "$(ProjectDir)ThirdParty\DirectXTK" "$(OutDir)ThirdParty\DirectXTK" /E /XO /MT:8 /NFL /NDL /NJH /NJS
   /nc /ns /np
     if exist "$(ProjectDir)editor.ini" xcopy /Y /D "$(ProjectDir)editor.ini" "$(OutDir)"
@@ -161,7 +162,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Source\Runtime\Core\Object;$(ProjectDir)Source\Runtime\Core\Math;$(ProjectDir)Source\Runtime\Core\Containers;$(ProjectDir)Source\Runtime\Core\Misc;$(ProjectDir)Source\Runtime\Core\Memory;$(ProjectDir)Source\Runtime\Engine\GameFramework;$(ProjectDir)Source\Runtime\Engine\Components;$(ProjectDir)Source\Runtime\Engine\Collision;$(ProjectDir)Source\Runtime\Engine\Spatial;$(ProjectDir)Source\Runtime\RHI;$(ProjectDir)Source\Runtime\Renderer;$(ProjectDir)Source\Runtime\AssetManagement;$(ProjectDir)Source\Runtime\InputCore;$(ProjectDir)Source\Editor;$(ProjectDir)Source\Slate;$(ProjectDir)ThirdParty;$(ProjectDir)ThirdParty\DirectXTex\Include;$(ProjectDir)ThirdParty\sol</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Source\Runtime\Core\Object;$(ProjectDir)Source\Runtime\Core\Math;$(ProjectDir)Source\Runtime\Core\Containers;$(ProjectDir)Source\Runtime\Core\Misc;$(ProjectDir)Source\Runtime\Core\Memory;$(ProjectDir)Source\Runtime\Engine\GameFramework;$(ProjectDir)Source\Runtime\Engine\Components;$(ProjectDir)Source\Runtime\Engine\Collision;$(ProjectDir)Source\Runtime\Engine\Spatial;$(ProjectDir)Source\Runtime\RHI;$(ProjectDir)Source\Runtime\Renderer;$(ProjectDir)Source\Runtime\AssetManagement;$(ProjectDir)Source\Runtime\InputCore;$(ProjectDir)Source\Editor;$(ProjectDir)Source\Slate;$(ProjectDir)ThirdParty;$(ProjectDir)ThirdParty\DirectXTex\Include;$(ProjectDir)ThirdParty\sol;$(ProjectDir)ThirdParty\lua\Include</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -177,6 +178,7 @@
       <Command>if "$(Configuration)"=="Release" (
     robocopy "$(ProjectDir)Data" "$(OutDir)Data" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
     robocopy "$(ProjectDir)Shaders" "$(OutDir)Shaders" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
+    robocopy "$(ProjectDir)Scripts" "$(OutDir)Scripts" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
     robocopy "$(ProjectDir)ThirdParty\DirectXTK" "$(OutDir)ThirdParty\DirectXTK" /E /XO /MT:8 /NFL /NDL /NJH /NJS
   /nc /ns /np
     if exist "$(ProjectDir)editor.ini" xcopy /Y /D "$(ProjectDir)editor.ini" "$(OutDir)"
@@ -619,6 +621,9 @@
     <ClInclude Include="Source\Slate\Windows\SViewportWindow.h" />
     <ClInclude Include="Source\Slate\Windows\SWindow.h" />
     <ClInclude Include="Source\Slate\Windows\UIWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\template.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
