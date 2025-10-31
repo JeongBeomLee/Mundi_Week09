@@ -59,7 +59,9 @@
     <FxCompile Include="Shaders\Common\ShadowVSM_PS.hlsl">
       <Filter>Shaders\Common</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\Utility\DepthRemap.hlsl" />
+    <FxCompile Include="Shaders\Utility\DepthRemap.hlsl">
+      <Filter>Shaders\Utility</Filter>
+    </FxCompile>
   </ItemGroup>
   <!-- Root Files -->
   <ItemGroup>
@@ -428,7 +430,6 @@
     <ClCompile Include="Source\Runtime\Engine\Components\RotatingMovementComponent.cpp">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\ShadowManager.cpp">
       <Filter>Source\Runtime\Renderer</Filter>
     </ClCompile>
@@ -437,6 +438,9 @@
     </ClCompile>
     <ClCompile Include="Source\Runtime\Renderer\ShadowConfiguration.cpp">
       <Filter>Source\Runtime\AssetManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp">
+      <Filter>Source\Editor</Filter>
     </ClCompile>
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
@@ -891,7 +895,6 @@
     <ClInclude Include="Source\Runtime\Engine\Components\RotatingMovementComponent.h">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
     <ClInclude Include="Source\Runtime\Renderer\ShadowViewProjection.h">
       <Filter>Source\Runtime\Renderer</Filter>
     </ClInclude>
@@ -906,6 +909,9 @@
     </ClInclude>
     <ClInclude Include="Source\Runtime\Renderer\ShadowStats.h">
       <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h">
+      <Filter>Source\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1011,5 +1017,13 @@
     <Filter Include="Shaders\Common">
       <UniqueIdentifier>{d1bddf1e-dd35-48e7-b930-c62fd0672d92}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{f9951c86-b8d8-425c-bdb9-79f30b9c6ff2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\template.lua">
+      <Filter>Scripts</Filter>
+    </None>
   </ItemGroup>
 </Project>
