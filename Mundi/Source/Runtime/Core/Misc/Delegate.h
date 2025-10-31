@@ -21,7 +21,7 @@ public:
 
 	// 멤버 함수 바인딩
 	template<typename TObject>
-	void BindMember(TObject* InObject, void (TObject::*InMethod)(Args...))
+	void BindDynamic(TObject* InObject, void (TObject::*InMethod)(Args...))
 	{
 		Function = [InObject, InMethod](Args... InArgs)
 		{
@@ -80,7 +80,7 @@ public:
 
 	// 멤버 함수 추가
 	template<typename TObject>
-	DelegateHandle AddMember(TObject* InObject, void (TObject::*InMethod)(Args...))
+	DelegateHandle AddDynamic(TObject* InObject, void (TObject::*InMethod)(Args...))
 	{
 		auto Function = [InObject, InMethod](Args... InArgs)
 		{
@@ -90,7 +90,7 @@ public:
 	}
 
 	// 핸들로 제거
-	void Remove(DelegateHandle Handle)
+	void RemoveDynamic(DelegateHandle Handle)
 	{
 		Functions.erase(
 			std::remove_if(Functions.begin(), Functions.end(),
@@ -103,7 +103,7 @@ public:
 	}
 
 	// 모두 제거
-	void Clear()
+	void RemoveAll()
 	{
 		Functions.clear();
 	}

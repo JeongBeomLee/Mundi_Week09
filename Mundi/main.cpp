@@ -88,7 +88,7 @@ void TestDelegate()
             TestActor Actor;
             TDelegate<float> OnDamage;
 
-            OnDamage.BindMember(&Actor, &TestActor::OnDamageReceived);
+            OnDamage.BindDynamic(&Actor, &TestActor::OnDamageReceived);
 
             if (OnDamage.IsBound())
             {
@@ -197,7 +197,7 @@ void TestDelegate()
             if (Count1 == 1 && Count2 == 1 && Count3 == 1)
             {
                 // Handle2 제거
-                OnEvent.Remove(Handle2);
+                OnEvent.RemoveDynamic(Handle2);
                 OnEvent.Broadcast();
 
                 if (Count1 == 2 && Count2 == 1 && Count3 == 2)
@@ -234,7 +234,7 @@ void TestDelegate()
             OnEvent.Broadcast();
             if (CallCount == 3)
             {
-                OnEvent.Clear();
+                OnEvent.RemoveAll();
                 if (!OnEvent.IsBound())
                 {
                     OnEvent.Broadcast();
@@ -305,9 +305,9 @@ void TestDelegate()
             TestActor Actor1, Actor2, Actor3;
             TMulticastDelegate<float> OnDamage;
 
-            OnDamage.AddMember(&Actor1, &TestActor::OnDamageReceived);
-            OnDamage.AddMember(&Actor2, &TestActor::OnDamageReceived);
-            OnDamage.AddMember(&Actor3, &TestActor::OnDamageReceived);
+            OnDamage.AddDynamic(&Actor1, &TestActor::OnDamageReceived);
+            OnDamage.AddDynamic(&Actor2, &TestActor::OnDamageReceived);
+            OnDamage.AddDynamic(&Actor3, &TestActor::OnDamageReceived);
 
             OnDamage.Broadcast(75.5f);
 
