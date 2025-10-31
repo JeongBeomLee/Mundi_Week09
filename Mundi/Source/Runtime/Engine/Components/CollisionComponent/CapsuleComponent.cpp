@@ -12,6 +12,8 @@ IMPLEMENT_CLASS(UCapsuleComponent)
 
 BEGIN_PROPERTIES(UCapsuleComponent)
 	MARK_AS_COMPONENT("캡슐 컴포넌트", "Capsule(캡슐) 형태의 충돌 컴포넌트입니다. 캐릭터 충돌에 주로 사용됩니다.")
+	ADD_PROPERTY_RANGE(float, CapsuleRadius, "Shape", 0.0f, 10000.0f, true, "Capsule의 반지름 (로컬 스페이스)")
+	ADD_PROPERTY_RANGE(float, CapsuleHalfHeight, "Shape", 0.0f, 10000.0f, true, "Capsule의 반 높이 (로컬 스페이스, 중심에서 끝까지, 반지름 제외)")
 END_PROPERTIES()
 
 // ────────────────────────────────────────────────────────────────────────────

@@ -46,6 +46,8 @@ class UShapeComponent : public UPrimitiveComponent
 {
 public:
 	DECLARE_CLASS(UShapeComponent, UPrimitiveComponent)
+	GENERATED_REFLECTION_BODY()
+	DECLARE_DUPLICATE(UShapeComponent)
 
 	UShapeComponent();
 
@@ -57,8 +59,7 @@ public:
 	// 복사 관련
 	// ────────────────────────────────────────────────
 	void DuplicateSubObjects() override;
-	DECLARE_DUPLICATE(UShapeComponent)
-
+	
 public:
 	// ────────────────────────────────────────────────
 	// 렌더링 속성

@@ -12,6 +12,7 @@ IMPLEMENT_CLASS(USphereComponent)
 
 BEGIN_PROPERTIES(USphereComponent)
 	MARK_AS_COMPONENT("스피어 컴포넌트", "Sphere(구) 형태의 충돌 컴포넌트입니다. 거리 기반 충돌 감지를 수행합니다.")
+	ADD_PROPERTY_RANGE(float, SphereRadius, "Shape", 0.0f, 10000.0f, true, "Sphere의 반지름 (로컬 스페이스)")
 END_PROPERTIES()
 // ────────────────────────────────────────────────────────────────────────────
 // 생성자 / 소멸자

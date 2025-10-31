@@ -12,6 +12,7 @@ IMPLEMENT_CLASS(UBoxComponent)
 
 BEGIN_PROPERTIES(UBoxComponent)
 	MARK_AS_COMPONENT("박스 컴포넌트", "Box(직육면체) 형태의 충돌 컴포넌트입니다. AABB 기반 충돌 감지를 수행합니다.")
+	ADD_PROPERTY(FVector, BoxExtent, "Shape", true, "Box의 반 크기 (로컬 스페이스, 중심에서 각 축으로의 거리)")
 END_PROPERTIES()
 
 // ────────────────────────────────────────────────────────────────────────────

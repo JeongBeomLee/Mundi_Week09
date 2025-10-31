@@ -8,6 +8,13 @@
 
 // UShapeComponent는 추상 클래스이므로 IMPLEMENT_ABSTRACT_CLASS 사용
 IMPLEMENT_CLASS(UShapeComponent)
+BEGIN_PROPERTIES(UShapeComponent)
+	MARK_AS_COMPONENT("Shape 컴포넌트", "충돌 감지를 위한 기본 Shape 컴포넌트입니다.")
+	ADD_PROPERTY(FVector, ShapeColor, "Rendering", true, "Shape의 디버그 렌더링 색상 (RGB)")
+	ADD_PROPERTY(bool, bDrawOnlyIfSelected, "Rendering", true, "선택된 경우에만 디버그 렌더링")
+	ADD_PROPERTY(bool, bGenerateOverlapEvents, "Collision", true, "Overlap 이벤트 생성 여부")
+	ADD_PROPERTY(bool, bBlockComponent, "Collision", true, "물리적 충돌 차단 여부")
+END_PROPERTIES()
 
 
 // ────────────────────────────────────────────────────────────────────────────
