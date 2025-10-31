@@ -442,6 +442,21 @@
     <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp">
       <Filter>Source\Editor</Filter>
     </ClCompile>
+    <ClCompile Include="UShapeComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\ShapeComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClCompile>
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -913,6 +928,21 @@
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h">
       <Filter>Source\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="UShapeComponent.h">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.h">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\ShapeComponent.h">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.h">
+      <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -1019,6 +1049,9 @@
     </Filter>
     <Filter Include="Scripts">
       <UniqueIdentifier>{f9951c86-b8d8-425c-bdb9-79f30b9c6ff2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
+      <UniqueIdentifier>{0ec50504-2dee-4432-bda1-6144fd3beda2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

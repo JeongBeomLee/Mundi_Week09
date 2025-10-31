@@ -198,6 +198,10 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\ShapeComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\DirectionalLightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\LightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\LightComponentBase.cpp" />
@@ -358,6 +362,7 @@
     <ClCompile Include="Source\Slate\Windows\SViewportWindow.cpp" />
     <ClCompile Include="Source\Slate\Windows\SWindow.cpp" />
     <ClCompile Include="Source\Slate\Windows\UIWindow.cpp" />
+    <ClCompile Include="UShapeComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Common\LightingBuffers.hlsl">
@@ -474,6 +479,10 @@
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h" />
     <ClInclude Include="Source\Runtime\Core\Object\Property.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\ShapeComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\MovementComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\ProjectileMovementComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\RotatingMovementComponent.h" />
@@ -621,6 +630,7 @@
     <ClInclude Include="Source\Slate\Windows\SViewportWindow.h" />
     <ClInclude Include="Source\Slate\Windows\SWindow.h" />
     <ClInclude Include="Source\Slate\Windows\UIWindow.h" />
+    <ClInclude Include="UShapeComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\template.lua" />
