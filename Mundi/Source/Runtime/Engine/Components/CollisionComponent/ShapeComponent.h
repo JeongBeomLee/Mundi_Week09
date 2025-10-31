@@ -1,43 +1,166 @@
-﻿#pragma once
+﻿// ────────────────────────────────────────────────────────────────────────────
+// ShapeComponent.h
+// 충돌 시스템의 기본 Shape 컴포넌트
+// ────────────────────────────────────────────────────────────────────────────
+#pragma once
 #include "PrimitiveComponent.h"
+#include "BoxSphereBounds.h"
+#include "OverlapInfo.h"
+#include "Delegate.h"
 
+// 전방 선언
 class UShader;
 
+/**
+ * FComponentOverlapSignature
+ *
+ * Overlap 이벤트를 처리하는 델리게이트 시그니처입니다.
+ *
+ * @param OverlappedComponent - Overlap이 발생한 자신의 컴포넌트
+ * @param OtherActor - 충돌한 상대방 액터
+ * @param OtherComp - 충돌한 상대방 컴포넌트
+ * @param ContactPoint - 충돌 지점 (World Space)
+ * @param PenetrationDepth - 침투 깊이
+ */
+DECLARE_MULTICAST_DELEGATE_FiveParams(
+	FComponentOverlapSignature,
+	UShapeComponent*,      // OverlappedComponent
+	AActor*,               // OtherActor
+	UShapeComponent*,      // OtherComp
+	const FVector&,        // ContactPoint
+	float                  // PenetrationDepth
+);
+
+/**
+ * UShapeComponent
+ *
+ * 충돌 감지를 위한 기본 Shape 컴포넌트 클래스입니다.
+ * Box, Sphere, Capsule 등의 구체적인 Shape 컴포넌트들의 부모 클래스입니다.
+ *
+ * 주요 기능:
+ * - Overlap 이벤트 처리
+ * - 디버그 렌더링
+ * - Bounds 계산 및 관리
+ */
 class UShapeComponent : public UPrimitiveComponent
 {
 public:
-    DECLARE_CLASS(UShapeComponent, UPrimitiveComponent)
+	DECLARE_CLASS(UShapeComponent, UPrimitiveComponent)
 
-    UShapeComponent();
+	UShapeComponent();
 
 protected:
-    ~UShapeComponent() override;
+	~UShapeComponent() override;
 
 public:
-    void DuplicateSubObjects() override;
-    DECLARE_DUPLICATE(UShapeComponent)
+	// ────────────────────────────────────────────────
+	// 복사 관련
+	// ────────────────────────────────────────────────
+	void DuplicateSubObjects() override;
+	DECLARE_DUPLICATE(UShapeComponent)
 
 public:
-    // 공통 속성
-    FColor ShapeColor = FColor::Green;
-    bool bDrawOnlyIfSelected = false;
-    bool bGenerateOverlapEvents = true;
-    bool bBlockComponent = false;
+	// ────────────────────────────────────────────────
+	// 렌더링 속성
+	// ────────────────────────────────────────────────
 
-    // Overlap 정보
-    TArray<FOverlapInfo> OverlapInfos;
+	/** Shape의 디버그 렌더링 색상 (RGB, 0.0 ~ 1.0) */
+	FVector ShapeColor = FVector(0.0f, 1.0f, 0.0f);
 
-    // 디버그 렌더링
-    virtual void DrawDebugShape() const = 0;
+	/** 선택된 경우에만 디버그 렌더링 여부 */
+	bool bDrawOnlyIfSelected = false;
 
-    // Bound 갱신
-    virtual void UpdateBounds() override = 0;
+	// ────────────────────────────────────────────────
+	// 충돌 속성
+	// ────────────────────────────────────────────────
 
-    // Overlap 체크
-    virtual bool IsOverlappingComponent(const UShapeComponent* Other) const;
+	/** Overlap 이벤트 생성 여부 */
+	bool bGenerateOverlapEvents = true;
 
-    // Bounds 반환
-    virtual FBoxSphereBounds GetScaledBounds() const = 0;
+	/** 물리적 충돌 차단 여부 (현재 미구현, 추후 Physics 시스템 연동용) */
+	bool bBlockComponent = false;
 
+	// ────────────────────────────────────────────────
+	// Overlap 정보
+	// ────────────────────────────────────────────────
 
+	/** 현재 겹쳐있는 컴포넌트들의 정보 */
+	TArray<FOverlapInfo> OverlapInfos;
+
+	// ────────────────────────────────────────────────
+	// Overlap 델리게이트
+	// ────────────────────────────────────────────────
+
+	/** Overlap 시작 시 호출되는 멀티캐스트 델리게이트 */
+	FComponentOverlapSignature OnComponentBeginOverlap;
+
+	/** Overlap 종료 시 호출되는 멀티캐스트 델리게이트 */
+	FComponentOverlapSignature OnComponentEndOverlap;
+
+	// ────────────────────────────────────────────────
+	// 순수 가상 함수 (자식 클래스에서 구현 필요)
+	// ────────────────────────────────────────────────
+
+	/**
+	 * Shape를 디버그 렌더링합니다 (구형 인터페이스, 호환성 유지용).
+	 * 각 Shape 타입(Box, Sphere, Capsule)에 맞게 구현해야 합니다.
+	 */
+	virtual void DrawDebugShape() const {};
+
+	/**
+	 * Renderer를 통해 디버그 볼륨을 렌더링합니다.
+	 * SceneRenderer에서 자동으로 호출됩니다.
+	 *
+	 * @param Renderer - 렌더러 객체
+	 */
+	virtual void RenderDebugVolume(class URenderer* Renderer) const override;
+
+	/**
+	 * Bounds를 업데이트합니다.
+	 * Transform 변경 시 호출되어야 합니다.
+	 */
+	virtual void UpdateBounds() {};
+
+	/**
+	 * 스케일이 적용된 Bounds를 반환합니다.
+	 *
+	 * @return FBoxSphereBounds 구조체 (Box와 Sphere 정보 포함)
+	 */
+	virtual FBoxSphereBounds GetScaledBounds() const { return FBoxSphereBounds(); };
+
+	// ────────────────────────────────────────────────
+	// Overlap 관련 함수
+	// ────────────────────────────────────────────────
+
+	/**
+	 * 다른 Shape 컴포넌트와 겹쳐있는지 확인합니다.
+	 *
+	 * @param Other - 확인할 상대방 Shape 컴포넌트
+	 * @return 겹쳐있으면 true, 아니면 false
+	 */
+	virtual bool IsOverlappingComponent(const UShapeComponent* Other) const;
+
+	/**
+	 * 현재 Overlap 상태를 업데이트하고 이벤트를 발생시킵니다.
+	 * 매 프레임 호출되어 Overlap 상태 변화를 감지합니다.
+	 *
+	 * @param OtherComponents - 확인할 다른 Shape 컴포넌트들의 배열
+	 */
+	virtual void UpdateOverlaps(const TArray<UShapeComponent*>& OtherComponents);
+
+	/**
+	 * 특정 컴포넌트와의 Overlap 정보를 찾습니다.
+	 *
+	 * @param OtherComponent - 찾을 컴포넌트
+	 * @return Overlap 정보 포인터 (없으면 nullptr)
+	 */
+	FOverlapInfo* FindOverlapInfo(const UShapeComponent* OtherComponent);
+
+	/**
+	 * 특정 컴포넌트와의 Overlap 정보를 제거합니다.
+	 *
+	 * @param OtherComponent - 제거할 컴포넌트
+	 * @return 제거 성공 여부
+	 */
+	bool RemoveOverlapInfo(const UShapeComponent* OtherComponent);
 };

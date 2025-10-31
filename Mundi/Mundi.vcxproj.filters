@@ -442,9 +442,6 @@
     <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp">
       <Filter>Source\Editor</Filter>
     </ClCompile>
-    <ClCompile Include="UShapeComponent.cpp">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.cpp">
       <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
     </ClCompile>
@@ -928,9 +925,6 @@
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h">
       <Filter>Source\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="UShapeComponent.h">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h">
       <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
     </ClInclude>
@@ -943,6 +937,9 @@
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.h">
       <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
     </ClInclude>
+    <ClInclude Include="BoxSphereBounds.h" />
+    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
+    <ClInclude Include="Sphere.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

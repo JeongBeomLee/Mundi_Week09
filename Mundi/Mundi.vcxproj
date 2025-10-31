@@ -362,7 +362,6 @@
     <ClCompile Include="Source\Slate\Windows\SViewportWindow.cpp" />
     <ClCompile Include="Source\Slate\Windows\SWindow.cpp" />
     <ClCompile Include="Source\Slate\Windows\UIWindow.cpp" />
-    <ClCompile Include="UShapeComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\Common\LightingBuffers.hlsl">
@@ -475,6 +474,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoxSphereBounds.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
@@ -514,6 +514,7 @@
     <ClInclude Include="Source\Runtime\RHI\SwapGuard.h" />
     <ClInclude Include="Source\Runtime\RHI\ConstantBufferType.h" />
     <ClInclude Include="Source\Slate\Widgets\PropertyRenderer.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="ThirdParty\ImGui\imconfig.h" />
     <ClInclude Include="ThirdParty\ImGui\imgui.h" />
     <ClInclude Include="ThirdParty\ImGui\imgui_impl_dx11.h" />
@@ -631,7 +632,6 @@
     <ClInclude Include="Source\Slate\Windows\SViewportWindow.h" />
     <ClInclude Include="Source\Slate\Windows\SWindow.h" />
     <ClInclude Include="Source\Slate\Windows\UIWindow.h" />
-    <ClInclude Include="UShapeComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\template.lua" />
