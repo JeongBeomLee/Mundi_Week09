@@ -30,30 +30,19 @@ public:
     UScriptManager();
     ~UScriptManager() override;
 
+    void AttachScriptTo(AActor* Target, FString ScriptName);
+
+    TMap<AActor*, TArray<FScript*>>& GetScriptsByOwner();
+public:
     static UScriptManager& GetInstance();
-    
-    void AttachScriptTo(AActor* Target, FString ScriptName)
-    {
-        TMap<std::string, FScript*>::iterator ScriptFound =
-            ScriptsByName.find(ScriptName);
-
-        // 해당 이름의 스크립트가 존재하지 않는 경우
-        if (ScriptFound == ScriptsByName.end())
-        {
-            // Default Script를 생성 후 할당한다.
-        }
-        else
-        {
-            ScriptsByOwner[Target].push_back(ScriptFound->second);
-        }
-    }
-
 private:
     void Initialize();
     void Shutdown();
 
     void RegisterUserTypeToLua();
     void RegisterGlobalFuncToLua();
+    
+    void RegisterActorToLua(sol::environment InEnv, AActor* InActor);
     
     // Lua로부터 Template 함수를 가져온다.
     // 해당 함수가 없으면 Throw한다.

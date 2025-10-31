@@ -15,6 +15,36 @@ UScriptManager::~UScriptManager()
     Shutdown();
 }
 
+void UScriptManager::AttachScriptTo(AActor* Target, FString ScriptName)
+{
+    // 이미 같은 스크립트가 부착되어 있으면 return
+    for (const TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
+    {
+        if (Target == Script.first)
+        {
+            for (FScript* ScriptData : Script.second)
+            {
+                if (ScriptData && ScriptData->ScriptName == ScriptName)
+                    return;
+            }
+        }
+    }
+
+    ScriptsByOwner[Target].push_back(GetOrCreate(ScriptName));
+}
+
+TMap<AActor*, TArray<FScript*>>& UScriptManager::GetScriptsByOwner()
+{
+    return ScriptsByOwner;
+}
+
+/* public static */
+UScriptManager& UScriptManager::GetInstance()
+{
+    static UScriptManager Instance;
+    return Instance;
+}
+
 /* Private */
 void UScriptManager::Initialize()
 {
@@ -82,7 +112,12 @@ void UScriptManager::RegisterUserTypeToLua()
 
 void UScriptManager::RegisterGlobalFuncToLua()
 {
-    Lua["print"] = print;
+    Lua["print"] = PrintToConsole;
+}
+
+void UScriptManager::RegisterActorToLua(sol::environment InEnv, AActor* InActor)
+{
+    InEnv["MyActor"] = *InActor;
 }
 
 // Lua로부터 Template 함수를 가져온다.
@@ -167,12 +202,4 @@ FScript* UScriptManager::GetOrCreate(FString InPath)
     NewScript->LuaTemplateFunctions = LuaTemplateFunction;
 
     return NewScript;
-}
-
-/* private static */
-
-UScriptManager& UScriptManager::GetInstance()
-{
-    static UScriptManager Instance;
-    return Instance;
 }

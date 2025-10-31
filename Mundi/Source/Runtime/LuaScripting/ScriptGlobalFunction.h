@@ -1,3 +1,3 @@
 ﻿#pragma once
 
-void print(const char* ch);
+void PrintToConsole(const char* ch);
