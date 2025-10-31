@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include "Source/Runtime/Core/Object/Actor.h"
 #include "Source/Runtime/Engine/Components/SceneComponent.h"
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
 
@@ -30,7 +31,18 @@ void UScriptManager::AttachScriptTo(AActor* Target, FString ScriptName)
         }
     }
 
-    ScriptsByOwner[Target].push_back(GetOrCreate(ScriptName));
+    FScript* Script = GetOrCreate(ScriptName, Target);
+
+    // --- 추가 디버그 코드 ---
+    AActor* CheckActor = Script->Env["MyActor"];
+    if (CheckActor == Target) {
+        UE_LOG("MyActor registration successful in C++ check.");
+    } else {
+        UE_LOG("MyActor registration FAILED in C++ check or pointer mismatched.");
+    }
+    // -----------------------
+
+    ScriptsByOwner[Target].push_back(Script);
 }
 
 TMap<AActor*, TArray<FScript*>>& UScriptManager::GetScriptsByOwner()
@@ -55,31 +67,32 @@ void UScriptManager::Initialize()
     Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
 
     RegisterUserTypeToLua();
+    RegisterGlobalFuncToLua();
     
     // 전역으로 lua에 값을 등록
 
-    // 경로에 있는 모든 lua 파일들을 모두 environment화하여 cache
-    for (const fs::directory_entry& entry : fs::directory_iterator(SCRIPT_FILE_PATH))
-    {
-        if (!entry.is_regular_file()) continue;
-        if (entry.path().extension() != ".lua") continue;
-        
-        FString FileName = entry.path().filename().string();
-
-        try {
-            // 맵에 저장
-            ScriptsByName[FileName] = GetOrCreate(FileName);
-
-            FString SuccessMessage =
-                FString("[Script Manager] Script ") + FileName + " Loaded Successfully.";
-            UE_LOG(SuccessMessage.c_str());
-        }
-        catch (const std::exception& e) {
-            FString ErrorMessage =
-                FString("[Script Manager] Exception : ") + FileName + ": " + e.what();
-            UE_LOG(ErrorMessage.c_str());
-        }
-    }
+    // // 경로에 있는 모든 lua 파일들을 모두 environment화하여 cache
+    // for (const fs::directory_entry& entry : fs::directory_iterator(SCRIPT_FILE_PATH))
+    // {
+    //     if (!entry.is_regular_file()) continue;
+    //     if (entry.path().extension() != ".lua") continue;
+    //     
+    //     FString FileName = entry.path().filename().string();
+    //
+    //     try {
+    //         // 맵에 저장
+    //         ScriptsByName[FileName] = GetOrCreate(FileName);
+    //
+    //         FString SuccessMessage =
+    //             FString("[Script Manager] Script ") + FileName + " Loaded Successfully.";
+    //         UE_LOG(SuccessMessage.c_str());
+    //     }
+    //     catch (const std::exception& e) {
+    //         FString ErrorMessage =
+    //             FString("[Script Manager] Exception : ") + FileName + ": " + e.what();
+    //         UE_LOG(ErrorMessage.c_str());
+    //     }
+    // }
 }
 
 void UScriptManager::Shutdown()
@@ -87,14 +100,17 @@ void UScriptManager::Shutdown()
     lua_close(Lua);
 }
 
+
+
 /* 전역으로 lua에 타입을 등록 */
 void UScriptManager::RegisterUserTypeToLua()
 {
     // FName 등록
     sol::usertype<FName> NameType = Lua.new_usertype<FName>(
         "FName",
-        sol::constructors<FName(), FName(const char*), FName(const FString&)>());
+        sol::no_constructor);
     NameType["ToString"] = &FName::ToString;
+    //NameType["ToString"] = static_cast<FString(FName::*)() const>(&FName::ToString);
 
     // USceneComponent 등록
     sol::usertype<USceneComponent> SceneComponentType = Lua.new_usertype<USceneComponent>(
@@ -105,19 +121,45 @@ void UScriptManager::RegisterUserTypeToLua()
     // AActor 등록
     sol::usertype<AActor> ActorType = Lua.new_usertype<AActor>(
         "AActor",
-        sol::constructors<AActor()>());
-    ActorType["Name"] = &AActor::Name;
-    ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
+        sol::no_constructor);
+    ActorType["GetName"] = &AActor::GetName;
+    // ActorType["GetName"] = [](AActor& self) {
+    //     return self.GetName(); // 값 복사 반환
+    // };
+
+    //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
 }
+
+// void UScriptManager::RegisterUserTypeToLua()
+// {
+//     // // FName 등록
+//     // sol::usertype<FName> NameType = Lua.new_usertype<FName>(
+//     //     "FName",
+//     //     sol::constructors<FName(), FName(const char*), FName(const FString&)>()
+//     // );
+//     //
+//     // NameType["ToString"] =
+//     //     static_cast<FString(FName::*)() const>(&FName::ToString);
+//
+//     // AActor 등록
+//     sol::usertype<AActor> ActorType = Lua.new_usertype<AActor>(
+//         "AActor",
+//         sol::constructors<AActor()>()
+//     );
+//
+//     // ActorType["GetName"] = [](AActor& self) {
+//     //     return self.GetName(); // 값 복사 반환
+//     // };
+// }
 
 void UScriptManager::RegisterGlobalFuncToLua()
 {
-    Lua["print"] = PrintToConsole;
+    Lua["PrintToConsole"] = PrintToConsole;
 }
 
-void UScriptManager::RegisterActorToLua(sol::environment InEnv, AActor* InActor)
+void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, AActor* InActor)
 {
-    InEnv["MyActor"] = *InActor;
+    InEnv["MyActor"] = InActor;
 }
 
 // Lua로부터 Template 함수를 가져온다.
@@ -142,18 +184,20 @@ FLuaTemplateFunctions UScriptManager::GetTemplateFunctionFromScript(
     AssignFunction(LuaTemplateFunctions.EndPlay, "EndPlay");
     AssignFunction(LuaTemplateFunctions.OnOverlap, "OnOverlap");
     AssignFunction(LuaTemplateFunctions.Tick, "Tick");
+
+    return LuaTemplateFunctions;
 }
 
-FScript* UScriptManager::GetOrCreate(FString InPath)
+FScript* UScriptManager::GetOrCreate(FString InPath, AActor* InActor)
 {
     fs::path Path(SCRIPT_FILE_PATH + InPath);
     FString FileName = Path.filename().string();
 
-    // 캐시에 존재하면 반환
-    if (!(ScriptsByName.find(FileName) == ScriptsByName.end()))
-    {
-        return ScriptsByName[FileName];
-    }
+    // // 캐시에 존재하면 반환
+    // if (!(ScriptsByName.find(FileName) == ScriptsByName.end()))
+    // {
+    //     return ScriptsByName[FileName];
+    // }
 
     /*
      *  경로에 파일이 존재하지 않으면
@@ -195,6 +239,8 @@ FScript* UScriptManager::GetOrCreate(FString InPath)
         GetTemplateFunctionFromScript(Env);
 
     FScript* NewScript = new FScript;
+
+    RegisterLocalValueToLua(Env, InActor);
 
     NewScript->ScriptName = FileName;
     NewScript->Env = Env;

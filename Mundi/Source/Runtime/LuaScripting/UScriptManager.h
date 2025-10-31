@@ -1,4 +1,6 @@
 ﻿#pragma once
+#define SOL_ALL_SAFETIES_ON 1
+#include <sol/sol.hpp>
 
 struct FLuaTemplateFunctions
 {
@@ -42,14 +44,14 @@ private:
     void RegisterUserTypeToLua();
     void RegisterGlobalFuncToLua();
     
-    void RegisterActorToLua(sol::environment InEnv, AActor* InActor);
+    void RegisterLocalValueToLua(sol::environment& InEnv, AActor* InActor);
     
     // Lua로부터 Template 함수를 가져온다.
     // 해당 함수가 없으면 Throw한다.
     FLuaTemplateFunctions GetTemplateFunctionFromScript(
         sol::environment& InEnv
     );
-    FScript* GetOrCreate(FString InPath);
+    FScript* GetOrCreate(FString InPath, AActor* InActor);
 private:
     const static inline FString SCRIPT_FILE_PATH{"Scripts/"};
     const static inline FString DEFAULT_FILE_PATH{"Scripts/template.lua"};

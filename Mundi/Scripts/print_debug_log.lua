@@ -19,5 +19,10 @@ end
 
 -- Tick: 매 프레임마다 호출 (dt: 델타 타임)
 function Tick(dt)
-    PrintToConsole("[MyActor's Name] " .. MyActor:GetName():ToString());
+    if MyActor == nil then
+        PrintToConsole("MyActor is nil!")
+        return
+    end
+    PrintToConsole("[MyActor's Name] ") --.. MyActor:GetName():ToString())
+    --PrintToConsole("[MyActor's Name] " .. MyActor:GetName():ToString());
 end

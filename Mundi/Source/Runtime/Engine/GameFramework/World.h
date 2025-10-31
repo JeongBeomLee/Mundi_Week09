@@ -156,14 +156,7 @@ inline T* UWorld::SpawnActor(const FTransform& Transform)
 
     //  월드 등록
     NewActor->SetWorld(this);
-
-    // Lua Scripting 작동을 확인하기 위한 임시 코드
-    UScriptManager::GetInstance().AttachScriptTo(NewActor, "print_debug_log.lua");
-    UScriptManager::GetInstance().GetScriptsByOwner()[NewActor][0]->LuaTemplateFunctions.BeginPlay();
-    UScriptManager::GetInstance().GetScriptsByOwner()[NewActor][0]->LuaTemplateFunctions.EndPlay();
-    UScriptManager::GetInstance().GetScriptsByOwner()[NewActor][0]->LuaTemplateFunctions.OnOverlap();
-    UScriptManager::GetInstance().GetScriptsByOwner()[NewActor][0]->LuaTemplateFunctions.Tick();
-
+    
     // 월드에 등록
     AddActorToLevel(NewActor);
 

@@ -18,7 +18,7 @@ public:
     DECLARE_CLASS(AActor, UObject)
     AActor(); 
 
-protected:
+//protected:
     ~AActor() override;
 
 public:
