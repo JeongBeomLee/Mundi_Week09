@@ -22,7 +22,7 @@ class AActor : public UObject
 {
 public:
     DECLARE_CLASS(AActor, UObject)
-    GENERATED_REFLECTION_BODY()
+    //GENERATED_REFLECTION_BODY()
     AActor(); 
 
 protected:
@@ -152,6 +152,12 @@ public:
     // Serialize
     void Serialize(const bool bInIsLoading, JSON& InOutHandle) override;
 
+    // 테스트 용
+    // Hot Reload Support
+    std::filesystem::file_time_type GetLastModifiedTime() const { return LastModifiedTime; }
+    void SetLastModifiedTime(std::filesystem::file_time_type InTime) { LastModifiedTime = InTime; }
+
+	bool CheckAndHotReloadLuaScript();
 public:
     FName Name;
     UWorld* World = nullptr;
@@ -174,7 +180,10 @@ protected:
     bool bCanEverTick = true;
     bool bIsCulled = false;
 
+    // 테스트 용
     sol::state* Lua = nullptr;
+    std::filesystem::file_time_type LastModifiedTime;
+    FName LuaFilePath;
 private:
    
 };

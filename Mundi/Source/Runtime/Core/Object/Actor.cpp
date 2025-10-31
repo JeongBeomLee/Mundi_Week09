@@ -12,16 +12,19 @@
 
 IMPLEMENT_CLASS(AActor)
 
-BEGIN_PROPERTIES(AActor)
-	MARK_AS_COMPONENT("엑터", "엑터입니다.")
-	ADD_PROPERTY(bool, bTickInEditor, "에디터 틱", true, "엑터가 에디터 모드에서도 Tick을 돌 수 있는지 표시합니다.")
-END_PROPERTIES()
+//BEGIN_PROPERTIES(AActor)
+//	MARK_AS_COMPONENT("엑터", "엑터입니다.")
+//	ADD_PROPERTY(bool, bTickInEditor, "에디터 틱", true, "엑터가 에디터 모드에서도 Tick을 돌 수 있는지 표시합니다.")
+//END_PROPERTIES()
 
 AActor::AActor()
 {
 	Name = "DefaultActor";
 
 	// lua 테스트 코드
+	
+	LuaFilePath = "Scripts/actor_transform.lua";
+
 	// lua 상태 생성
 	Lua = new sol::state();
 	Lua->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
@@ -70,7 +73,10 @@ AActor::AActor()
 	);
 
 	// actor_transform.lua 파일 로드
-	Lua->script_file("Scripts/actor_transform.lua");
+	Lua->script_file(LuaFilePath.ToString().c_str());
+
+	// 핫리로드용
+	LastModifiedTime = std::filesystem::last_write_time(LuaFilePath.ToString());
 
 	Lua->set("actor", this);
 }
@@ -104,6 +110,9 @@ void AActor::BeginPlay()
 
 void AActor::Tick(float DeltaSeconds)
 {
+	// 테스트 용
+	CheckAndHotReloadLuaScript();
+
 	// 에디터에서 틱 Off면 스킵
 	if (!bTickInEditor && World->bPie == false) return;
 
@@ -668,6 +677,32 @@ void AActor::Serialize(const bool bInIsLoading, JSON& InOutHandle)
 		InOutHandle["OwnedComponents"] = Components;
 		InOutHandle["Name"] = GetName().ToString();
 	}
+}
+
+bool AActor::CheckAndHotReloadLuaScript()
+{
+	if (LuaFilePath.ToString().empty())
+	{
+		return false;
+	}
+	if (!std::filesystem::exists(LuaFilePath.ToString()))
+	{
+		return false; // File doesn't exist, not outdated
+	}
+
+	auto CurrentWriteTime = std::filesystem::last_write_time(LuaFilePath.ToString());
+	auto LastWriteTime = GetLastModifiedTime();
+	if (CurrentWriteTime > LastWriteTime)
+	{
+		UE_LOG("Hot Reloading Lua Script: %s", LuaFilePath.ToString().c_str());
+		// Lua 스크립트 다시 로드
+		Lua->script_file(LuaFilePath.ToString().c_str());
+		// 액터 인스턴스를 Lua에 다시 설정
+		Lua->set("actor", this);
+		// 수정 시간 업데이트
+		SetLastModifiedTime(CurrentWriteTime);
+	}
+	return true;
 }
 
 //AActor* AActor::Duplicate()
