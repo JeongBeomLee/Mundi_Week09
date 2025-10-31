@@ -13,6 +13,9 @@
 // DirectXTK
 #pragma comment(lib, "DirectXTK.lib")
 
+// lua
+#pragma comment(lib, "lua.lib")
+
 // Standard Library (MUST come before UEContainer.h)
 #include <vector>
 #include <map>
