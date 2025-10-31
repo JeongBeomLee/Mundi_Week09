@@ -2,13 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Shader Files -->
   <ItemGroup>
-    <FxCompile Include="Shaders\UI\Gizmo.hlsl">
-      <Filter>Shaders\UI</Filter>
-    </FxCompile>
     <FxCompile Include="Shaders\Effects\Decal.hlsl">
       <Filter>Shaders\Effects</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\PostProcess\HeightFog_PS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PostProcess\TileDebugVisualization_PS.hlsl">
       <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\PostProcess\FXAA_PS.hlsl">
@@ -23,7 +23,13 @@
     <FxCompile Include="Shaders\Utility\SceneDepth_PS.hlsl">
       <Filter>Shaders\Utility</Filter>
     </FxCompile>
+    <FxCompile Include="Shaders\Utility\DepthRemap.hlsl">
+      <Filter>Shaders\Utility</Filter>
+    </FxCompile>
     <FxCompile Include="Shaders\UI\Billboard.hlsl">
+      <Filter>Shaders\UI</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\UI\Gizmo.hlsl">
       <Filter>Shaders\UI</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\UI\ShaderLine.hlsl">
@@ -32,11 +38,11 @@
     <FxCompile Include="Shaders\UI\TextBillboard.hlsl">
       <Filter>Shaders\UI</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\Materials\UberLit.hlsl">
+    <FxCompile Include="Shaders\Materials\ShadowDepth.hlsl">
       <Filter>Shaders\Materials</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\PostProcess\TileDebugVisualization_PS.hlsl">
-      <Filter>Shaders\PostProcess</Filter>
+    <FxCompile Include="Shaders\Materials\UberLit.hlsl">
+      <Filter>Shaders\Materials</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\Common\LightingBuffers.hlsl">
       <Filter>Shaders\Common</Filter>
@@ -47,9 +53,6 @@
     <FxCompile Include="Shaders\Common\LightStructures.hlsl">
       <Filter>Shaders\Common</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\Materials\ShadowDepth.hlsl">
-      <Filter>Shaders\Materials</Filter>
-    </FxCompile>
     <FxCompile Include="Shaders\Common\ShadowESM_PS.hlsl">
       <Filter>Shaders\Common</Filter>
     </FxCompile>
@@ -59,14 +62,22 @@
     <FxCompile Include="Shaders\Common\ShadowVSM_PS.hlsl">
       <Filter>Shaders\Common</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\Utility\DepthRemap.hlsl">
-      <Filter>Shaders\Utility</Filter>
-    </FxCompile>
   </ItemGroup>
   <!-- Root Files -->
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\SceneView.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\ShadowManager.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\TileLightCuller.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Renderer\SceneRenderer.cpp">
       <Filter>Source\Runtime\Renderer</Filter>
     </ClCompile>
@@ -124,6 +135,15 @@
     <ClCompile Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\EmptyActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\HeightFogActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
@@ -140,9 +160,6 @@
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\FakeSpotLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\HeightFogActor.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Level.cpp">
@@ -172,7 +189,16 @@
     <ClCompile Include="Source\Runtime\Engine\Components\LocalLightComponent.cpp">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\MovementComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\PointLightComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\ProjectileMovementComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\RotatingMovementComponent.cpp">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\SpotLightComponent.cpp">
@@ -253,6 +279,12 @@
     <ClCompile Include="Source\Runtime\RHI\RHIDevice.cpp">
       <Filter>Source\Runtime\RHI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\ShadowConfiguration.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\ShadowMap.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\AssetManagement\DynamicMesh.cpp">
       <Filter>Source\Runtime\AssetManagement</Filter>
     </ClCompile>
@@ -286,6 +318,9 @@
     <ClCompile Include="Source\Runtime\InputCore\InputManager.cpp">
       <Filter>Source\Runtime\InputCore</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp">
+      <Filter>Source\Editor\Clipboard</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Editor\ObjManager.cpp">
       <Filter>Source\Editor</Filter>
     </ClCompile>
@@ -318,6 +353,9 @@
     </ClCompile>
     <ClCompile Include="Source\Slate\USlateManager.cpp">
       <Filter>Source\Slate</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Slate\Widgets\PropertyRenderer.cpp">
+      <Filter>Source\Slate\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Source\Slate\Widgets\ConsoleWidget.cpp">
       <Filter>Source\Slate\Widgets</Filter>
@@ -403,45 +441,7 @@
     <ClCompile Include="ThirdParty\ImGui\imgui_widgets.cpp">
       <Filter>ThirdParty\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\SceneView.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\EmptyActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\TileLightCuller.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Slate\Widgets\PropertyRenderer.cpp">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\Components\MovementComponent.cpp">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\Components\ProjectileMovementComponent.cpp">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\Components\RotatingMovementComponent.cpp">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\ShadowManager.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\ShadowMap.cpp">
-      <Filter>Source\Runtime\AssetManagement</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\ShadowConfiguration.cpp">
-      <Filter>Source\Runtime\AssetManagement</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp">
-      <Filter>Source\Editor</Filter>
-    </ClCompile>
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -469,7 +469,31 @@
     <!-- Source\Slate\Widgets -->
     <!-- Source\Slate\Windows -->
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\Renderer\LightManager.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\MeshBatchElement.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\SceneView.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowManager.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowStats.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowViewProjection.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\TileCullingStats.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\TileLightCuller.h">
       <Filter>Source\Runtime\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Renderer\DecalStatManager.h">
@@ -502,11 +526,8 @@
     <ClInclude Include="Source\Runtime\Renderer\Shader.h">
       <Filter>Source\Runtime\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\MeshBatchElement.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\SceneView.h">
-      <Filter>Source\Runtime\Renderer</Filter>
+    <ClInclude Include="Source\Runtime\Core\Object\Property.h">
+      <Filter>Source\Runtime\Core\Object</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Core\Object\Actor.h">
       <Filter>Source\Runtime\Core\Object</Filter>
@@ -526,6 +547,9 @@
     <ClInclude Include="Source\Runtime\Core\Containers\UEContainer.h">
       <Filter>Source\Runtime\Core\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\Core\Misc\Archive.h">
       <Filter>Source\Runtime\Core\Misc</Filter>
     </ClInclude>
@@ -539,9 +563,6 @@
       <Filter>Source\Runtime\Core\Misc</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Core\Misc\Name.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h">
       <Filter>Source\Runtime\Core\Misc</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Core\Misc\ObjectIterator.h">
@@ -568,6 +589,15 @@
     <ClInclude Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\EmptyActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\HeightFogActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
@@ -586,9 +616,6 @@
     <ClInclude Include="Source\Runtime\Engine\GameFramework\FakeSpotLightActor.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\HeightFogActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Level.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
@@ -597,6 +624,15 @@
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\World.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\MovementComponent.h">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\ProjectileMovementComponent.h">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\RotatingMovementComponent.h">
+      <Filter>Source\Runtime\Engine\Components</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Components\AmbientLightComponent.h">
       <Filter>Source\Runtime\Engine\Components</Filter>
@@ -703,6 +739,12 @@
     <ClInclude Include="Source\Runtime\RHI\RHIDevice.h">
       <Filter>Source\Runtime\RHI</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowConfiguration.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowMap.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\AssetManagement\Cube.h">
       <Filter>Source\Runtime\AssetManagement</Filter>
     </ClInclude>
@@ -742,6 +784,9 @@
     <ClInclude Include="Source\Runtime\InputCore\InputManager.h">
       <Filter>Source\Runtime\InputCore</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h">
+      <Filter>Source\Editor\Clipboard</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Editor\ImGuiConsole.h">
       <Filter>Source\Editor</Filter>
     </ClInclude>
@@ -780,6 +825,9 @@
     </ClInclude>
     <ClInclude Include="Source\Slate\USlateManager.h">
       <Filter>Source\Slate</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Slate\Widgets\PropertyRenderer.h">
+      <Filter>Source\Slate\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Source\Slate\Widgets\ConsoleWidget.h">
       <Filter>Source\Slate\Widgets</Filter>
@@ -868,162 +916,123 @@
     <ClInclude Include="ThirdParty\ImGui\imstb_truetype.h">
       <Filter>ThirdParty\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Object\Property.h">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\EmptyActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\TileCullingStats.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\TileLightCuller.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Slate\Widgets\PropertyRenderer.h">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\Components\MovementComponent.h">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\Components\ProjectileMovementComponent.h">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\Components\RotatingMovementComponent.h">
-      <Filter>Source\Runtime\Engine\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowViewProjection.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowManager.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowMap.h">
-      <Filter>Source\Runtime\AssetManagement</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowConfiguration.h">
-      <Filter>Source\Runtime\AssetManagement</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowStats.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h">
-      <Filter>Source\Editor</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Source">
-      <UniqueIdentifier>{0fcd3754-d417-42d5-8fbb-00a76cdde570}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime">
-      <UniqueIdentifier>{cd5afae7-1b67-4506-a3c4-4c1f1b292625}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Renderer">
-      <UniqueIdentifier>{afec44f0-77c1-4bb9-8358-3b868707451e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core">
-      <UniqueIdentifier>{e1c7ffb3-4c81-4545-95db-6555cba117fc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Object">
-      <UniqueIdentifier>{49729421-a640-4866-8348-38be02631211}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Math">
-      <UniqueIdentifier>{7aaa4791-7f75-4dad-ba03-a3e72c86e491}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Containers">
-      <UniqueIdentifier>{948dcd28-58c6-4449-aca1-296e9952f004}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Misc">
-      <UniqueIdentifier>{fce3edf3-fea5-4a56-8352-0c336730f8f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Memory">
-      <UniqueIdentifier>{c134b244-c85d-4c5d-91df-c69161fc856e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine">
-      <UniqueIdentifier>{d867a789-b9dd-4169-a35a-b9974ff14619}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\GameFramework">
-      <UniqueIdentifier>{8e939160-9456-4a0c-9cac-25fcda3a13c5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components">
-      <UniqueIdentifier>{d1bae462-2941-42d8-b6fe-935ea13d430c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Collision">
-      <UniqueIdentifier>{f947d9ff-a03d-477b-827a-46b01bcad1ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Spatial">
-      <UniqueIdentifier>{d9bc1c0d-baa4-46b9-b835-d2bf9e9f71cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\RHI">
-      <UniqueIdentifier>{de6cb299-4ce5-472d-bb48-3d1ac26b1cbc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\AssetManagement">
-      <UniqueIdentifier>{5bfc6ba7-04f8-4fac-83a9-303bfb5386e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\InputCore">
-      <UniqueIdentifier>{b32d6445-c1d4-4f89-98ac-f7985cb5c8df}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor">
-      <UniqueIdentifier>{c5a2689b-aef3-4172-9ee3-0bba9adc899c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Gizmo">
-      <UniqueIdentifier>{3fd6d8b3-06e2-4110-b9cc-131a70b6888e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Grid">
-      <UniqueIdentifier>{1386b729-50f0-4bc7-85c0-ea2e939188eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate">
-      <UniqueIdentifier>{e9028351-46aa-4f40-b185-3b4702e968b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Widgets">
-      <UniqueIdentifier>{83dff4a9-f793-4741-8540-d4032947ee9c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Windows">
-      <UniqueIdentifier>{7c8a8cae-cb33-4739-85bb-af31f11306ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Factory">
-      <UniqueIdentifier>{6e5581ad-2327-4fb7-b7d9-a153fea87db0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\ImGui">
-      <UniqueIdentifier>{833b5e30-b8e8-4d3c-acfd-96683cfd624b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{e801a1f2-d38c-4899-a656-b9d19f84f509}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\Effects">
-      <UniqueIdentifier>{7626d39b-5009-4a8d-b1ed-e8b469f43ee0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\PostProcess">
-      <UniqueIdentifier>{2a7ef92d-73f3-48c7-85df-ab3033a6c94c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\Utility">
-      <UniqueIdentifier>{efd94379-3cf6-476e-9673-73533aa353e9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\UI">
-      <UniqueIdentifier>{b084e332-59ad-4154-8d6b-79c018c69b9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\Materials">
-      <UniqueIdentifier>{f8ab716e-ba68-40e7-a9da-d79824bf362c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ThirdParty">
-      <UniqueIdentifier>{420d890f-3966-47b6-8414-3dc4c8829f4c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ThirdParty\ImGui">
-      <UniqueIdentifier>{51521bc4-ae3a-4617-8c40-b8c98e9ba446}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\Common">
-      <UniqueIdentifier>{d1bddf1e-dd35-48e7-b930-c62fd0672d92}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts">
-      <UniqueIdentifier>{f9951c86-b8d8-425c-bdb9-79f30b9c6ff2}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="Scripts\actor_transform.lua">
+      <Filter>Scripts</Filter>
+    </None>
     <None Include="Scripts\template.lua">
       <Filter>Scripts</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source">
+      <UniqueIdentifier>{ff9c4026-eea8-41fe-bcd4-8314784688b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime">
+      <UniqueIdentifier>{52bf96d2-19fe-4db7-adc1-1fcf596dc231}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core">
+      <UniqueIdentifier>{1e3f8cbb-fe09-4e2b-a38a-094c2f8d25e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Misc">
+      <UniqueIdentifier>{076a8340-2484-4288-a48a-c8d13f9d6770}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{59c067f6-aa49-4f93-ada3-7cafbe5afca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Renderer">
+      <UniqueIdentifier>{c2a3a2a0-52b3-46b3-9d08-21f91b8ac30a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Object">
+      <UniqueIdentifier>{83d53cce-1dca-4d70-a024-555cb087bad1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Math">
+      <UniqueIdentifier>{662ad02e-066b-490f-862c-e41c04c5e765}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Containers">
+      <UniqueIdentifier>{9e597074-7801-4a95-a82a-c55c45e8c0b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Memory">
+      <UniqueIdentifier>{2294d271-65a0-4cc4-b2da-a84e70f95e24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine">
+      <UniqueIdentifier>{bf053fdf-172b-4a36-801d-b75bbc710240}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\GameFramework">
+      <UniqueIdentifier>{89dd1ad8-5556-41fb-8372-9a11e9563b18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components">
+      <UniqueIdentifier>{d9521ed2-c501-4598-b608-e2df5e64d92f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Collision">
+      <UniqueIdentifier>{e6dc8c94-25d5-40ac-91e4-e30a18d9130e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Spatial">
+      <UniqueIdentifier>{4930a1d5-21fd-4264-b31d-74988be8a007}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\RHI">
+      <UniqueIdentifier>{8777c88b-1545-40c4-bdea-3af8913de401}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\AssetManagement">
+      <UniqueIdentifier>{ef597a67-4fdb-4c98-bf34-f1207cf83751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\InputCore">
+      <UniqueIdentifier>{78de8d15-6c62-41ac-ade2-0d017978eb05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor">
+      <UniqueIdentifier>{7f3ffb57-1ae0-401e-809c-f4807595163c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Clipboard">
+      <UniqueIdentifier>{61c4e5c7-2229-4a58-bee4-7b5c81939c81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Gizmo">
+      <UniqueIdentifier>{b6916137-94dc-4e6a-8ef6-46cf42906962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Grid">
+      <UniqueIdentifier>{d65fa55f-b88e-4353-8c29-69e9a4aad069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate">
+      <UniqueIdentifier>{549bf192-83a9-49e9-9d08-1a73e8a34e7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Widgets">
+      <UniqueIdentifier>{246e6add-eb51-489f-8c67-a8894494cc5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Windows">
+      <UniqueIdentifier>{f2db74c6-bf57-4f8b-a936-568617aec475}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Factory">
+      <UniqueIdentifier>{40cc3704-4c9c-45b3-b063-1240ab6def1a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\ImGui">
+      <UniqueIdentifier>{b4ee0d22-59bf-448f-94a7-56f31bedb90c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{fb372d4c-9a2d-4ca1-95da-f50789fd4f6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Effects">
+      <UniqueIdentifier>{7583d8ed-6f7f-44f7-b342-6bbafb7df0c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PostProcess">
+      <UniqueIdentifier>{2a8f3b1e-e38f-4325-bcf6-642add1afcb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Utility">
+      <UniqueIdentifier>{589d5f28-e33f-411f-9b5d-0d94c623b7e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\UI">
+      <UniqueIdentifier>{a431a638-72f4-46b5-91e1-846e651ebfed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Materials">
+      <UniqueIdentifier>{f6cfab53-a575-47b5-8e85-3031cd22e98b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Common">
+      <UniqueIdentifier>{3100fa0d-4260-4d95-b603-daf27d8b81cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{571af285-cf7b-498b-8d95-4e10ac9358ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty\ImGui">
+      <UniqueIdentifier>{b2177298-632f-4907-9542-0d972c79410e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

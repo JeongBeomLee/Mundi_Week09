@@ -17,11 +17,15 @@ AStaticMeshActor::AStaticMeshActor()
     
     // 루트 교체
     RootComponent = StaticMeshComponent;
+
+	//SetTickInEditor(true);
 }
 
 void AStaticMeshActor::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+
+    Lua->get<sol::function>("Tick")(DeltaTime);
 }
 
 AStaticMeshActor::~AStaticMeshActor()

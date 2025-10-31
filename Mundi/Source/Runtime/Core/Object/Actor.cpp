@@ -12,9 +12,67 @@
 
 IMPLEMENT_CLASS(AActor)
 
+BEGIN_PROPERTIES(AActor)
+	MARK_AS_COMPONENT("엑터", "엑터입니다.")
+	ADD_PROPERTY(bool, bTickInEditor, "에디터 틱", true, "엑터가 에디터 모드에서도 Tick을 돌 수 있는지 표시합니다.")
+END_PROPERTIES()
+
 AActor::AActor()
 {
 	Name = "DefaultActor";
+
+	// lua 테스트 코드
+	// lua 상태 생성
+	Lua = new sol::state();
+	Lua->open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+
+	// FVector 타입을 Lua에 등록
+	Lua->new_usertype<FVector>("FVector",
+		sol::constructors<FVector(), FVector(float, float, float)>(),
+		"X", &FVector::X,
+		"Y", &FVector::Y,
+		"Z", &FVector::Z,
+		// 연산자 오버로딩 (메타메서드)
+		sol::meta_function::addition, [](const FVector& a, const FVector& b) { return a + b; },
+		sol::meta_function::subtraction, [](const FVector& a, const FVector& b) { return a - b; },
+		sol::meta_function::multiplication, [](const FVector& v, float scalar) { return v * scalar; },
+		sol::meta_function::division, [](const FVector& v, float scalar) { return v / scalar; },
+		sol::meta_function::unary_minus, [](const FVector& v) { return -v; },
+		"Add", [](const FVector& a, const FVector& b) { return a + b; },
+		"Sub", [](const FVector& a, const FVector& b) { return a - b; },
+		"Mul", [](const FVector& v, float scalar) { return v * scalar; }
+	);
+
+	// FQuat 타입을 Lua에 등록
+	Lua->new_usertype<FQuat>("FQuat",
+		sol::constructors<FQuat()>(),
+		"MakeFromEuler", [](float pitch, float yaw, float roll) {
+			return FQuat::MakeFromEulerZYX(FVector(pitch, yaw, roll));
+		}
+	);
+
+	// Actor 래퍼 클래스 등록
+	Lua->new_usertype<AActor>("Actor",
+		"GetLocation", &AActor::GetActorLocation,
+		"SetLocation", &AActor::SetActorLocation,
+		"GetRotation", &AActor::GetActorRotation,
+		"SetRotation", sol::overload(
+			static_cast<void(AActor::*)(const FVector&)>(&AActor::SetActorRotation),
+			static_cast<void(AActor::*)(const FQuat&)>(&AActor::SetActorRotation)
+		),
+		"GetScale", &AActor::GetActorScale,
+		"SetScale", &AActor::SetActorScale,
+		"AddWorldLocation", &AActor::AddActorWorldLocation,
+		"AddWorldRotation", sol::overload(
+			static_cast<void(AActor::*)(const FQuat&)>(&AActor::AddActorWorldRotation)
+		),
+		"GetName", &AActor::GetName
+	);
+
+	// actor_transform.lua 파일 로드
+	Lua->script_file("Scripts/actor_transform.lua");
+
+	Lua->set("actor", this);
 }
 
 AActor::~AActor()
@@ -25,6 +83,14 @@ AActor::~AActor()
 	OwnedComponents.clear();
 	SceneComponents.Empty();
 	RootComponent = nullptr;
+
+	// lua 상태 정리
+	//if (Lua)
+	//{
+	//	//Lua->~state(); // Explicitly call destructor to close Lua state
+	//	delete Lua;
+	//	Lua = nullptr;
+	//}
 }
 
 void AActor::BeginPlay()
@@ -412,6 +478,8 @@ void AActor::PostDuplicate()
 void AActor::DuplicateSubObjects()
 {
 	Super::DuplicateSubObjects();
+
+	Lua->set("actor", this);
 
 	// 기본 프로퍼티 초기화
 	bIsPicked = false;

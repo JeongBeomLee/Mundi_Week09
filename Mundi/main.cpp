@@ -1,5 +1,7 @@
 ﻿#include "pch.h"
 #include "EditorEngine.h"
+//#include "EmptyActor.h"
+#include "SceneComponent.h"
 
 #if defined(_MSC_VER) && defined(_DEBUG)
 #   define _CRTDBG_MAP_ALLOC
@@ -435,6 +437,355 @@ void TestLua()
     }
 }
 
+// ============================================
+// Lua + Delegate를 활용한 Actor Transform 제어 테스트
+// ============================================
+void TestLuaWithDelegateTransform()
+{
+    std::string result = "=== Lua + Delegate Actor Transform Test ===\n\n";
+    bool allTestsPassed = true;
+
+    try
+    {
+        // ============================================
+        // 테스트 1: Lua에서 Actor Transform 변경
+        // ============================================
+        {
+            result += "[Test 1] Lua Script - Actor Transform Modification\n";
+
+            // Actor 생성 (ObjectFactory 사용)
+            AActor* TestActor = ObjectFactory::NewObject<AActor>();
+            TestActor->SetName("TestLuaActor");
+            
+            // 초기 Transform 설정
+            FVector InitialLocation(10.0f, 20.0f, 30.0f);
+            FQuat InitialRotation = FQuat::MakeFromEulerZYX(FVector(0.0f, 0.0f, 0.0f));
+            FVector InitialScale(1.0f, 1.0f, 1.0f);
+            
+			TestActor->SetRootComponent(ObjectFactory::NewObject<USceneComponent>());
+
+            TestActor->SetActorLocation(InitialLocation);
+            TestActor->SetActorRotation(InitialRotation);
+            TestActor->SetActorScale(InitialScale);
+
+            // Lua 상태 생성 및 FVector 타입 바인딩
+            sol::state lua;
+            lua.open_libraries(sol::lib::base, sol::lib::math);
+
+            // FVector 타입을 Lua에 등록
+            lua.new_usertype<FVector>("FVector",
+                sol::constructors<FVector(), FVector(float, float, float)>(),
+                "X", &FVector::X,
+                "Y", &FVector::Y,
+                "Z", &FVector::Z,
+                "Add", [](const FVector& a, const FVector& b) { return a + b; },
+                "Sub", [](const FVector& a, const FVector& b) { return a - b; },
+                "Mul", [](const FVector& v, float scalar) { return v * scalar; }
+            );
+
+            // FQuat 타입을 Lua에 등록
+            lua.new_usertype<FQuat>("FQuat",
+                sol::constructors<FQuat()>(),
+                "MakeFromEuler", [](float pitch, float yaw, float roll) {
+                    return FQuat::MakeFromEulerZYX(FVector(pitch, yaw, roll));
+                }
+            );
+
+            // Actor 래퍼 클래스 등록
+            lua.new_usertype<AActor>("Actor",
+                "GetLocation", &AActor::GetActorLocation,
+                "SetLocation", &AActor::SetActorLocation,
+                "GetRotation", &AActor::GetActorRotation,
+                "SetRotation", sol::overload(
+                    static_cast<void(AActor::*)(const FVector&)>(&AActor::SetActorRotation),
+                    static_cast<void(AActor::*)(const FQuat&)>(&AActor::SetActorRotation)
+                ),
+                "GetScale", &AActor::GetActorScale,
+                "SetScale", &AActor::SetActorScale,
+                "AddWorldLocation", &AActor::AddActorWorldLocation,
+                "AddWorldRotation", sol::overload(
+                    static_cast<void(AActor::*)(const FQuat&)>(&AActor::AddActorWorldRotation)
+                ),
+                "GetName", &AActor::GetName
+            );
+
+            // Lua 스크립트 실행
+            lua["actor"] = TestActor;
+
+            FQuat testRotation = FQuat::MakeFromEulerZYX(FVector(10.0f, 80.0f, 20.0f));
+			FVector testRotationEuler = testRotation.ToEulerZYXDeg();
+
+            lua.script(R"(
+                -- 위치 변경
+                local newLocation = FVector.new(100, 200, 300)
+                actor:SetLocation(newLocation)
+                
+                -- 스케일 변경
+                local newScale = FVector.new(2, 2, 2)
+                actor:SetScale(newScale)
+
+                -- 회전 변경
+                local newRotation = FQuat.MakeFromEuler(10, 80, 20)
+                actor:SetRotation(newRotation)
+                
+                -- 상대 위치 이동
+                local deltaLocation = FVector.new(10, 0, 0)
+                actor:AddWorldLocation(deltaLocation)
+            )");
+
+            // 결과 검증
+            FVector finalLocation = TestActor->GetActorLocation();
+            FVector finalScale = TestActor->GetActorScale();
+			FQuat finalRotation = TestActor->GetActorRotation();
+
+            if (finalLocation.X == 110.0f && finalLocation.Y == 200.0f && finalLocation.Z == 300.0f &&
+                finalScale.X == 2.0f && finalScale.Y == 2.0f && finalScale.Z == 2.0f &&
+                finalRotation == testRotation)
+            {
+                result += "  [O] PASS: Lua successfully modified Actor transform\n";
+                result += "      Location: (" + std::to_string(finalLocation.X) + ", " + 
+                          std::to_string(finalLocation.Y) + ", " + std::to_string(finalLocation.Z) + ")\n";
+                result += "      Scale: (" + std::to_string(finalScale.X) + ", " + 
+                          std::to_string(finalScale.Y) + ", " + std::to_string(finalScale.Z) + ")\n";
+				result += "      Rotation (Euler): (" + std::to_string(finalRotation.X) + ", " +
+					std::to_string(finalRotation.Y) + ", " + std::to_string(finalRotation.Z) + ")\n";
+            }
+            else
+            {
+                result += "  [X] FAIL: Lua transform modification incorrect\n";
+                allTestsPassed = false;
+            }
+            result += "\n";
+
+            // Actor 정리
+            ObjectFactory::DeleteObject(TestActor);
+        }
+
+        // ============================================
+        // 테스트 2: Delegate로 Transform 변경 알림
+        // ============================================
+        {
+            result += "[Test 2] Delegate - Transform Change Notification\n";
+
+            AActor* TestActor = ObjectFactory::NewObject<AActor>();
+            TestActor->SetName("DelegateActor");
+
+            // RootComponent 설정 추가!
+            TestActor->SetRootComponent(ObjectFactory::NewObject<USceneComponent>());
+
+            // Transform 변경 알림 델리게이트 선언
+            DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnTransformChanged, const FVector&, const FQuat&, const FVector&);
+            FOnTransformChanged OnTransformChanged;
+
+            // 변경 이력 저장
+            int32 ChangeCount = 0;
+            FVector LastLocation;
+            FVector LastScale;
+
+            // 델리게이트에 람다 바인딩
+            OnTransformChanged.Add([&ChangeCount, &LastLocation, &LastScale](const FVector& Loc, const FQuat& Rot, const FVector& Scale) {
+                ChangeCount++;
+                LastLocation = Loc;
+                LastScale = Scale;
+            });
+
+            // Lua 상태 생성
+            sol::state lua;
+            lua.open_libraries(sol::lib::base, sol::lib::math);
+
+            // FVector 타입을 Lua에 등록
+            lua.new_usertype<FVector>("FVector",
+                sol::constructors<FVector(), FVector(float, float, float)>(),
+                "X", &FVector::X,
+                "Y", &FVector::Y,
+                "Z", &FVector::Z,
+                "Add", [](const FVector& a, const FVector& b) { return a + b; },
+                "Sub", [](const FVector& a, const FVector& b) { return a - b; },
+                "Mul", [](const FVector& v, float scalar) { return v * scalar; }
+            );
+
+            // FQuat 타입을 Lua에 등록
+            lua.new_usertype<FQuat>("FQuat",
+                sol::constructors<FQuat()>(),
+                "MakeFromEuler", [](float pitch, float yaw, float roll) {
+                    return FQuat::MakeFromEulerZYX(FVector(pitch, yaw, roll));
+                }
+            );
+
+            // Actor 래퍼 클래스 등록
+            lua.new_usertype<AActor>("Actor",
+                "GetLocation", &AActor::GetActorLocation,
+                "SetLocation", &AActor::SetActorLocation,
+                "GetRotation", &AActor::GetActorRotation,
+                "SetRotation", sol::overload(
+                    static_cast<void(AActor::*)(const FVector&)>(&AActor::SetActorRotation),
+                    static_cast<void(AActor::*)(const FQuat&)>(&AActor::SetActorRotation)
+                ),
+                "GetScale", &AActor::GetActorScale,
+                "SetScale", &AActor::SetActorScale,
+                "AddWorldLocation", &AActor::AddActorWorldLocation,
+                "AddWorldRotation", sol::overload(
+                    static_cast<void(AActor::*)(const FQuat&)>(&AActor::AddActorWorldRotation)
+                ),
+                "GetName", &AActor::GetName
+            );
+
+            // Actor와 델리게이트 함께 사용
+            lua["actor"] = TestActor;
+            lua["notifyTransformChanged"] = [&](const FVector& loc, const FQuat& rot, const FVector& scale) {
+                OnTransformChanged.Broadcast(loc, rot, scale);
+            };
+
+            // Lua에서 Transform 변경 및 델리게이트 호출
+            lua.script(R"(
+                local newLoc = FVector.new(50, 60, 70)
+                local newScale = FVector.new(1.5, 1.5, 1.5)
+                
+                actor:SetLocation(newLoc)
+                actor:SetScale(newScale)
+                
+                -- 변경 사항 알림
+                notifyTransformChanged(
+                    actor:GetLocation(),
+                    actor:GetRotation(),
+                    actor:GetScale()
+                )
+            )");
+
+            if (ChangeCount == 1 && 
+                LastLocation.X == 50.0f && LastLocation.Y == 60.0f && LastLocation.Z == 70.0f &&
+                LastScale.X == 1.5f && LastScale.Y == 1.5f && LastScale.Z == 1.5f)
+            {
+                result += "  [O] PASS: Delegate correctly notified of transform changes\n";
+                result += "      Notifications: " + std::to_string(ChangeCount) + "\n";
+                result += "      Last Location: (" + std::to_string(LastLocation.X) + ", " + 
+                          std::to_string(LastLocation.Y) + ", " + std::to_string(LastLocation.Z) + ")\n";
+            }
+            else
+            {
+                result += "  [X] FAIL: Delegate notification failed\n";
+                allTestsPassed = false;
+            }
+            result += "\n";
+
+            // Actor 정리
+            ObjectFactory::DeleteObject(TestActor);
+        }
+
+        // ============================================
+        // 테스트 3: Lua 스크립트로 Actor 애니메이션
+        // ============================================
+        {
+            result += "[Test 3] Lua Script - Actor Animation with Tick\n";
+
+            AActor* TestActor = ObjectFactory::NewObject<AActor>();
+            TestActor->SetName("AnimatedActor");
+            TestActor->SetActorLocation(FVector(0, 0, 0));
+
+            // Tick 델리게이트
+            DECLARE_MULTICAST_DELEGATE_OneParam(FOnTick, float);
+            FOnTick OnTick;
+
+            sol::state lua;
+            lua.open_libraries(sol::lib::base, sol::lib::math);
+
+            // FVector 등록
+            lua.new_usertype<FVector>("FVector",
+                sol::constructors<FVector(), FVector(float, float, float)>(),
+                "X", &FVector::X,
+                "Y", &FVector::Y,
+                "Z", &FVector::Z
+            );
+
+            // Actor 등록
+            lua.new_usertype<AActor>("Actor",
+                "GetLocation", &AActor::GetActorLocation,
+                "SetLocation", &AActor::SetActorLocation,
+                "AddWorldLocation", &AActor::AddActorWorldLocation
+            );
+
+            lua["actor"] = TestActor;
+            lua["time"] = 0.0f;
+
+            // Lua Tick 함수 정의
+            lua.script(R"(
+                function Tick(deltaTime)
+                    time = time + deltaTime
+                    
+                    -- 원형 운동
+                    local radius = 100
+                    local x = math.cos(time) * radius
+                    local y = math.sin(time) * radius
+                    local z = 0
+                    
+                    local newPos = FVector.new(x, y, z)
+                    actor:SetLocation(newPos)
+                end
+            )");
+
+            // 델리게이트에 Lua Tick 연결
+            OnTick.Add([&lua](float dt) {
+                if (lua["Tick"].valid()) {
+                    lua["Tick"](dt);
+                }
+            });
+
+            // 시뮬레이션 (몇 프레임)
+            float totalTime = 0.0f;
+            for (int i = 0; i < 10; i++)
+            {
+                float dt = 0.016f; // 60 FPS
+                OnTick.Broadcast(dt);
+                totalTime += dt;
+            }
+
+            FVector finalPos = TestActor->GetActorLocation();
+            
+            // 원형 운동이 올바르게 적용되었는지 확인 (대략적인 범위 체크)
+            if (abs(finalPos.X) <= 100.0f && abs(finalPos.Y) <= 100.0f && finalPos.Z == 0.0f)
+            {
+                result += "  [O] PASS: Lua animation script executed correctly\n";
+                result += "      Final Position: (" + std::to_string(finalPos.X) + ", " + 
+                          std::to_string(finalPos.Y) + ", " + std::to_string(finalPos.Z) + ")\n";
+                result += "      Total Time: " + std::to_string(totalTime) + "s\n";
+            }
+            else
+            {
+                result += "  [X] FAIL: Lua animation script failed\n";
+                allTestsPassed = false;
+            }
+            result += "\n";
+
+            // Actor 정리
+            ObjectFactory::DeleteObject(TestActor);
+        }
+
+        // ============================================
+        // 최종 결과
+        // ============================================
+        result += "========================================\n";
+        if (allTestsPassed)
+        {
+            result += "[O] ALL TESTS PASSED!\n";
+        }
+        else
+        {
+            result += "[X] SOME TESTS FAILED!\n";
+        }
+        result += "========================================\n";
+
+        MessageBoxA(NULL, result.c_str(),
+                   allTestsPassed ? "Lua Transform Test - SUCCESS" : "Lua Transform Test - FAILED",
+                   MB_OK | (allTestsPassed ? MB_ICONINFORMATION : MB_ICONWARNING));
+    }
+    catch (const std::exception& e)
+    {
+        result += "\n[X] EXCEPTION OCCURRED:\n";
+        result += e.what();
+        MessageBoxA(NULL, result.c_str(), "Lua Transform Test - EXCEPTION", MB_OK | MB_ICONERROR);
+    }
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
 #if defined(_MSC_VER) && defined(_DEBUG)
@@ -446,10 +797,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif
 
     // Delegate 시스템 테스트 실행
-    TestDelegate();
+    //TestDelegate();
 
     // lua 테스트 실행
-    TestLua();
+    //TestLua();
+
+    // Lua + Delegate를 활용한 Actor Transform 제어 테스트
+    TestLuaWithDelegateTransform();
 
     if (!GEngine.Startup(hInstance))
         return -1;

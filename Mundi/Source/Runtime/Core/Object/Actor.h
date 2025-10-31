@@ -1,10 +1,11 @@
 ﻿#pragma once
+//#include "pch.h"
+
 #include "Object.h"
 #include "Vector.h"
 #include "ActorComponent.h"
 #include "AABB.h"
 #include "LightManager.h"
-
 
 class UWorld;
 class USceneComponent;
@@ -12,10 +13,16 @@ class UShapeComponent;
 class UTextRenderComponent;
 class UBillboardComponent;
 
+// Forward declare sol::state instead of including the full header
+namespace sol {
+    class state;
+}
+
 class AActor : public UObject
 {
 public:
     DECLARE_CLASS(AActor, UObject)
+    GENERATED_REFLECTION_BODY()
     AActor(); 
 
 protected:
@@ -167,6 +174,7 @@ protected:
     bool bCanEverTick = true;
     bool bIsCulled = false;
 
+    sol::state* Lua = nullptr;
 private:
    
 };
