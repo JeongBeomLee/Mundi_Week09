@@ -148,6 +148,9 @@
     if exist "$(ProjectDir)imgui.ini" xcopy /Y /D "$(ProjectDir)imgui.ini" "$(OutDir)"
     if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
     if %ERRORLEVEL% LEQ 7 exit 0
+  )
+if "$(Configuration)"=="Debug" (
+    if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
   )</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -185,6 +188,9 @@
     if exist "$(ProjectDir)imgui.ini" xcopy /Y /D "$(ProjectDir)imgui.ini" "$(OutDir)"
     if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
     if %ERRORLEVEL% LEQ 7 exit 0
+  )
+if "$(Configuration)"=="Debug" (
+    if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
   )</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -473,6 +479,7 @@
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
+    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h" />
     <ClInclude Include="Source\Runtime\Core\Object\Property.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\MovementComponent.h" />
