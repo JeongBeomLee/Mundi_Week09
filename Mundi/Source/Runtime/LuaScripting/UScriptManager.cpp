@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 #include "Source/Runtime/Engine/Components/SceneComponent.h"
+#include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -14,6 +15,7 @@ UScriptManager::~UScriptManager()
     Shutdown();
 }
 
+/* Private */
 void UScriptManager::Initialize()
 {
     /*
@@ -22,26 +24,7 @@ void UScriptManager::Initialize()
      */
     Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
 
-    /* 전역으로 lua에 타입을 등록 */
-    // FName 등록
-    sol::usertype<FName> NameType = Lua.new_usertype<FName>(
-        "FName",
-        sol::constructors<FName(), FName(const char*), FName(const FString&)>());
-    NameType["ToString"] = &FName::ToString;
-
-    // USceneComponent 등록
-    sol::usertype<USceneComponent> SceneComponentType = Lua.new_usertype<USceneComponent>(
-        "USceneComponent",
-        sol::constructors<USceneComponent()>());
-    SceneComponentType["GetSceneId"] = &USceneComponent::GetSceneId;
-    
-    // AActor 등록
-    sol::usertype<AActor> ActorType = Lua.new_usertype<AActor>(
-        "AActor",
-        sol::constructors<AActor()>());
-    ActorType["Name"] = &AActor::Name;
-    ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
-    
+    RegisterUserTypeToLua();
     
     // 전역으로 lua에 값을 등록
 
@@ -74,13 +57,33 @@ void UScriptManager::Shutdown()
     lua_close(Lua);
 }
 
-UScriptManager& UScriptManager::GetInstance()
+/* 전역으로 lua에 타입을 등록 */
+void UScriptManager::RegisterUserTypeToLua()
 {
-    static UScriptManager Instance;
-    return Instance;
+    // FName 등록
+    sol::usertype<FName> NameType = Lua.new_usertype<FName>(
+        "FName",
+        sol::constructors<FName(), FName(const char*), FName(const FString&)>());
+    NameType["ToString"] = &FName::ToString;
+
+    // USceneComponent 등록
+    sol::usertype<USceneComponent> SceneComponentType = Lua.new_usertype<USceneComponent>(
+        "USceneComponent",
+        sol::constructors<USceneComponent()>());
+    SceneComponentType["GetSceneId"] = &USceneComponent::GetSceneId;
+    
+    // AActor 등록
+    sol::usertype<AActor> ActorType = Lua.new_usertype<AActor>(
+        "AActor",
+        sol::constructors<AActor()>());
+    ActorType["Name"] = &AActor::Name;
+    ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
 }
 
-/* Private */
+void UScriptManager::RegisterGlobalFuncToLua()
+{
+    Lua["print"] = print;
+}
 
 // Lua로부터 Template 함수를 가져온다.
 // 해당 함수가 없으면 Throw한다.
@@ -164,4 +167,12 @@ FScript* UScriptManager::GetOrCreate(FString InPath)
     NewScript->LuaTemplateFunctions = LuaTemplateFunction;
 
     return NewScript;
+}
+
+/* private static */
+
+UScriptManager& UScriptManager::GetInstance()
+{
+    static UScriptManager Instance;
+    return Instance;
 }

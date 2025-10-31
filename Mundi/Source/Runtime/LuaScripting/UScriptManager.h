@@ -51,13 +51,15 @@ public:
 private:
     void Initialize();
     void Shutdown();
+
+    void RegisterUserTypeToLua();
+    void RegisterGlobalFuncToLua();
     
     // Lua로부터 Template 함수를 가져온다.
     // 해당 함수가 없으면 Throw한다.
     FLuaTemplateFunctions GetTemplateFunctionFromScript(
         sol::environment& InEnv
     );
-    
     FScript* GetOrCreate(FString InPath);
 private:
     const static inline FString SCRIPT_FILE_PATH{"Scripts/"};
