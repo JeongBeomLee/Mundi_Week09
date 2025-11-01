@@ -524,6 +524,81 @@ void UTargetActorTransformWidget::RenderSelectedActorDetails(AActor* SelectedAct
 	{
 		SelectedActor->SetActorHiddenInGame(bActorHiddenInGame);
 	}
+
+	// --------------------------------------------------------------------
+	// Lua Script 설정 영역
+	// --------------------------------------------------------------------
+	ImGui::Separator();
+	ImGui::Text("Lua Scripts");
+
+	static char NewScriptName[128] = "";
+	static FString LastErrorMessage = "";
+
+	UScriptManager& ScriptMgr = UScriptManager::GetInstance();
+	const TArray<FScript*>& Scripts = ScriptMgr.GetScriptsOfActor(SelectedActor);
+
+	// 현재 부착된 스크립트 목록 표시
+	for (int i = 0; i < Scripts.size(); ++i)
+	{
+		FScript* Script = Scripts[i];
+		if (!Script)
+			continue;
+
+		ImGui::PushID(i);
+		ImGui::Text("%s", Script->ScriptName.c_str());
+		ImGui::SameLine();
+
+		if (ImGui::Button("Remove"))
+		{
+			ScriptMgr.DetachScriptFrom(SelectedActor, Script->ScriptName);
+			ImGui::PopID();
+			break;
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Reload"))
+		{
+			ScriptMgr.CheckAndHotReloadLuaScript();
+		}
+
+		ImGui::PopID();
+	}
+
+	ImGui::Separator();
+	ImGui::InputText("New Script Name", NewScriptName, IM_ARRAYSIZE(NewScriptName));
+
+	if (ImGui::Button("Add Script"))
+	{
+		if (strlen(NewScriptName) > 0)
+		{
+			// 스크립트 이름 정규화
+			FString ScriptName = FString(NewScriptName);
+			
+			// LuaLocalValue 설정
+			FLuaLocalValue LocalVal;
+			LocalVal.MyActor = SelectedActor;
+
+			// 스크립트 추가 시도
+			ScriptMgr.AttachScriptTo(LocalVal, ScriptName);
+			ScriptMgr.PrintDebugLog();
+
+			memset(NewScriptName, 0, sizeof(NewScriptName));
+		}
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Remove All Scripts"))
+	{
+		ScriptMgr.DetachAllScriptFrom(SelectedActor);
+		LastErrorMessage = FString("");
+	}
+
+	// 에러 메시지 표시
+	if (!LastErrorMessage.empty())
+	{
+		ImGui::Separator();
+		ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "%s", LastErrorMessage.c_str());
+	}
 }
 
 void UTargetActorTransformWidget::RenderSelectedComponentDetails(UActorComponent* SelectedComponent)

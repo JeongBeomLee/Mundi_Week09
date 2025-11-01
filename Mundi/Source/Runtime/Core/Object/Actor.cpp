@@ -25,6 +25,8 @@ AActor::~AActor()
 	OwnedComponents.clear();
 	SceneComponents.Empty();
 	RootComponent = nullptr;
+
+	UScriptManager::GetInstance().DetachAllScriptFrom(const_cast<AActor*>(this));
 }
 
 void AActor::BeginPlay()
@@ -34,6 +36,11 @@ void AActor::BeginPlay()
 		if (Comp) Comp->InitializeComponent();
 	for (UActorComponent* Comp : OwnedComponents)
 		if (Comp) Comp->BeginPlay();
+
+	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	{
+		Script->LuaTemplateFunctions.BeginPlay();
+	}
 }
 
 void AActor::Tick(float DeltaSeconds)
@@ -48,11 +55,21 @@ void AActor::Tick(float DeltaSeconds)
 			Comp->TickComponent(DeltaSeconds /*, … 필요 인자*/);
 		}
 	}
+
+	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	{
+		Script->LuaTemplateFunctions.Tick(DeltaSeconds);
+	}
 }
 void AActor::EndPlay(EEndPlayReason Reason)
 {
 	for (UActorComponent* Comp : OwnedComponents)
 		if (Comp) Comp->EndPlay(Reason);
+
+	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	{
+		Script->LuaTemplateFunctions.EndPlay();
+	}
 }
 void AActor::Destroy()
 {
@@ -217,8 +234,6 @@ void AActor::ClearSceneComponentCaches()
 	SceneComponents.Empty();
 	RootComponent = nullptr;
 }
-
-
 
 // ───────────────
 // Transform API

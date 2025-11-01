@@ -4,7 +4,7 @@
 #include "ActorComponent.h"
 #include "AABB.h"
 #include "LightManager.h"
-
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 class UWorld;
 class USceneComponent;
@@ -138,9 +138,11 @@ public:
     }
 
     // ───── 복사 관련 ────────────────────────────
+    // Lua Script 복사를 위해 원본의 주소를 가져와야 하기 때문에 별도로 Duplicate 생성
+    DECLARE_ACTOR_DUPLICATE(AActor)
+    
     void DuplicateSubObjects() override;
     void PostDuplicate() override;
-    DECLARE_DUPLICATE(AActor)
 
     // Serialize
     void Serialize(const bool bInIsLoading, JSON& InOutHandle) override;

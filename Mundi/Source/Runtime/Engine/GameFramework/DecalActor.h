@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Actor.h"
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 class UDecalComponent;
 
@@ -18,7 +19,7 @@ public:
 
     // ───── 복사 관련 ────────────────────────────
     void DuplicateSubObjects() override;
-    DECLARE_DUPLICATE(ADecalActor)
+    DECLARE_ACTOR_DUPLICATE(ADecalActor)
 
     // Serialize
     void OnSerialized() override;
