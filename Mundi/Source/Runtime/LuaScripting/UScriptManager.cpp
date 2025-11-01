@@ -15,7 +15,7 @@ UScriptManager::UScriptManager()
 
 UScriptManager::~UScriptManager()
 {
-    Shutdown();
+    //Shutdown();
 }
 
 void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, FString ScriptName)

@@ -567,7 +567,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     //TestDelegate();
 
     // TWeakPtr Dangling Pointer 해결 테스트 실행
-    TestWeakPtrDanglingPointer();
+    //TestWeakPtrDanglingPointer();
 
     // lua 테스트 실행
     //TestLua();
