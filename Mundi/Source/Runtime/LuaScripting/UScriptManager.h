@@ -10,6 +10,11 @@ struct FLuaTemplateFunctions
     sol::function Tick;
 };
 
+struct FLuaLocalValue
+{
+    AActor* MyActor = nullptr;
+};
+
 struct FScript
 {
     FString ScriptName;
@@ -17,6 +22,10 @@ struct FScript
     sol::environment Env;
     sol::table Table;
     FLuaTemplateFunctions LuaTemplateFunctions;
+
+    // hot reload support
+    FLuaLocalValue LuaLocalValue;
+    fs::file_time_type LastModifiedTime;
 };
 
 class UScriptManager : public UObject
@@ -32,9 +41,11 @@ public:
     UScriptManager();
     ~UScriptManager() override;
 
-    void AttachScriptTo(AActor* Target, FString ScriptName);
+    void AttachScriptTo(FLuaLocalValue LuaLocalValue, FString ScriptName);
 
     TMap<AActor*, TArray<FScript*>>& GetScriptsByOwner();
+    
+    void CheckAndHotReloadLuaScript();
 public:
     static UScriptManager& GetInstance();
 private:
@@ -44,14 +55,25 @@ private:
     void RegisterUserTypeToLua();
     void RegisterGlobalFuncToLua();
     
-    void RegisterLocalValueToLua(sol::environment& InEnv, AActor* InActor);
+    void RegisterLocalValueToLua(
+        sol::environment& InEnv,
+        FLuaLocalValue LuaLocalValue
+        );
     
     // Lua로부터 Template 함수를 가져온다.
     // 해당 함수가 없으면 Throw한다.
     FLuaTemplateFunctions GetTemplateFunctionFromScript(
         sol::environment& InEnv
     );
-    FScript* GetOrCreate(FString InPath);
+    
+    void SetLuaScriptField(
+        fs::path Path,
+        sol::environment& InEnv,
+        sol::table& InScriptTable,
+        FLuaTemplateFunctions& InLuaTemplateFunction
+    );
+    
+    FScript* GetOrCreate(FString InScriptName);
 private:
     const static inline FString SCRIPT_FILE_PATH{"Scripts/"};
     const static inline FString DEFAULT_FILE_PATH{"Scripts/template.lua"};

@@ -18,12 +18,12 @@ UScriptManager::~UScriptManager()
     Shutdown();
 }
 
-void UScriptManager::AttachScriptTo(AActor* Target, FString ScriptName)
+void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, FString ScriptName)
 {
     // 이미 같은 스크립트가 부착되어 있으면 return
     for (const TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
     {
-        if (Target == Script.first)
+        if (LuaLocalValue.MyActor == Script.first)
         {
             for (FScript* ScriptData : Script.second)
             {
@@ -33,25 +33,79 @@ void UScriptManager::AttachScriptTo(AActor* Target, FString ScriptName)
         }
     }
 
-    FScript* Script = GetOrCreate(ScriptName);
-    RegisterLocalValueToLua(Script->Env, Target);
-
-    // --- 추가 디버그 코드 ---
-    AActor* CheckActor = Script->Env["MyActor"];
-    if (CheckActor == Target) {
-        UE_LOG("MyActor registration successful in C++ check.");
-    } else {
-        UE_LOG("MyActor registration FAILED in C++ check or pointer mismatched.");
+    try
+    {
+        FScript* Script = GetOrCreate(ScriptName);
+        RegisterLocalValueToLua(Script->Env, LuaLocalValue);
+        ScriptsByOwner[LuaLocalValue.MyActor].push_back(Script);
     }
-    // -----------------------
-
-    ScriptsByOwner[Target].push_back(Script);
+    catch (std::exception& e)
+    {
+        FString ErrorMessage = FString("[Script Manager] ") + ScriptName + " creation failed : " + e.what();
+        UE_LOG(ErrorMessage.c_str());
+    }
 }
 
 TMap<AActor*, TArray<FScript*>>& UScriptManager::GetScriptsByOwner()
 {
     return ScriptsByOwner;
 }
+
+void UScriptManager::CheckAndHotReloadLuaScript()
+{
+    for (auto& ScriptPair : ScriptsByOwner)
+    {
+        for (FScript* Script : ScriptPair.second)
+        {
+            // 파일이 존재하지 않을 경우
+            if (!fs::exists(Script->ScriptName))
+            {
+                continue;
+            }
+
+            auto CurrentWriteTime = std::filesystem::last_write_time(Script->ScriptName);
+            if (CurrentWriteTime > Script->LastModifiedTime)
+            {
+                FString HotReloadMessage =
+                    FString("[Script Manager] Lua Script: ") +
+                    Script->ScriptName +
+                    " hot reload.";
+                UE_LOG(HotReloadMessage.c_str());
+
+                // 기존 상태 백업
+                sol::environment OldEnv = Script->Env;
+                sol::table OldTable = Script->Table;
+                FLuaTemplateFunctions OldFuncs = Script->LuaTemplateFunctions;
+
+                try
+                {
+                    fs::path Path(SCRIPT_FILE_PATH + Script->ScriptName);
+                    SetLuaScriptField(
+                        Path,
+                        Script->Env,
+                        Script->Table,
+                        Script->LuaTemplateFunctions
+                    );
+                    RegisterLocalValueToLua(Script->Env, Script->LuaLocalValue);
+                }
+                catch (std::exception& e)
+                {
+                    FString ErrorMessage =
+                        FString("[Script Manager] Lua Script: ") +
+                        Script->ScriptName +
+                        " hot reload failed and fall backed.";
+
+                    Script->Env = OldEnv;
+                    Script->Table = OldTable;
+                    Script->LuaTemplateFunctions = OldFuncs;
+                }
+
+                Script->LastModifiedTime = CurrentWriteTime;
+            }
+        }
+    }
+}
+
 
 /* public static */
 UScriptManager& UScriptManager::GetInstance()
@@ -144,9 +198,9 @@ void UScriptManager::RegisterGlobalFuncToLua()
     Lua["PrintToConsole"] = PrintToConsole;
 }
 
-void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, AActor* InActor)
+void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)
 {
-    InEnv["MyActor"] = InActor;
+    InEnv["MyActor"] = LuaLocalValue.MyActor;
 }
 
 // Lua로부터 Template 함수를 가져온다.
@@ -175,24 +229,15 @@ FLuaTemplateFunctions UScriptManager::GetTemplateFunctionFromScript(
     return LuaTemplateFunctions;
 }
 
-FScript* UScriptManager::GetOrCreate(FString InPath)
+void UScriptManager::SetLuaScriptField(
+    fs::path Path,
+    sol::environment& InEnv,
+    sol::table& InScriptTable,
+    FLuaTemplateFunctions& InLuaTemplateFunction
+)
 {
-    fs::path Path(SCRIPT_FILE_PATH + InPath);
-    FString FileName = Path.filename().string();
-
-    /*
-     *  경로에 파일이 존재하지 않으면
-     *  template.lua를 복제하여 스크립트를 생성한다.
-     */
-    if (!fs::exists(Path))
-    {
-        Path = fs::path(FileName);
-
-        fs::copy_file(DEFAULT_FILE_PATH, Path, fs::copy_options::overwrite_existing);
-    }
-    
     // 새 environment 생성 (globals 기반)
-    sol::environment Env(Lua, sol::create, Lua.globals());
+    InEnv = sol::environment (Lua, sol::create, Lua.globals());
 
     // 스크립트 실행
     sol::load_result scriptLoad = Lua.load_file(Path.string());
@@ -201,30 +246,51 @@ FScript* UScriptManager::GetOrCreate(FString InPath)
         throw Err;
     }
 
-    sol::protected_function_result result = scriptLoad(Env);
+    sol::protected_function_result result = scriptLoad(InEnv);
     if (!result.valid()) {
         sol::error Err = result;
         throw Err;
     }
-
-    // table 반환 여부 확인
-    sol::table ScriptTable;
+    
     // 혹은 스크립트가 return table이면 result 반환값 사용 가능
-    sol::object returned = Env["_G"];
+    sol::object returned = InEnv["_G"];
     if (returned.is<sol::table>()) {
-        ScriptTable = returned.as<sol::table>();
+        InScriptTable = returned.as<sol::table>();
     }
 
     // LuaTemplateFunction 생성
-    FLuaTemplateFunctions LuaTemplateFunction =
-        GetTemplateFunctionFromScript(Env);
+    InLuaTemplateFunction =
+        GetTemplateFunctionFromScript(InEnv);
+}
+
+FScript* UScriptManager::GetOrCreate(FString InScriptName)
+{
+    fs::path Path(SCRIPT_FILE_PATH + InScriptName);
+    FString ScriptName = Path.filename().string();
+
+    /*
+     *  경로에 파일이 존재하지 않으면
+     *  template.lua를 복제하여 스크립트를 생성한다.
+     */
+    if (!fs::exists(Path))
+    {
+        Path = fs::path(ScriptName);
+
+        fs::copy_file(DEFAULT_FILE_PATH, Path, fs::copy_options::overwrite_existing);
+    }
+    
+    sol::environment Env;
+    sol::table Table;
+    FLuaTemplateFunctions LuaTemplateFunctions;
+
+    SetLuaScriptField(Path, Env, Table, LuaTemplateFunctions);
 
     FScript* NewScript = new FScript;
 
-    NewScript->ScriptName = FileName;
+    NewScript->ScriptName = ScriptName;
     NewScript->Env = Env;
-    NewScript->Table = ScriptTable;
-    NewScript->LuaTemplateFunctions = LuaTemplateFunction;
+    NewScript->Table = Table;
+    NewScript->LuaTemplateFunctions = LuaTemplateFunctions;
 
     return NewScript;
 }
