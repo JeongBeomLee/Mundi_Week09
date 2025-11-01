@@ -5,10 +5,13 @@
 
 struct CoroutineEntry 
 {
+    sol::thread Thread;
     sol::coroutine Co;
     double WakeTime = 0.0;
     std::function<bool()> WaitUntil;
     bool WaitingNextFrame = false;
+
+    bool bFinished = false;
 };
 
 class UCoroutineScheduler : public UObject 
@@ -28,7 +31,7 @@ public:
 	}
 private:
     double CurrentTime = 0.0;
-    std::vector<CoroutineEntry> Entries;
+    TArray<CoroutineEntry> Entries;
 };
 
 // 코루틴 예시

@@ -4,20 +4,42 @@
 
 void UCoroutineScheduler::Start(sol::function F)
 {
-    sol::coroutine Co(F);
-    CoroutineEntry E{ Co, CurrentTime, nullptr, false };
-    Entries.push_back(std::move(E));
-    
-    UE_LOG("[Coroutine] Started new coroutine. Total entries: %zu", Entries.size());
+    sol::thread NewThread = sol::thread::create(F.lua_state());
+    sol::coroutine Co(NewThread.state(), F);
+
+    CoroutineEntry E{ NewThread, Co, CurrentTime, nullptr, false, false };
+    Entries.Add(std::move(E));
+
+    UE_LOG("[Coroutine] Started new coroutine. Total entries: %zu", Entries.Num());
 }
 
 void UCoroutineScheduler::Update(double Dt)
 {
     CurrentTime += Dt;
 
-    uint32 index = 0;
+    if (Entries.empty())
+    {
+		return;
+    }
+
     for (auto It = Entries.begin(); It != Entries.end();)
     {
+        if (It->bFinished)
+        {
+            It = Entries.erase(It);
+            continue;
+        }
+        ++It;
+    }
+
+    uint32 index = 0;
+    for (auto It = Entries.begin(); It != Entries.end(); ++It, ++index)
+    {
+        if(It->bFinished)
+        {
+            continue;
+		}
+
         bool Ready = false;
 
         if (It->WaitingNextFrame)
@@ -28,12 +50,6 @@ void UCoroutineScheduler::Update(double Dt)
         }
         else if (It->WaitUntil)
         {
-            /*UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
-                index++,
-                CurrentTime,
-                It->WakeTime,
-                It->WaitingNextFrame ? "true" : "false",
-                It->WaitUntil ? "true" : "false");*/
             if (It->WaitUntil())
             {
                 UE_LOG("[Coroutine] Ready: WaitUntil condition met, Entry index %u", index);
@@ -48,18 +64,13 @@ void UCoroutineScheduler::Update(double Dt)
                    CurrentTime, It->WakeTime, index);
             Ready = true;
         }
-        else
-        {
-            /*UE_LOG("[Coroutine] Waiting: CurrentTime: %.3f < WakeTime: %.3f", 
-                   CurrentTime, It->WakeTime);*/
-        }
 
-        if (!Ready) { ++It; continue; }
+        if (!Ready) { continue; }
 
         UE_LOG("[Coroutine] Executing coroutine..., Entry index %u", index);
         
-        // ✅ auto로 받아서 sol2가 자동으로 타입 추론하도록 함
-        auto result = It->Co();
+		// ✅ auto로 받아서 sol2가 자동으로 타입 추론하도록 함
+        auto result = It->Co(); // 다음 yield에 도달할 때까지 코루틴 실행 -> yield의 인자 리턴
         
         // ✅ 에러 체크
         if (!result.valid())
@@ -74,7 +85,8 @@ void UCoroutineScheduler::Update(double Dt)
         if (It->Co.status() == sol::call_status::ok)
         {
             UE_LOG("[Coroutine] Finished (status: ok), Entry index %u", index);
-            It = Entries.erase(It);
+            /*It = Entries.erase(It);*/
+			It->bFinished = true;
             continue;
         }
 
@@ -112,8 +124,5 @@ void UCoroutineScheduler::Update(double Dt)
             UE_LOG("[Coroutine] Yielded: unknown type (%d) (wait next frame), Entry index %u", static_cast<int>(ValueType), index);
             It->WaitingNextFrame = true;
         }
-
-        ++It;
-		++index;
     }
 }
