@@ -8,6 +8,8 @@
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
 #include "Source/Runtime/Engine/GameFramework/Pawn.h"
 #include "Source/Runtime/Engine/GameFramework/Character.h"
+#include "Source/Runtime/Engine/GameFramework/GameModeBase.h"
+#include "Source/Runtime/Engine/GameFramework/GameStateBase.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -291,6 +293,15 @@ void UScriptManager::RegisterUserTypeToLua()
         "LookUp", &ACharacter::LookUp
     );
 
+    // AGameModeBase 클래스 등록
+    Lua.new_usertype<AGameModeBase>("AGameModeBase",
+        sol::no_constructor,
+        "StartGame", &AGameModeBase::StartGame,
+        "PauseGame", &AGameModeBase::PauseGame,
+        "EndGame", &AGameModeBase::EndGame,
+        "IsGameStarted", [](AGameModeBase* gm) { return gm->GetGameState() && gm->GetGameState()->GetGameState() == EGameState::Playing; }
+    );
+
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
 }
 
@@ -319,6 +330,12 @@ void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalV
     else
     {
         InEnv["MyActor"] = Actor;
+    }
+
+    // GameMode 등록
+    if (LuaLocalValue.GameMode)
+    {
+        InEnv["GameMode"] = LuaLocalValue.GameMode;
     }
 }
 

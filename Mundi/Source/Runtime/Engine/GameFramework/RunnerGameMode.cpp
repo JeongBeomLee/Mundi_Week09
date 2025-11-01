@@ -58,6 +58,7 @@ void ARunnerGameMode::BeginPlay()
 
 			FLuaLocalValue LuaLocalValue;
 			LuaLocalValue.MyActor = SpawnedPawn;
+			LuaLocalValue.GameMode = this;  // GameMode 전달
 			UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "PlayerAutoMove.lua");
 
 			UE_LOG("[RunnerGameMode] PlayerAutoMove.lua attached successfully!");
@@ -82,6 +83,50 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 	// {
 	//     UpdateDifficulty(DeltaSeconds);
 	// }
+}
+
+void ARunnerGameMode::RestartGame()
+{
+	UE_LOG("[RunnerGameMode] RestartGame called!");
+
+	// 기존 Pawn에서 스크립트 명시적으로 제거
+	if (PlayerController && PlayerController->GetPawn())
+	{
+		UE_LOG("[RunnerGameMode] Detaching script from old pawn...");
+		UScriptManager::GetInstance().DetachScriptFrom(PlayerController->GetPawn(), "PlayerAutoMove.lua");
+	}
+
+	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
+	Super::RestartGame();
+
+	// 플레이어 리스폰
+	if (PlayerController)
+	{
+		UE_LOG("[RunnerGameMode] Restarting player...");
+		RestartPlayer(PlayerController);
+
+		// 새로 스폰된 Pawn에 다시 스크립트 부착
+		APawn* SpawnedPawn = PlayerController->GetPawn();
+		if (SpawnedPawn)
+		{
+			UE_LOG("[RunnerGameMode] Re-attaching PlayerAutoMove.lua to restarted player");
+			UE_LOG("[RunnerGameMode] New Pawn location: (%.1f, %.1f, %.1f)",
+				SpawnedPawn->GetActorLocation().X,
+				SpawnedPawn->GetActorLocation().Y,
+				SpawnedPawn->GetActorLocation().Z);
+
+			FLuaLocalValue LuaLocalValue;
+			LuaLocalValue.MyActor = SpawnedPawn;
+			LuaLocalValue.GameMode = this;
+			UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "PlayerAutoMove.lua");
+
+			UE_LOG("[RunnerGameMode] Player restarted successfully!");
+		}
+		else
+		{
+			UE_LOG("[RunnerGameMode] ERROR: Failed to get spawned pawn after restart!");
+		}
+	}
 }
 
 // ────────────────────────────────────────────────────────────────────────────

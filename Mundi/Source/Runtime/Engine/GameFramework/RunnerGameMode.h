@@ -52,6 +52,10 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+public:
+	/** 게임 재시작 (플레이어 리스폰) */
+	virtual void RestartGame() override;
+
 	/** 난이도 설정 */
 	float BaseDifficulty = 1.0f;
 	float DifficultyIncreaseRate = 0.1f;

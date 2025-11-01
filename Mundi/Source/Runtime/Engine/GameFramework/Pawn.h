@@ -107,13 +107,13 @@ public:
 	 * @param DeltaRoll - 추가할 Roll 값 (도 단위)
 	 */
 	virtual void AddControllerRollInput(float DeltaRoll);
-
+	virtual void BeginPlay() override;
 protected:
 	// ────────────────────────────────────────────────
 	// 생명주기
 	// ────────────────────────────────────────────────
 
-	virtual void BeginPlay() override;
+	
 	virtual void Tick(float DeltaSeconds) override;
 
 	// ────────────────────────────────────────────────

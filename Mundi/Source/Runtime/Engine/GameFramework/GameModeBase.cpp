@@ -296,10 +296,12 @@ void AGameModeBase::RestartPlayer(APlayerController* Player)
 	UE_LOG("[GameMode] Restarting player...");
 
 	// 기존 Pawn 제거
-	if (Player->GetPawn())
+	APawn* OldPawn = Player->GetPawn();
+	if (OldPawn)
 	{
 		Player->UnPossess();
-		World->DestroyActor(Player->GetPawn());
+		World->DestroyActor(OldPawn);  // UnPossess 전에 저장한 OldPawn 사용
+		//UE_LOG("[GameMode] Old pawn destroyed: %s", OldPawn->GetName().ToString());
 	}
 
 	// 새 Pawn 스폰
@@ -312,6 +314,8 @@ void AGameModeBase::RestartPlayer(APlayerController* Player)
 
 	if (NewPawn)
 	{
+		// PIE 모드에서 런타임 스폰된 Pawn은 BeginPlay를 수동으로 호출해야 함
+		NewPawn->BeginPlay();
 		UE_LOG("[GameMode] Player restarted!");
 	}
 }
