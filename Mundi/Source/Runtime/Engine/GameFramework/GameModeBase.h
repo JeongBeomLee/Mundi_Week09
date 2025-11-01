@@ -42,6 +42,21 @@ public:
 	virtual FVector GetPlayerSpawnLocation() const;
 	virtual void SetPlayerSpawnLocation(const FVector& Location);
 
+	/** PlayerController 생성 */
+	virtual APlayerController* SpawnPlayerController();
+
+	/** 플레이어를 위한 기본 Pawn 스폰 */
+	virtual APawn* SpawnDefaultPawnFor(APlayerController* NewPlayer, const FTransform& SpawnTransform);
+
+	/** 플레이어를 위한 기본 Pawn 클래스 반환 */
+	virtual UClass* GetDefaultPawnClassForController(APlayerController* InController);
+
+	/** 플레이어 리스폰 */
+	virtual void RestartPlayer(APlayerController* Player);
+
+	/** 메인 플레이어 컨트롤러 반환 */
+	APlayerController* GetPlayerController() const { return PlayerController; }
+
 	// GameState 접근자
 	AGameStateBase* GetGameState() const { return GameState.Get(); }
 	void SetGameState(AGameStateBase* NewGameState);
@@ -61,10 +76,19 @@ protected:
 	// 플레이어 스폰 위치
 	FVector PlayerSpawnLocation;
 
-	// DefaultPawn, PlayerController 클래스 (창근아 여기야)
-	// UClass* DefaultPawnClass;
-	// UClass* PlayerControllerClass;
+	// DefaultPawn, PlayerController 클래스
+	UClass* DefaultPawnClass;
+	UClass* PlayerControllerClass;
+
+	// 메인 플레이어 컨트롤러 인스턴스
+	APlayerController* PlayerController;
 
 	// 게임 시작 여부
 	bool bGameStarted;
+
+	// 자동으로 플레이어 스폰 여부
+	bool bAutoSpawnPlayer;
+
+	/** 플레이어 초기화 */
+	virtual void InitPlayer();
 };
