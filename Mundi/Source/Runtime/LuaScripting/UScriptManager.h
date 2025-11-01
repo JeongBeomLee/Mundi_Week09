@@ -54,13 +54,20 @@ public:
 
     TMap<AActor*, TArray<FScript*>>& GetScriptsByOwner();
     TArray<FScript*> GetScriptsOfActor(AActor* InActor);
-    
+
     // 매 Frame마다 호출되는 함수
     void CheckAndHotReloadLuaScript();
     void UpdateCoroutineState(double Dt)
     {
         CoroutineScheduler.Update(Dt);
 	}
+
+    // 스크립트 파일 생성 (template.lua 복사)
+    bool CreateScriptFile(const FString& ScriptName);
+
+    // 스크립트 파일을 외부 에디터로 열기
+    bool OpenScriptInEditor(const FString& ScriptName);
+
 public:
     static UScriptManager& GetInstance();
 private:

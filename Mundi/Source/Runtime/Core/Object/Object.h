@@ -296,7 +296,15 @@ public:                                                                       \
 	    FLuaLocalValue LuaLocalValue = {NewObject};                           \
 	    for (FScript* Script : ScriptManager.GetScriptsOfActor(const_cast<ActorClass*>(this)))  \
 	    {                                                                     \
-		    ScriptManager.AttachScriptTo(LuaLocalValue, Script->ScriptName);  \
+		    try                                                               \
+		    {                                                                 \
+			    ScriptManager.AttachScriptTo(LuaLocalValue, Script->ScriptName); \
+		    }                                                                 \
+		    catch (const std::exception& e)                                   \
+		    {                                                                 \
+			    UE_LOG("[Actor Duplicate] Failed to attach script '%s': %s",  \
+			           Script->ScriptName.c_str(), e.what());                 \
+		    }                                                                 \
 	    }                                                                     \
         return NewObject;                                                     \
     }

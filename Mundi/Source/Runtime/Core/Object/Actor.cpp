@@ -617,9 +617,20 @@ void AActor::Serialize(const bool bInIsLoading, JSON& InOutHandle)
 				FString ScriptName = ScriptsJson.at(i).ToString();
 				if (!ScriptName.empty())
 				{
-					FLuaLocalValue LuaLocalValue;
-					LuaLocalValue.MyActor = this;
-					UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, ScriptName);
+					try
+					{
+						FLuaLocalValue LuaLocalValue;
+						LuaLocalValue.MyActor = this;
+						UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, ScriptName);
+					}
+					catch (const std::exception& e)
+					{
+						// Script 파일이 없거나 로드 실패 시 경고만 출력하고 계속 진행
+						UE_LOG("[Actor] Failed to attach script '%s' to actor '%s': %s",
+							   ScriptName.c_str(),
+							   GetName().ToString().c_str(),
+							   e.what());
+					}
 				}
 			}
 		}

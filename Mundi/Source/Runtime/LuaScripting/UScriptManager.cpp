@@ -51,6 +51,8 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString&
     {
         FString ErrorMessage = FString("[Script Manager] ") + ScriptName + " creation failed : " + e.what();
         UE_LOG(ErrorMessage.c_str());
+        // 예외를 다시 던져서 호출자가 처리할 수 있도록 함
+        throw;
     }
 }
 
@@ -361,15 +363,13 @@ FScript* UScriptManager::GetOrCreate(FString InScriptName)
     fs::path Path(SCRIPT_FILE_PATH + InScriptName);
     FString ScriptName = Path.filename().string();
 
-    /*
-     *  경로에 파일이 존재하지 않으면
-     *  template.lua를 복제하여 스크립트를 생성한다.
-     */
+    // 파일이 존재하지 않으면 예외 발생
     if (!fs::exists(Path))
     {
-        fs::copy_file(DEFAULT_FILE_PATH, Path, fs::copy_options::overwrite_existing);
+        throw std::runtime_error(FString("Script file not found: ") + ScriptName +
+                                 ". Please create the script file first.");
     }
-    
+
     sol::environment Env;
     sol::table Table;
     FLuaTemplateFunctions LuaTemplateFunctions;
@@ -390,4 +390,94 @@ FScript* UScriptManager::GetOrCreate(FString InScriptName)
     }
 
     return NewScript;
+}
+
+// 스크립트 파일 생성 (template.lua 복사)
+bool UScriptManager::CreateScriptFile(const FString& ScriptName)
+{
+    try
+    {
+        fs::path TargetPath(SCRIPT_FILE_PATH + ScriptName);
+
+        // 이미 파일이 존재하면 false 반환
+        if (fs::exists(TargetPath))
+        {
+            UE_LOG("[Script Manager] Script file already exists: %s", ScriptName.c_str());
+            return false;
+        }
+
+        // Scripts 디렉토리가 없으면 생성
+        fs::path ScriptDir(SCRIPT_FILE_PATH);
+        if (!fs::exists(ScriptDir))
+        {
+            fs::create_directories(ScriptDir);
+        }
+
+        // template.lua 복사
+        fs::copy_file(DEFAULT_FILE_PATH, TargetPath, fs::copy_options::overwrite_existing);
+
+        UE_LOG("[Script Manager] Created new script file: %s", ScriptName.c_str());
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        UE_LOG("[Script Manager] Failed to create script file: %s - Error: %s",
+               ScriptName.c_str(), e.what());
+        return false;
+    }
+}
+
+// 스크립트 파일을 외부 에디터로 열기
+bool UScriptManager::OpenScriptInEditor(const FString& ScriptName)
+{
+    try
+    {
+        fs::path ScriptPath(SCRIPT_FILE_PATH + ScriptName);
+
+        // 파일이 존재하는지 확인
+        if (!fs::exists(ScriptPath))
+        {
+            UE_LOG("[Script Manager] Script file not found: %s", ScriptName.c_str());
+            return false;
+        }
+
+        // 절대 경로로 변환
+        fs::path AbsolutePath = fs::absolute(ScriptPath);
+        FString PathStr = AbsolutePath.string();
+
+        // Windows에서 기본 텍스트 에디터로 열기
+#ifdef _WIN32
+        HINSTANCE Result = ShellExecuteA(
+            nullptr,              // hwnd
+            "open",               // operation
+            PathStr.c_str(),      // file
+            nullptr,              // parameters
+            nullptr,              // directory
+            SW_SHOW               // show command
+        );
+
+        // ShellExecute는 성공 시 32보다 큰 값을 반환
+        if ((INT_PTR)Result > 32)
+        {
+            UE_LOG("[Script Manager] Opened script in editor: %s", ScriptName.c_str());
+            return true;
+        }
+        else
+        {
+            UE_LOG("[Script Manager] Failed to open script in editor: %s", ScriptName.c_str());
+            return false;
+        }
+#else
+        // Linux/Mac의 경우 시스템 명령으로 처리
+        FString Command = "xdg-open \"" + PathStr + "\"";
+        int Result = system(Command.c_str());
+        return Result == 0;
+#endif
+    }
+    catch (const std::exception& e)
+    {
+        UE_LOG("[Script Manager] Exception while opening script: %s - Error: %s",
+               ScriptName.c_str(), e.what());
+        return false;
+    }
 }
