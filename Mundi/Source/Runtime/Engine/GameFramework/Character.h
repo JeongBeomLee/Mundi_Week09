@@ -104,22 +104,8 @@ public:
 	 */
 	bool IsFalling() const;
 
-protected:
 	// ────────────────────────────────────────────────
-	// 생명주기
-	// ────────────────────────────────────────────────
-
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
-
-	// ────────────────────────────────────────────────
-	// 입력 바인딩 (오버라이드)
-	// ────────────────────────────────────────────────
-
-	virtual void SetupPlayerInputComponent(UInputComponent* InInputComponent) override;
-
-	// ────────────────────────────────────────────────
-	// 이동 입력 콜백 (예시)
+	// 이동 입력 함수 (Lua에서 호출 가능)
 	// ────────────────────────────────────────────────
 
 	/** 앞/뒤 이동 */
@@ -133,6 +119,20 @@ protected:
 
 	/** 위/아래 회전 */
 	void LookUp(float Value);
+
+protected:
+	// ────────────────────────────────────────────────
+	// 생명주기
+	// ────────────────────────────────────────────────
+
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
+
+	// ────────────────────────────────────────────────
+	// 입력 바인딩 (오버라이드)
+	// ────────────────────────────────────────────────
+
+	virtual void SetupPlayerInputComponent(UInputComponent* InInputComponent) override;
 
 	// ────────────────────────────────────────────────
 	// 멤버 변수

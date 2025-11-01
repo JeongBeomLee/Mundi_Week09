@@ -1,4 +1,4 @@
-// ────────────────────────────────────────────────────────────────────────────
+﻿// ────────────────────────────────────────────────────────────────────────────
 // CharacterMovementComponent.cpp
 // Character 이동 컴포넌트 구현
 // ────────────────────────────────────────────────────────────────────────────
@@ -26,7 +26,7 @@ UCharacterMovementComponent::UCharacterMovementComponent()
 	, TimeInAir(0.0f)
 	, bIsJumping(false)
 	// 이동 설정
-	, MaxWalkSpeed(600.0f)           // 6 m/s
+	, MaxWalkSpeed(30.0f)           // 0.3 m/s
 	, MaxAcceleration(2048.0f)       // 20.48 m/s²
 	, GroundFriction(8.0f)
 	, AirControl(0.05f)
@@ -129,7 +129,7 @@ void UCharacterMovementComponent::AddInputVector(FVector WorldDirection, float S
 	WorldDirection.Z = 0.0f;
 	FVector NormalizedDirection = WorldDirection.GetNormalized();
 
-	PendingInputVector += NormalizedDirection * ScaleValue;
+ 	PendingInputVector += NormalizedDirection * ScaleValue;
 }
 
 bool UCharacterMovementComponent::Jump()

@@ -673,6 +673,9 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Slate\Windows\UIWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Scripts\actor_transform.lua" />
+    <None Include="Scripts\PlayerAutoMove.lua" />
+    <None Include="Scripts\print_debug_log.lua" />
     <None Include="Scripts\template.lua" />
     <None Include="Scripts\test_coroutine.lua">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

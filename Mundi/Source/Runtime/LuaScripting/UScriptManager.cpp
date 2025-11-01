@@ -6,6 +6,8 @@
 #include "Source/Runtime/Core/Object/Actor.h"
 #include "Source/Runtime/Engine/Components/SceneComponent.h"
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
+#include "Source/Runtime/Engine/GameFramework/Pawn.h"
+#include "Source/Runtime/Engine/GameFramework/Character.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -267,6 +269,28 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetName", &AActor::GetName
     );
 
+    // APawn 클래스 등록 (AActor 상속)
+    Lua.new_usertype<APawn>("APawn",
+        sol::base_classes, sol::bases<AActor>(),
+        "AddMovementInput", &APawn::AddMovementInput,
+        "ConsumeMovementInput", &APawn::ConsumeMovementInput
+    );
+
+    // ACharacter 클래스 등록 (APawn 상속)
+    Lua.new_usertype<ACharacter>("ACharacter",
+        sol::base_classes, sol::bases<APawn, AActor>(),
+        "Jump", &ACharacter::Jump,
+        "StopJumping", &ACharacter::StopJumping,
+        "CanJump", &ACharacter::CanJump,
+        "GetVelocity", &ACharacter::GetVelocity,
+        "IsGrounded", &ACharacter::IsGrounded,
+        "IsFalling", &ACharacter::IsFalling,
+        "MoveForward", &ACharacter::MoveForward,
+        "MoveRight", &ACharacter::MoveRight,
+        "Turn", &ACharacter::Turn,
+        "LookUp", &ACharacter::LookUp
+    );
+
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
 }
 
@@ -278,7 +302,24 @@ void UScriptManager::RegisterGlobalFuncToLua()
 
 void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)
 {
-    InEnv["MyActor"] = LuaLocalValue.MyActor;
+    // MyActor를 실제 타입으로 캐스팅해서 등록
+    AActor* Actor = LuaLocalValue.MyActor;
+
+    // Character로 캐스팅 시도
+    if (ACharacter* Character = Cast<ACharacter>(Actor))
+    {
+        InEnv["MyActor"] = Character;
+    }
+    // Pawn으로 캐스팅 시도
+    else if (APawn* Pawn = Cast<APawn>(Actor))
+    {
+        InEnv["MyActor"] = Pawn;
+    }
+    // 그냥 Actor
+    else
+    {
+        InEnv["MyActor"] = Actor;
+    }
 }
 
 // 스크립트를 Actor에 부착할 때 Actor의 ShapeComponent에 Lua의 OnOverlap 함수를 연결한다

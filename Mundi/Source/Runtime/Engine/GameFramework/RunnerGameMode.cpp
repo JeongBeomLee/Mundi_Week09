@@ -6,6 +6,7 @@
 #include "RunnerGameMode.h"
 #include "Character.h"
 #include "PlayerController.h"
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 IMPLEMENT_CLASS(ARunnerGameMode)
 
@@ -43,9 +44,33 @@ ARunnerGameMode::~ARunnerGameMode()
 
 void ARunnerGameMode::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();  // ← 여기서 InitPlayer()가 호출되어 Character 스폰됨
 
 	UE_LOG("[RunnerGameMode] BeginPlay - Runner Game Starting!");
+
+	// Player가 스폰된 직후, Character::BeginPlay 이전에 스크립트 부착
+	if (PlayerController)
+	{
+		APawn* SpawnedPawn = PlayerController->GetPawn();
+		if (SpawnedPawn)
+		{
+			UE_LOG("[RunnerGameMode] Attaching PlayerAutoMove.lua to spawned player");
+
+			FLuaLocalValue LuaLocalValue;
+			LuaLocalValue.MyActor = SpawnedPawn;
+			UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "PlayerAutoMove.lua");
+
+			UE_LOG("[RunnerGameMode] PlayerAutoMove.lua attached successfully!");
+		}
+		else
+		{
+			UE_LOG("[RunnerGameMode] ERROR: SpawnedPawn is null!");
+		}
+	}
+	else
+	{
+		UE_LOG("[RunnerGameMode] ERROR: PlayerController is null!");
+	}
 }
 
 void ARunnerGameMode::Tick(float DeltaSeconds)
