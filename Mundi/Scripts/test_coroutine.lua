@@ -30,7 +30,7 @@ function Tick(dt)
 end
 
 function MoveWithCo()
-    PrintToConsole("MyActor: ".. MyActor:GetName():ToString());
+    PrintToConsole("In lua: Coroutine Start:".. MyActor:GetName():ToString());
     -- 스케일 변경
     local newScale = FVector.new(2, 2, 2);
     MyActor:SetScale(newScale);
@@ -47,12 +47,12 @@ function MoveWithCo()
     MyActor:AddWorldLocation(deltaLocation);
     -- PrintToConsole("In lua: [Coroutine Move 1] ");
     coroutine.yield(0.5);
-    PrintToConsole("In lua: end yield 1");
+    PrintToConsole("In lua: end yield 1 ".. MyActor:GetName():ToString());
 
     MyActor:AddWorldLocation(deltaLocation);
     -- PrintToConsole("In lua: [Coroutine Move 2] ");
     coroutine.yield(2.0);
-    PrintToConsole("In lua: end yield 2");
+    PrintToConsole("In lua: end yield 2 ".. MyActor:GetName():ToString());
 
     MyActor:AddWorldLocation(deltaLocation);
     -- -- PrintToConsole("In lua: [Coroutine Move 3] ");
@@ -63,5 +63,5 @@ function MoveWithCo()
     --     return count >= 3              -- resume after 3 checks
     -- end)
     coroutine.yield(4.0);
-    PrintToConsole("In lua: end yield 3");
+    PrintToConsole("In lua: end yield 3 ".. MyActor:GetName():ToString());
 end

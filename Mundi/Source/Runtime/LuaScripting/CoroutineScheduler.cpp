@@ -22,41 +22,30 @@ void UCoroutineScheduler::Update(double Dt)
 
         if (It->WaitingNextFrame)
         {
-            UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
-                index++,
-                CurrentTime,
-                It->WakeTime,
-                It->WaitingNextFrame ? "true" : "false",
-                It->WaitUntil ? "true" : "false");
-            UE_LOG("[Coroutine] Ready: WaitingNextFrame");
+            UE_LOG("[Coroutine] Ready: WaitingNextFrame, Entry index %u", index);
             Ready = true;
             It->WaitingNextFrame = false;
         }
         else if (It->WaitUntil)
         {
-            UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
+            /*UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
                 index++,
                 CurrentTime,
                 It->WakeTime,
                 It->WaitingNextFrame ? "true" : "false",
-                It->WaitUntil ? "true" : "false");
+                It->WaitUntil ? "true" : "false");*/
             if (It->WaitUntil())
             {
-                UE_LOG("[Coroutine] Ready: WaitUntil condition met");
+                UE_LOG("[Coroutine] Ready: WaitUntil condition met, Entry index %u", index);
                 Ready = true;
                 It->WaitUntil = nullptr;
             }
         }
         else if (CurrentTime >= It->WakeTime)
         {
-            UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
-                index++,
-                CurrentTime,
-                It->WakeTime,
-                It->WaitingNextFrame ? "true" : "false",
-                It->WaitUntil ? "true" : "false");
-            UE_LOG("[Coroutine] Ready: WakeTime reached (CurrentTime: %.3f >= WakeTime: %.3f)", 
-                   CurrentTime, It->WakeTime);
+
+            UE_LOG("[Coroutine] Ready: WakeTime reached (CurrentTime: %.3f >= WakeTime: %.3f), Entry index %u",
+                   CurrentTime, It->WakeTime, index);
             Ready = true;
         }
         else
@@ -67,7 +56,7 @@ void UCoroutineScheduler::Update(double Dt)
 
         if (!Ready) { ++It; continue; }
 
-        UE_LOG("[Coroutine] Executing coroutine...");
+        UE_LOG("[Coroutine] Executing coroutine..., Entry index %u", index);
         
         // ✅ auto로 받아서 sol2가 자동으로 타입 추론하도록 함
         auto result = It->Co();
@@ -84,7 +73,7 @@ void UCoroutineScheduler::Update(double Dt)
         // ✅ 코루틴 상태 확인
         if (It->Co.status() == sol::call_status::ok)
         {
-            UE_LOG("[Coroutine] Finished (status: ok)");
+            UE_LOG("[Coroutine] Finished (status: ok), Entry index %u", index);
             It = Entries.erase(It);
             continue;
         }
@@ -92,13 +81,13 @@ void UCoroutineScheduler::Update(double Dt)
         // ✅ yield 값 해석 - sol::object로 명시적 변환
         sol::object YieldedValue = result;  // auto -> sol::object
         sol::type ValueType = YieldedValue.get_type();
-        
-        UE_LOG("[Coroutine] Yielded value type: %d", static_cast<int>(ValueType));
+
+        UE_LOG("[Coroutine] Yielded value type: %d, Entry index %u", static_cast<int>(ValueType), index);
 
         // ✅ nil 체크
         if (ValueType == sol::type::lua_nil)
         {
-            UE_LOG("[Coroutine] Yielded: nil (wait next frame)");
+            UE_LOG("[Coroutine] Yielded: nil (wait next frame), Entry index %u", index);  
             It->WaitingNextFrame = true;
         }
         // ✅ number 타입
@@ -106,12 +95,12 @@ void UCoroutineScheduler::Update(double Dt)
         {
             double Sec = YieldedValue.as<double>();
             It->WakeTime = CurrentTime + Sec;
-            UE_LOG("[Coroutine] Yielded: %.3f seconds (WakeTime: %.3f)", Sec, It->WakeTime);
+            UE_LOG("[Coroutine] Yielded: %.3f seconds (WakeTime: %.3f), Entry index %u", Sec, It->WakeTime, index);
         }
         // ✅ function 타입
         else if (ValueType == sol::type::function)
         {
-            UE_LOG("[Coroutine] Yielded: function (wait until condition)");
+            UE_LOG("[Coroutine] Yielded: function (wait until condition), Entry index %u", index);
             sol::function Pred = YieldedValue.as<sol::function>();
             It->WaitUntil = [Pred]() {
                 sol::protected_function_result R = Pred();
@@ -120,10 +109,11 @@ void UCoroutineScheduler::Update(double Dt)
         }
         else
         {
-            UE_LOG("[Coroutine] Yielded: unknown type (%d) (wait next frame)", static_cast<int>(ValueType));
+            UE_LOG("[Coroutine] Yielded: unknown type (%d) (wait next frame), Entry index %u", static_cast<int>(ValueType), index);
             It->WaitingNextFrame = true;
         }
 
         ++It;
+		++index;
     }
 }
