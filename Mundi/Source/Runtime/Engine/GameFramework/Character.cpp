@@ -78,6 +78,11 @@ void ACharacter::SetupPlayerInputComponent(UInputComponent* InInputComponent)
 {
 	Super::SetupPlayerInputComponent(InInputComponent);
 
+	// 점프 입력 바인딩 (스페이스바)
+	InInputComponent->BindAction("Jump", VK_SPACE, this, &ACharacter::Jump, &ACharacter::StopJumping);
+
+	UE_LOG("[Character] Input bindings set up - Jump bound to SPACE");
+
 	// 기본 입력 바인딩 예시 (파생 클래스에서 오버라이드 가능)
 	//
 	// 이동
@@ -85,9 +90,6 @@ void ACharacter::SetupPlayerInputComponent(UInputComponent* InInputComponent)
 	// InInputComponent->BindAxis("MoveForward", 'S', -1.0f, this, &ACharacter::MoveForward);
 	// InInputComponent->BindAxis("MoveRight", 'D', 1.0f, this, &ACharacter::MoveRight);
 	// InInputComponent->BindAxis("MoveRight", 'A', -1.0f, this, &ACharacter::MoveRight);
-	//
-	// 점프
-	// InInputComponent->BindAction("Jump", VK_SPACE, this, &ACharacter::Jump, &ACharacter::StopJumping);
 	//
 	// 회전
 	// InInputComponent->BindAxis("Turn", VK_RIGHT, 1.0f, this, &ACharacter::Turn);

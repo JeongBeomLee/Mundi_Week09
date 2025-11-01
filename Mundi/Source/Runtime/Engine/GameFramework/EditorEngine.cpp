@@ -7,7 +7,7 @@
 #include "GameModeBase.h"
 #include "GameStateBase.h"
 #include"RunnerGameMode.h"
-
+#include"CameraActor.h"
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;
 
@@ -370,6 +370,22 @@ void UEditorEngine::StartPIE()
         PIEWorld->GameMode->SetGameState(PIEWorld->GameState);
     }
     UE_LOG("PIE: GameMode/GameState 생성 완료");
+
+    // PIE World의 MainCamera 설정 (복사된 CameraActor 찾기)
+    for (AActor* Actor : PIEWorld->GetLevel()->GetActors())
+    {
+        if (ACameraActor* CameraActor = Cast<ACameraActor>(Actor))
+        {
+            PIEWorld->SetCameraActor(CameraActor);
+            UE_LOG("PIE: MainCamera set to %s", CameraActor->GetName().ToString());
+            break;
+        }
+    }
+
+    if (!PIEWorld->GetCameraActor())
+    {
+        UE_LOG("PIE: WARNING - No CameraActor found in PIE world!");
+    }
 
     // GameHUD에 GameState 설정
     SLATE.SetPIEWorld(GWorld);

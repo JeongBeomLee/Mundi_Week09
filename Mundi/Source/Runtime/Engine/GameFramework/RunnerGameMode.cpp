@@ -7,6 +7,7 @@
 #include "Character.h"
 #include "PlayerController.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include"CameraActor.h"
 
 IMPLEMENT_CLASS(ARunnerGameMode)
 
@@ -77,6 +78,33 @@ void ARunnerGameMode::BeginPlay()
 void ARunnerGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// 카메라를 플레이어 뒤에서 따라가도록 업데이트
+	if (PlayerController && PlayerController->GetPawn() && World->GetCameraActor())
+	{
+		APawn* PlayerPawn = PlayerController->GetPawn();
+		ACameraActor* Camera = World->GetCameraActor();
+
+		// 플레이어 위치
+		FVector PlayerLocation = PlayerPawn->GetActorLocation();
+
+		// 카메라 위치: 플레이어 뒤쪽(-600) 위쪽(+300)
+		FVector CameraOffset(-10.0f, 0.0f, 10.0f);
+		FVector CameraLocation = PlayerLocation + CameraOffset;
+
+		// 카메라 위치 설정
+		Camera->SetActorLocation(CameraLocation);
+
+		//// 카메라가 플레이어를 향하도록 회전
+		//FVector LookAtTarget = PlayerLocation + FVector(0.0f, 0.0f, 50.0f); // 플레이어 중심보다 약간 위
+		//FVector Direction = (LookAtTarget - CameraLocation).GetNormalized();
+
+		//// Direction으로부터 Rotation 계산
+		//float Pitch = asinf(-Direction.Z) * (180.0f / 3.14159265f);
+		//float Yaw = atan2f(Direction.Y, Direction.X) * (180.0f / 3.14159265f);
+
+		//Camera->SetActorRotation(FQuat::MakeFromEulerZYX(FVector(Pitch, Yaw, 0.0f)));
+	}
 
 	// 게임 진행 중이면 난이도 업데이트 (나중에 구현)
 	// if (GetGameState() && GetGameState()->IsMatchInProgress())

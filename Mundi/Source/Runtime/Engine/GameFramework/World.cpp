@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "SelectionManager.h"
 #include "Picking.h"
 #include "CameraActor.h"
@@ -163,7 +163,7 @@ UWorld* UWorld::DuplicateWorldForPIE(UWorld* InEditorWorld)
 		NewActor->SetWorld(PIEWorld);
 		
 	}
-
+	PIEWorld->MainCameraActor = InEditorWorld->GetCameraActor();
 	return PIEWorld;
 }
 
