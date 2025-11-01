@@ -4,7 +4,6 @@
 #include "SelectionManager.h"
 #include <ObjManager.h>
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
-#include "Source/Runtime/Event/Event.h"
 #include "GameModeBase.h"
 #include "GameStateBase.h"
 
@@ -384,4 +383,9 @@ void UEditorEngine::StartPIE()
 void UEditorEngine::EndPIE()
 {
     bChangedPieToEditor = true;
+    
+    for (AActor* Actor : GWorld->GetLevel()->GetActors())
+    {
+        Actor->EndPlay(EEndPlayReason::EndPlayInEditor);
+    }
 }

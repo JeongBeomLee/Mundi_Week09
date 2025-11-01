@@ -25,7 +25,6 @@
 #include "Level.h"
 #include "LightManager.h"
 #include "ShadowManager.h"
-#include "Source/Runtime/Event/Event.h"
 #include "CollisionManager.h"
 
 IMPLEMENT_CLASS(UWorld)
@@ -143,7 +142,6 @@ UWorld* UWorld::DuplicateWorldForPIE(UWorld* InEditorWorld)
 		}
 
 		AActor* NewActor = SourceActor->Duplicate();
-		UE_LOG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
 		if (!NewActor)
 		{

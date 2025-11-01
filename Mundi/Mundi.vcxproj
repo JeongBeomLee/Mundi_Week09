@@ -226,7 +226,6 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\GameFramework\GameModeBase.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp" />
-    <ClCompile Include="Source\Runtime\Event\Event.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\CoroutineScheduler.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp" />
@@ -513,7 +512,6 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\GameModeBase.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h" />
-    <ClInclude Include="Source\Runtime\Event\Event.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\CoroutineScheduler.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h" />
