@@ -9,7 +9,7 @@
 IMPLEMENT_CLASS(AController)
 
 BEGIN_PROPERTIES(AController)
-	MARK_AS_SPAWNABLE("Controller", "Pawn을 빙의하여 제어하는 기본 Controller 클래스입니다.")
+	//MARK_AS_SPAWNABLE("Controller", "Pawn을 빙의하여 제어하는 기본 Controller 클래스입니다.")
 END_PROPERTIES()
 
 // ────────────────────────────────────────────────────────────────────────────
