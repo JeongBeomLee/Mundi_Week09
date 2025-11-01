@@ -1,0 +1,77 @@
+﻿#pragma once
+#include "Info.h"
+
+// Forward Declarations
+class AGameStateBase;
+class UWorld;
+class APawn;
+class APlayerController;
+
+// 게임 시작 델리게이트
+DECLARE_MULTICAST_DELEGATE(FOnGameStarted);
+
+// 게임 종료 델리게이트 (bVictory)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameEnded, bool);
+
+// 게임 재시작 델리게이트
+DECLARE_MULTICAST_DELEGATE(FOnGameRestarted);
+
+// 게임 모드를 관리하는 클래스
+// 게임 규칙, 플레이어 스폰, 게임 상태 전환 등을 담당
+class AGameModeBase : public AInfo
+{
+public:
+	DECLARE_CLASS(AGameModeBase, AInfo)
+	GENERATED_REFLECTION_BODY()
+
+	AGameModeBase();
+	virtual ~AGameModeBase() = default;
+
+	// AActor 오버라이드
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+	// 게임 라이프사이클
+	virtual void StartGame();
+	virtual void EndGame(bool bVictory);
+	virtual void RestartGame();
+	virtual void PauseGame();
+	virtual void ResumeGame();
+
+	// 플레이어 관리
+	virtual FVector GetPlayerSpawnLocation() const;
+	virtual void SetPlayerSpawnLocation(const FVector& Location);
+
+	// GameState 접근자
+	AGameStateBase* GetGameState() const { return GameState.Get(); }
+	void SetGameState(AGameStateBase* NewGameState);
+
+	// World 접근자
+	UWorld* GetWorld() const { return OwningWorld; }
+	void SetWorld(UWorld* World) { OwningWorld = World; }
+
+	// 델리게이트
+	FOnGameStarted OnGameStarted;
+	FOnGameEnded OnGameEnded;
+	FOnGameRestarted OnGameRestarted;
+
+	DECLARE_DUPLICATE(AGameModeBase)
+	void DuplicateSubObjects() override;
+
+protected:
+	// GameState 참조
+	TWeakPtr<AGameStateBase> GameState;
+
+	// 소유하는 World
+	UWorld* OwningWorld;
+
+	// 플레이어 스폰 위치
+	FVector PlayerSpawnLocation;
+
+	// DefaultPawn, PlayerController 클래스 (창근아 여기야)
+	// UClass* DefaultPawnClass;
+	// UClass* PlayerControllerClass;
+
+	// 게임 시작 여부
+	bool bGameStarted;
+};
