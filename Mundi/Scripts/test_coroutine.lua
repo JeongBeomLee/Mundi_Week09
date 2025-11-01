@@ -3,7 +3,7 @@ local _ENV = ...
 -- BeginPlay: Actor가 생성되거나 레벨이 시작될 때 호출
 function BeginPlay()
     PrintToConsole("[Begin Play] ");
-    
+
     -- ✅ 코루틴으로 감싸서 시작
     StartCoroutine(function()
         MoveWithCo()
@@ -51,11 +51,16 @@ function MoveWithCo()
 
     MyActor:AddWorldLocation(deltaLocation);
     PrintToConsole("In lua: [Coroutine Move 2] ");
-    coroutine.yield(0.5);
+    coroutine.yield(2.0);
     PrintToConsole("In lua: end yield 2");
 
     MyActor:AddWorldLocation(deltaLocation);
     PrintToConsole("In lua: [Coroutine Move 3] ");
-    coroutine.yield(0.5);
+    local count = 0
+    coroutine.yield(function()
+        count = count + 1
+        PrintToConsole("In lua: [Coroutine Count 4] ");
+        return count >= 3              -- resume after 3 checks
+    end)
     PrintToConsole("In lua: end yield 3");
 end
