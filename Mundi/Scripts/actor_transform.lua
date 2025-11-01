@@ -38,7 +38,7 @@ function Tick(deltaTime)
     MyActor:SetRotation(newRotation)
 
     -- 상대 위치 이동
-    local deltaLocation = FVector.new(10, 0, 0)
+    local deltaLocation = FVector.new(0, 10, 0)
     MyActor:AddWorldLocation(deltaLocation * deltaTime)
 
     -- elapsed = elapsed + deltaTime
@@ -68,7 +68,13 @@ function Tick(deltaTime)
 end
 
 -- OnOverlap: 다른 Actor와 충돌했을 때 호출
-function OnOverlap(OtherActor)
+function OnOverlap(
+    OverlappedComponent,
+    OtherActor,
+    OtherComp,
+    ContactPoint,
+    PenetrationDepth
+)
     PrintToConsole("[Lua] OnOverlap Called");
 end
 

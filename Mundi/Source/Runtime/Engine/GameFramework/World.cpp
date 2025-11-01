@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "SelectionManager.h"
 #include "Picking.h"
 #include "CameraActor.h"
@@ -25,7 +25,6 @@
 #include "Level.h"
 #include "LightManager.h"
 #include "ShadowManager.h"
-#include "Source/Runtime/Event/Event.h"
 #include "CollisionManager.h"
 #include"Pawn.h"
 #include"PlayerController.h"
@@ -154,7 +153,6 @@ UWorld* UWorld::DuplicateWorldForPIE(UWorld* InEditorWorld)
 		}
 
 		AActor* NewActor = SourceActor->Duplicate();
-		UE_LOG("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
 		if (!NewActor)
 		{

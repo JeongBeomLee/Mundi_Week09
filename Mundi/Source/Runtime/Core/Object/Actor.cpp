@@ -9,6 +9,7 @@
 #include "AABB.h"
 #include "JsonSerializer.h"
 #include "World.h"
+#include "CollisionComponent/ShapeComponent.h"
 
 IMPLEMENT_CLASS(AActor)
 
@@ -66,9 +67,12 @@ void AActor::EndPlay(EEndPlayReason Reason)
 	for (UActorComponent* Comp : OwnedComponents)
 		if (Comp) Comp->EndPlay(Reason);
 
-	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	if (Reason == EEndPlayReason::EndPlayInEditor)
 	{
-		Script->LuaTemplateFunctions.EndPlay();
+		for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+		{
+			Script->LuaTemplateFunctions.EndPlay();
+		}
 	}
 }
 void AActor::Destroy()
@@ -136,6 +140,19 @@ void AActor::AddOwnedComponent(UActorComponent* Component)
 		if (!RootComponent)
 		{
 			SetRootComponent(SC);
+		}
+	}
+
+	// 충돌 처리 컴포넌트일 경우 Script의 OnOverlap function을 연결
+	if (UShapeComponent* ShapeComponent = Cast<UShapeComponent>(Component))
+	{
+		TArray<FScript*> Scripts = UScriptManager::GetInstance().GetScriptsOfActor(this);
+
+		for (FScript* Script : Scripts)
+		{
+			Script->LuaTemplateFunctions.OnOverlapDelegateHandle = ShapeComponent->OnComponentBeginOverlap.Add(
+			Script->LuaTemplateFunctions.OnOverlap
+			);
 		}
 	}
 }

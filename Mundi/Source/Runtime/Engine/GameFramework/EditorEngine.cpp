@@ -4,7 +4,6 @@
 #include "SelectionManager.h"
 #include <ObjManager.h>
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
-#include "Source/Runtime/Event/Event.h"
 #include "GameModeBase.h"
 #include "GameStateBase.h"
 #include"RunnerGameMode.h"
@@ -321,6 +320,7 @@ void UEditorEngine::MainLoop()
         // This ensures all GPU commands are submitted before we check for shader updates
         UResourceManager::GetInstance().CheckAndReloadShaders(DeltaSeconds);
         UScriptManager::GetInstance().CheckAndHotReloadLuaScript();
+		UScriptManager::GetInstance().UpdateCoroutineState(DeltaSeconds);
     }
 }
 
@@ -389,4 +389,9 @@ void UEditorEngine::StartPIE()
 void UEditorEngine::EndPIE()
 {
     bChangedPieToEditor = true;
+    
+    for (AActor* Actor : GWorld->GetLevel()->GetActors())
+    {
+        Actor->EndPlay(EEndPlayReason::EndPlayInEditor);
+    }
 }

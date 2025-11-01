@@ -233,7 +233,7 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PlayerController.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp" />
-    <ClCompile Include="Source\Runtime\Event\Event.cpp" />
+    <ClCompile Include="Source\Runtime\LuaScripting\CoroutineScheduler.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp" />
@@ -526,7 +526,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h" />
-    <ClInclude Include="Source\Runtime\Event\Event.h" />
+    <ClInclude Include="Source\Runtime\LuaScripting\CoroutineScheduler.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h" />
     <ClInclude Include="Source\Runtime\Renderer\LightManager.h" />
@@ -674,6 +674,10 @@ if "$(Configuration)"=="Debug" (
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\template.lua" />
+    <None Include="Scripts\test_coroutine.lua">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
