@@ -315,6 +315,19 @@ void UWorld::AddActorToLevel(AActor* Actor)
 	{
 		Level->AddActor(Actor);
 		Partition->Register(Actor);
+
+		// Lua Scripting 작동을 확인하기 위한 임시 코드
+		FLuaLocalValue LuaLocalValue = {Actor};
+		
+		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "print_debug_log.lua");
+		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.BeginPlay();
+		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.EndPlay();
+		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.OnOverlap();
+		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.Tick(
+			sol::env_key,
+			UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->Env,
+			1.6f
+		);
 	}
 }
 

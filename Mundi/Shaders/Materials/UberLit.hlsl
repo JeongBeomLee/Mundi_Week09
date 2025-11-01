@@ -35,14 +35,7 @@ cbuffer ModelBuffer : register(b0)
     row_major float4x4 WorldInverseTranspose;    // 64 bytes - 올바른 노멀 변환을 위함
 };
 
-// b1: ViewProjBuffer (VS) - ViewProjBufferType과 일치
-cbuffer ViewProjBuffer : register(b1)
-{
-    row_major float4x4 ViewMatrix;
-    row_major float4x4 ProjectionMatrix;
-    row_major float4x4 InverseViewMatrix;
-    row_major float4x4 InverseProjectionMatrix;
-};
+// b1: ViewProjBuffer (VS) - LightingBuffers.hlsl에서 공통으로 정의됨
 
 // b3: ColorBuffer (PS) - 색상 블렌딩/lerp용
 cbuffer ColorBuffer : register(b3)

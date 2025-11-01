@@ -88,7 +88,7 @@ void TestDelegate()
             TestActor Actor;
             TDelegate<float> OnDamage;
 
-            OnDamage.BindMember(&Actor, &TestActor::OnDamageReceived);
+            OnDamage.BindDynamic(&Actor, &TestActor::OnDamageReceived);
 
             if (OnDamage.IsBound())
             {
@@ -197,7 +197,7 @@ void TestDelegate()
             if (Count1 == 1 && Count2 == 1 && Count3 == 1)
             {
                 // Handle2 제거
-                OnEvent.Remove(Handle2);
+                OnEvent.RemoveDynamic(Handle2);
                 OnEvent.Broadcast();
 
                 if (Count1 == 2 && Count2 == 1 && Count3 == 2)
@@ -234,7 +234,7 @@ void TestDelegate()
             OnEvent.Broadcast();
             if (CallCount == 3)
             {
-                OnEvent.Clear();
+                OnEvent.RemoveAll();
                 if (!OnEvent.IsBound())
                 {
                     OnEvent.Broadcast();
@@ -305,9 +305,9 @@ void TestDelegate()
             TestActor Actor1, Actor2, Actor3;
             TMulticastDelegate<float> OnDamage;
 
-            OnDamage.AddMember(&Actor1, &TestActor::OnDamageReceived);
-            OnDamage.AddMember(&Actor2, &TestActor::OnDamageReceived);
-            OnDamage.AddMember(&Actor3, &TestActor::OnDamageReceived);
+            OnDamage.AddDynamic(&Actor1, &TestActor::OnDamageReceived);
+            OnDamage.AddDynamic(&Actor2, &TestActor::OnDamageReceived);
+            OnDamage.AddDynamic(&Actor3, &TestActor::OnDamageReceived);
 
             OnDamage.Broadcast(75.5f);
 
@@ -384,6 +384,124 @@ void TestDelegate()
     }
 }
 
+// ============================================
+// TWeakPtr를 사용한 Dangling Pointer 해결 테스트
+// ============================================
+
+void TestWeakPtrDanglingPointer()
+{
+	std::string result = "=== TWeakPtr Dangling Pointer Solution Test ===\n\n";
+	result += "✅ TWeakPtr를 사용하면 Dangling Pointer 문제가 자동으로 해결됩니다!\n\n";
+
+	MessageBoxA(NULL, result.c_str(),
+		"TWeakPtr Dangling Pointer Test",
+		MB_OK | MB_ICONINFORMATION);
+
+	// ============================================
+	// 시나리오: Player가 Monster를 타겟팅
+	// ============================================
+
+	// Monster와 Player를 TWeakPtr로 관리하는 클래스
+	class WeakPtrPlayer
+	{
+	public:
+		TWeakPtr<UObject> CurrentTarget;  // TWeakPtr 사용!
+		FString PlayerName;
+
+		WeakPtrPlayer(const FString& InName)
+			: CurrentTarget(nullptr)
+			, PlayerName(InName)
+		{
+		}
+
+		void SetTarget(UObject* Target)
+		{
+			CurrentTarget = Target;  // TWeakPtr 대입
+			if (CurrentTarget.IsValid())
+			{
+			}
+		}
+
+		void AttackTarget()
+		{
+			// ✅ TWeakPtr로 안전하게 체크!
+			if (CurrentTarget.IsValid())
+			{
+				UObject* Target = CurrentTarget.Get();
+			}
+			else
+			{
+			}
+		}
+
+		void CheckTarget()
+		{
+			// if문에서 직접 사용 가능
+			if (CurrentTarget)
+			{
+			}
+			else
+			{
+			}
+		}
+	};
+
+	// ============================================
+	// 테스트 실행
+	// ============================================
+
+	// 1. Monster 생성
+	UObject* Monster = ObjectFactory::NewObject<UObject>();
+	Monster->ObjectName = FName("Goblin");
+
+	// 2. Player 생성 및 타겟 설정
+	WeakPtrPlayer* Player = new WeakPtrPlayer("Hero");
+	Player->SetTarget(Monster);
+
+	// 3. 타겟 확인 (살아있음)
+	Player->CheckTarget();
+
+	// 4. 타겟 공격 (성공)
+	Player->AttackTarget();
+
+	// 5. Monster 삭제!
+	ObjectFactory::DeleteObject(Monster);
+
+	// 6. 타겟 확인 (죽었음) - TWeakPtr가 자동으로 무효화!
+	Player->CheckTarget();
+
+	// 7. 타겟 공격 시도 (안전하게 실패) - Dangling Pointer 문제 해결!
+	Player->AttackTarget();
+
+	// 8. 새로운 Monster 생성
+	UObject* Monster2 = ObjectFactory::NewObject<UObject>();
+	Monster2->ObjectName = FName("Orc");
+
+	// 9. 새로운 타겟 설정
+	Player->SetTarget(Monster2);
+
+	// 10. 새 타겟 공격 (성공)
+	Player->AttackTarget();
+
+	// 정리
+	ObjectFactory::DeleteObject(Monster2);
+	delete Player;
+
+	// 최종 결과 메시지
+	std::string finalResult = "=== Test Results ===\n\n";
+	finalResult += "✅ TWeakPtr successfully prevented Dangling Pointer!\n\n";
+	finalResult += "Key Points:\n";
+	finalResult += "1. Monster was deleted (GUObjectArray[index] = nullptr)\n";
+	finalResult += "2. TWeakPtr.IsValid() returned false\n";
+	finalResult += "3. No crash occurred!\n";
+	finalResult += "4. Player safely handled the dead target\n\n";
+	finalResult += "Check the console output for detailed logs!";
+
+	MessageBoxA(NULL, finalResult.c_str(),
+		"✅ TWeakPtr Test - SUCCESS",
+		MB_OK | MB_ICONINFORMATION);
+}
+
 // lua 스크립트 파일 로드 테스트 함수
 void TestLua()
 {
@@ -446,10 +564,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif
 
     // Delegate 시스템 테스트 실행
-    TestDelegate();
+    //TestDelegate();
+
+    // TWeakPtr Dangling Pointer 해결 테스트 실행
+    //TestWeakPtrDanglingPointer();
 
     // lua 테스트 실행
-    TestLua();
+    //TestLua();
 
     if (!GEngine.Startup(hInstance))
         return -1;

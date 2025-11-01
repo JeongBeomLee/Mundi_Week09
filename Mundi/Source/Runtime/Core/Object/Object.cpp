@@ -1,5 +1,8 @@
 ﻿#include "pch.h"
 
+// UObject를 ObjectFactory에 등록
+IMPLEMENT_CLASS(UObject)
+
 FString UObject::GetName()
 {
     return ObjectName.ToString();

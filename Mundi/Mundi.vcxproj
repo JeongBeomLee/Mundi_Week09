@@ -148,6 +148,9 @@
     if exist "$(ProjectDir)imgui.ini" xcopy /Y /D "$(ProjectDir)imgui.ini" "$(OutDir)"
     if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
     if %ERRORLEVEL% LEQ 7 exit 0
+  )
+if "$(Configuration)"=="Debug" (
+    if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
   )</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -185,6 +188,9 @@
     if exist "$(ProjectDir)imgui.ini" xcopy /Y /D "$(ProjectDir)imgui.ini" "$(OutDir)"
     if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
     if %ERRORLEVEL% LEQ 7 exit 0
+  )
+if "$(Configuration)"=="Debug" (
+    if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
   )</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -218,6 +224,8 @@
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp" />
+    <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp" />
+    <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\SceneView.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\ShadowConfiguration.cpp" />
@@ -481,6 +489,7 @@
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h" />
+    <ClInclude Include="Source\Runtime\Core\Misc\WeakPtr.h" />
     <ClInclude Include="Source\Runtime\Core\Object\Property.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.h" />
@@ -496,6 +505,8 @@
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h" />
+    <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h" />
+    <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h" />
     <ClInclude Include="Source\Runtime\Renderer\LightManager.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\AmbientLightComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\DirectionalLightComponent.h" />

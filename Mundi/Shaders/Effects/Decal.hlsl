@@ -24,13 +24,7 @@ cbuffer ModelBuffer : register(b0)
     row_major float4x4 WorldInverseTranspose;
 }
 
-cbuffer ViewProjBuffer : register(b1)
-{
-    row_major float4x4 ViewMatrix;
-    row_major float4x4 ProjectionMatrix;
-    row_major float4x4 InverseViewMatrix;
-    row_major float4x4 InverseProjectionMatrix;
-}
+// ViewProjBuffer는 LightingBuffers.hlsl에서 공통으로 정의됨 (register b1)
 
 cbuffer PSScrollCB : register(b5)
 {
