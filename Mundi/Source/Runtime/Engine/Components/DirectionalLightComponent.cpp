@@ -139,10 +139,11 @@ void UDirectionalLightComponent::OnRegister(UWorld* InWorld)
 
 void UDirectionalLightComponent::OnUnregister()
 {
-	if (bPendingDestroy == false)
-	{
+	// Serialize 시 Crash 방지를 위한 주석 처리
+	//if (bPendingDestroy == false)
+	//{
 		GWorld->GetLightManager()->DeRegisterLight(this);
-	}
+	//}
 }
 
 void UDirectionalLightComponent::UpdateLightData()
