@@ -6,6 +6,7 @@
 #include "Character.h"
 #include "CharacterMovementComponent.h"
 #include "SceneComponent.h"
+#include "StaticMeshComponent.h"
 #include "InputComponent.h"
 #include "ObjectFactory.h"
 
@@ -22,6 +23,7 @@ END_PROPERTIES()
 ACharacter::ACharacter()
 	: CharacterMovement(nullptr)
 	, MeshComponent(nullptr)
+	, StaticMeshComponent(nullptr)
 	, bIsCrouched(false)
 	, CrouchedHeightRatio(0.5f)
 {
@@ -38,6 +40,15 @@ ACharacter::ACharacter()
 	{
 		MeshComponent->SetOwner(this);
 		SetRootComponent(MeshComponent);
+	}
+
+	// StaticMesh 컴포넌트 생성 (시각적 표현용)
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
+	if (StaticMeshComponent)
+	{
+		StaticMeshComponent->SetOwner(this);
+		StaticMeshComponent->SetupAttachment(MeshComponent);
+		UE_LOG("[Character] StaticMeshComponent created!");
 	}
 }
 

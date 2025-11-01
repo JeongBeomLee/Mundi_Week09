@@ -49,7 +49,7 @@ public:
 	/**
 	 * 현재 빙의한 Pawn을 반환합니다.
 	 */
-	APawn* GetPawn() const { return PossessedPawn; }
+	APawn* GetPawn() const { return PossessedPawn.Get(); }
 
 protected:
 	/**
@@ -125,7 +125,7 @@ protected:
 	// ────────────────────────────────────────────────
 
 	/** 현재 빙의한 Pawn */
-	APawn* PossessedPawn;
+	TWeakPtr<APawn> PossessedPawn;
 
 	/** Controller의 회전 (Controller가 보고 있는 방향) */
 	FQuat ControlRotation;

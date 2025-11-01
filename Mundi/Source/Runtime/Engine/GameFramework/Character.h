@@ -9,6 +9,7 @@
 // 전방 선언
 class UCharacterMovementComponent;
 class USceneComponent;
+class UStaticMeshComponent;
 
 /**
  * ACharacter
@@ -40,6 +41,9 @@ public:
 
 	/** Mesh 컴포넌트를 반환합니다 (나중에 SkeletalMesh로 교체 가능) */
 	USceneComponent* GetMesh() const { return MeshComponent; }
+
+	/** StaticMesh 컴포넌트를 반환합니다 */
+	UStaticMeshComponent* GetStaticMesh() const { return StaticMeshComponent; }
 
 	// ────────────────────────────────────────────────
 	// 이동 입력 처리 (APawn 오버라이드)
@@ -139,6 +143,9 @@ protected:
 
 	/** Mesh 컴포넌트 (나중에 SkeletalMeshComponent로 교체) */
 	USceneComponent* MeshComponent;
+
+	/** StaticMesh 컴포넌트 (시각적 표현) */
+	UStaticMeshComponent* StaticMeshComponent;
 
 	/** 웅크리기 상태 */
 	bool bIsCrouched;
