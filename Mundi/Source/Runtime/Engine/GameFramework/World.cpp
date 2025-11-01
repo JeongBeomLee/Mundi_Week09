@@ -26,6 +26,8 @@
 #include "LightManager.h"
 #include "ShadowManager.h"
 #include "CollisionManager.h"
+#include"Pawn.h"
+#include"PlayerController.h"
 
 IMPLEMENT_CLASS(UWorld)
 
@@ -68,6 +70,15 @@ void UWorld::Initialize()
 
 	InitializeGrid();
 	InitializeGizmo();
+
+	// Pawn 생성
+	APawn* MyPawn = SpawnActor<APawn>();
+
+	// PlayerController 생성
+	APlayerController* PC = NewObject<APlayerController>();
+
+	// Pawn 빙의
+	PC->Possess(MyPawn);
 }
 
 void UWorld::InitializeGrid()
