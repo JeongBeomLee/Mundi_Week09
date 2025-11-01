@@ -320,6 +320,7 @@ void UEditorEngine::MainLoop()
         // This ensures all GPU commands are submitted before we check for shader updates
         UResourceManager::GetInstance().CheckAndReloadShaders(DeltaSeconds);
         UScriptManager::GetInstance().CheckAndHotReloadLuaScript();
+		UScriptManager::GetInstance().UpdateCoroutineState(DeltaSeconds);
     }
 }
 

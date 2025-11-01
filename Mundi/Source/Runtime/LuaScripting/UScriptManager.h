@@ -3,6 +3,8 @@
 #include <sol/sol.hpp>
 #include "Source/Runtime/Core/Misc/Delegate.h"
 
+#include "CoroutineScheduler.h"
+
 struct FLuaTemplateFunctions
 {
     sol::function BeginPlay;
@@ -53,7 +55,12 @@ public:
     TMap<AActor*, TArray<FScript*>>& GetScriptsByOwner();
     TArray<FScript*> GetScriptsOfActor(AActor* InActor);
     
+    // 매 Frame마다 호출되는 함수
     void CheckAndHotReloadLuaScript();
+    void UpdateCoroutineState(double Dt)
+    {
+        CoroutineScheduler.Update(Dt);
+	}
 public:
     static UScriptManager& GetInstance();
 private:
@@ -90,4 +97,6 @@ private:
     
     // 소유자 기반 접근
     TMap<AActor*, TArray<FScript*>> ScriptsByOwner;
+
+    UCoroutineScheduler CoroutineScheduler;
 };
