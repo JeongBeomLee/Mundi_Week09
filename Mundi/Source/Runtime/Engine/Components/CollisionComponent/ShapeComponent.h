@@ -192,4 +192,10 @@ protected:
 	 * CollisionManager에 Dirty 마킹합니다.
 	 */
 	virtual void OnTransformChanged();
+
+	/**
+	 * SceneComponent의 OnTransformUpdated 오버라이드
+	 * Transform 변경 시 OnTransformChanged를 호출합니다.
+	 */
+	virtual void OnTransformUpdated() override;
 };

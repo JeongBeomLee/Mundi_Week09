@@ -1,4 +1,4 @@
-// ────────────────────────────────────────────────────────────────────────────
+﻿// ────────────────────────────────────────────────────────────────────────────
 // RunnerGameMode.cpp
 // 런2 게임 모드 구현
 // ────────────────────────────────────────────────────────────────────────────
@@ -29,7 +29,7 @@ ARunnerGameMode::ARunnerGameMode()
 	DefaultPawnClass = ACharacter::StaticClass();
 
 	// 플레이어 스폰 위치 (런2 게임 시작 위치)
-	PlayerSpawnLocation = FVector(0.0f, 0.0f, 100.0f);
+	PlayerSpawnLocation = FVector(0.0f, 0.0f, 30.0f);
 
 	// 자동 스폰 활성화
 	bAutoSpawnPlayer = true;
