@@ -5,6 +5,7 @@
 #include "Level.h"
 #include "Gizmo/GizmoActor.h"
 #include "LightManager.h"
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 // Forward Declarations
 class UResourceManager;
@@ -155,7 +156,7 @@ inline T* UWorld::SpawnActor(const FTransform& Transform)
 
     //  월드 등록
     NewActor->SetWorld(this);
-
+    
     // 월드에 등록
     AddActorToLevel(NewActor);
 
