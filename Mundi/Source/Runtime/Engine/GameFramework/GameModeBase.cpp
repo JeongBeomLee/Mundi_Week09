@@ -110,7 +110,7 @@ void AGameModeBase::RestartGame()
 	UE_LOG("GameMode: 게임 재시작");
 
 	// 자동으로 게임 시작
-	// StartGame();
+	StartGame();
 }
 
 void AGameModeBase::PauseGame()

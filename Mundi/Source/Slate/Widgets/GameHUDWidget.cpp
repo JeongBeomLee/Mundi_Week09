@@ -8,6 +8,9 @@ IMPLEMENT_CLASS(UGameHUDWidget)
 
 UGameHUDWidget::UGameHUDWidget()
 	: GameState(nullptr)
+	, GameStateChangedHandle(0)
+	, ScoreChangedHandle(0)
+	, TimerUpdatedHandle(0)
 	, CachedScore(0)
 	, CachedElapsedTime(0.0f)
 	, CachedGameStateText("Not Started")
@@ -21,24 +24,8 @@ void UGameHUDWidget::Initialize()
 
 void UGameHUDWidget::Update()
 {
-	if (!GWorld || !GWorld->bPie)
-		return;
-
-	// GameState에서 데이터 읽어오기
-	if (GameState.IsValid())
-	{
-		AGameStateBase* State = GameState.Get();
-		CachedScore = State->GetScore();
-		CachedElapsedTime = State->GetElapsedTime();
-		CachedGameStateText = GetGameStateText();
-	}
-	else
-	{
-		// GameState가 없으면 초기값
-		CachedScore = 0;
-		CachedElapsedTime = 0.0f;
-		CachedGameStateText = "No GameState";
-	}
+	// 델리게이트를 통해 자동으로 업데이트되므로 여기서는 아무것도 하지 않음
+	// 필요시 추가 로직 작성 가능
 }
 
 void UGameHUDWidget::RenderWidget()
@@ -51,9 +38,9 @@ void UGameHUDWidget::RenderWidget()
 	ImGuiIO& io = ImGui::GetIO();
 	const float windowWidth = 300.0f;
 	const float windowHeight = 100.0f;
-	const float padding = 20.0f;
+	const float padding = 100.0f;
 
-	ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - windowWidth) * 0.5f, padding), ImGuiCond_Always);
+	ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - windowWidth) * 0.01f, padding), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_Always);
 
 	// 윈도우 플래그: 타이틀바 없음, 리사이징 불가, 이동 불가, 반투명 배경
@@ -101,14 +88,64 @@ void UGameHUDWidget::RenderWidget()
 
 void UGameHUDWidget::SetGameState(AGameStateBase* InGameState)
 {
+	// 기존 델리게이트 바인딩 해제
+	UnbindDelegates();
+
 	if (InGameState)
 	{
 		GameState = TWeakPtr<AGameStateBase>(InGameState);
+
+		// 델리게이트 바인딩 (핸들 저장)
+		GameStateChangedHandle = InGameState->OnGameStateChanged.AddDynamic(this, &UGameHUDWidget::OnGameStateChanged_Handler);
+		ScoreChangedHandle = InGameState->OnScoreChanged.AddDynamic(this, &UGameHUDWidget::OnScoreChanged_Handler);
+		TimerUpdatedHandle = InGameState->OnTimerUpdated.AddDynamic(this, &UGameHUDWidget::OnTimerUpdated_Handler);
+
+		// 초기 데이터 캐시
+		CachedScore = InGameState->GetScore();
+		CachedElapsedTime = InGameState->GetElapsedTime();
+		CachedGameStateText = GetGameStateText();
 	}
 	else
 	{
 		GameState.Reset();
+
+		// 초기값으로 리셋
+		CachedScore = 0;
+		CachedElapsedTime = 0.0f;
+		CachedGameStateText = "No GameState";
 	}
+}
+
+void UGameHUDWidget::UnbindDelegates()
+{
+	if (GameState.IsValid())
+	{
+		AGameStateBase* State = GameState.Get();
+		// 이 위젯의 바인딩만 제거 (다른 위젯의 바인딩은 유지)
+		State->OnGameStateChanged.RemoveDynamic(GameStateChangedHandle);
+		State->OnScoreChanged.RemoveDynamic(ScoreChangedHandle);
+		State->OnTimerUpdated.RemoveDynamic(TimerUpdatedHandle);
+	}
+}
+
+void UGameHUDWidget::OnGameStateChanged_Handler(EGameState OldState, EGameState NewState)
+{
+	// 게임 상태 텍스트 업데이트
+	CachedGameStateText = GetGameStateText();
+	UE_LOG("GameHUDWidget: GameState changed from %d to %d", static_cast<int>(OldState), static_cast<int>(NewState));
+}
+
+void UGameHUDWidget::OnScoreChanged_Handler(int32 OldScore, int32 NewScore)
+{
+	// 스코어 캐시 업데이트
+	CachedScore = NewScore;
+	UE_LOG("GameHUDWidget: Score changed from %d to %d", OldScore, NewScore);
+}
+
+void UGameHUDWidget::OnTimerUpdated_Handler(float ElapsedTime)
+{
+	// 타이머 캐시 업데이트
+	CachedElapsedTime = ElapsedTime;
 }
 
 FString UGameHUDWidget::FormatTime(float Seconds) const

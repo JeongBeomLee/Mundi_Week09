@@ -139,7 +139,10 @@ void UDirectionalLightComponent::OnRegister(UWorld* InWorld)
 
 void UDirectionalLightComponent::OnUnregister()
 {
-	GWorld->GetLightManager()->DeRegisterLight(this);
+	if (bPendingDestroy == false)
+	{
+		GWorld->GetLightManager()->DeRegisterLight(this);
+	}
 }
 
 void UDirectionalLightComponent::UpdateLightData()

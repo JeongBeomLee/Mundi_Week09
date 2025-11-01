@@ -9,9 +9,11 @@
 #include "Windows/ConsoleWindow.h"
 #include "Widgets/MainToolbarWidget.h"
 #include "Widgets/GameHUDWidget.h"
+#include "Widgets/GameControlWindow.h"
 #include "FViewportClient.h"
 #include "UIManager.h"
 #include "GlobalConsole.h"
+#include "GameModeBase.h"
 
 IMPLEMENT_CLASS(USlateManager)
 
@@ -78,6 +80,10 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
     // GameHUD 생성 (PIE 전용)
     GameHUD = NewObject<UGameHUDWidget>();
     GameHUD->Initialize();
+
+    // GameControlWindow 생성 (PIE 전용)
+    GameControlWindow = NewObject<UGameControlWindow>();
+    GameControlWindow->Initialize();
 
     Device = InDevice;
     World = InWorld;
@@ -200,6 +206,13 @@ void USlateManager::Render()
     {
         GameHUD->Update();
         GameHUD->RenderWidget();
+    }
+
+    // 게임 컨트롤 윈도우 렌더링 (PIE 모드에서만)
+    if (GameControlWindow)
+    {
+        GameControlWindow->Update();
+        GameControlWindow->RenderWidget();
     }
 
     // 콘솔 오버레이 렌더링 (모든 것 위에 표시)
@@ -477,6 +490,13 @@ void USlateManager::SetPIEWorld(UWorld* InWorld)
     {
         AGameStateBase* GameState = InWorld->GetGameState();
         GameHUD->SetGameState(GameState);
+    }
+
+    // PIE World의 GameMode를 GameControlWindow에 설정
+    if (GameControlWindow && InWorld)
+    {
+        AGameModeBase* GameMode = InWorld->GetGameMode();
+        GameControlWindow->SetGameMode(GameMode);
     }
 }
 
