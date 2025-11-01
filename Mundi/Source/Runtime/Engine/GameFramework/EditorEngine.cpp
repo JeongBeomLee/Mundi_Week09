@@ -7,6 +7,7 @@
 #include "Source/Runtime/Event/Event.h"
 #include "GameModeBase.h"
 #include "GameStateBase.h"
+#include"RunnerGameMode.h"
 
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;
@@ -363,7 +364,7 @@ void UEditorEngine::StartPIE()
 
     // PIE World에 GameMode/GameState 자동 생성
     PIEWorld->GameState = PIEWorld->SpawnActor<AGameStateBase>();
-    PIEWorld->GameMode = PIEWorld->SpawnActor<AGameModeBase>();
+    PIEWorld->GameMode = PIEWorld->SpawnActor<ARunnerGameMode>();
     if (PIEWorld->GameMode)
     {
         PIEWorld->GameMode->SetGameState(PIEWorld->GameState);
@@ -373,9 +374,14 @@ void UEditorEngine::StartPIE()
     // GameHUD에 GameState 설정
     SLATE.SetPIEWorld(GWorld);
 
-    for (AActor* Actor : GWorld->GetLevel()->GetActors())
+    // Index-based iteration: BeginPlay에서 새 액터가 추가되어도 안전
+    const TArray<AActor*>& Actors = GWorld->GetLevel()->GetActors();
+    for (size_t i = 0; i < Actors.size(); ++i)
     {
-        Actor->BeginPlay();
+        if (Actors[i])
+        {
+            Actors[i]->BeginPlay();
+        }
     }
     UE_LOG("START PIE CLICKED");
 }

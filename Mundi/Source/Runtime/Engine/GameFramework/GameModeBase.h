@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "Info.h"
-
+#include "GameStateBase.h"
 // Forward Declarations
-class AGameStateBase;
+
 class UWorld;
 class APawn;
 class APlayerController;
