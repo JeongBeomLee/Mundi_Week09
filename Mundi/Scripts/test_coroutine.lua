@@ -22,45 +22,46 @@ end
 
 -- Tick: 매 프레임마다 호출 (dt: 델타 타임)
 function Tick(dt)
-    if MyActor == nil then
-        PrintToConsole("MyActor is nil!")
-        return
-    end
-    PrintToConsole("[MyActor's Name] ".. MyActor:GetName():ToString())
+    -- if MyActor == nil then
+    --     PrintToConsole("MyActor is nil!")
+    --     return
+    -- end
+    -- PrintToConsole("[MyActor's Name] ".. MyActor:GetName():ToString())
 end
 
 function MoveWithCo()
-    PrintToConsole("In lua: [Begin Coroutine] ");
+    PrintToConsole("MyActor: ".. MyActor:GetName():ToString());
     -- 스케일 변경
     local newScale = FVector.new(2, 2, 2);
     MyActor:SetScale(newScale);
-    PrintToConsole("In lua: [Coroutine Scale] ");
+    -- PrintToConsole("In lua: [Coroutine Scale] ");
 
     -- 회전 변경
     local newRotation = FQuat.MakeFromEuler(10, 80, 20);
     MyActor:SetRotation(newRotation);
-    PrintToConsole("In lua: [Coroutine Rotation] ");
+    -- PrintToConsole("In lua: [Coroutine Rotation] ");
 
     -- 상대 위치 이동
     local deltaLocation = FVector.new(5, 0, 0);
 
     MyActor:AddWorldLocation(deltaLocation);
-    PrintToConsole("In lua: [Coroutine Move 1] ");
+    -- PrintToConsole("In lua: [Coroutine Move 1] ");
     coroutine.yield(0.5);
     PrintToConsole("In lua: end yield 1");
 
     MyActor:AddWorldLocation(deltaLocation);
-    PrintToConsole("In lua: [Coroutine Move 2] ");
+    -- PrintToConsole("In lua: [Coroutine Move 2] ");
     coroutine.yield(2.0);
     PrintToConsole("In lua: end yield 2");
 
     MyActor:AddWorldLocation(deltaLocation);
-    PrintToConsole("In lua: [Coroutine Move 3] ");
-    local count = 0
-    coroutine.yield(function()
-        count = count + 1
-        PrintToConsole("In lua: [Coroutine Count 4] ");
-        return count >= 3              -- resume after 3 checks
-    end)
+    -- -- PrintToConsole("In lua: [Coroutine Move 3] ");
+    -- local count = 0
+    -- coroutine.yield(function()
+    --     count = count + 1
+    --     -- PrintToConsole("In lua: [Coroutine Count 4] ");
+    --     return count >= 3              -- resume after 3 checks
+    -- end)
+    coroutine.yield(4.0);
     PrintToConsole("In lua: end yield 3");
 end

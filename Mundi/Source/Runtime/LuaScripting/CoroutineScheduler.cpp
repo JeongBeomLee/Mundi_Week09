@@ -5,7 +5,7 @@
 void UCoroutineScheduler::Start(sol::function F)
 {
     sol::coroutine Co(F);
-    CoroutineEntry E{ Co, CurrentTime, nullptr, true };
+    CoroutineEntry E{ Co, CurrentTime, nullptr, false };
     Entries.push_back(std::move(E));
     
     UE_LOG("[Coroutine] Started new coroutine. Total entries: %zu", Entries.size());
@@ -15,18 +15,31 @@ void UCoroutineScheduler::Update(double Dt)
 {
     CurrentTime += Dt;
 
+    uint32 index = 0;
     for (auto It = Entries.begin(); It != Entries.end();)
     {
         bool Ready = false;
 
         if (It->WaitingNextFrame)
         {
+            UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
+                index++,
+                CurrentTime,
+                It->WakeTime,
+                It->WaitingNextFrame ? "true" : "false",
+                It->WaitUntil ? "true" : "false");
             UE_LOG("[Coroutine] Ready: WaitingNextFrame");
             Ready = true;
             It->WaitingNextFrame = false;
         }
         else if (It->WaitUntil)
         {
+            UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
+                index++,
+                CurrentTime,
+                It->WakeTime,
+                It->WaitingNextFrame ? "true" : "false",
+                It->WaitUntil ? "true" : "false");
             if (It->WaitUntil())
             {
                 UE_LOG("[Coroutine] Ready: WaitUntil condition met");
@@ -36,6 +49,12 @@ void UCoroutineScheduler::Update(double Dt)
         }
         else if (CurrentTime >= It->WakeTime)
         {
+            UE_LOG("Entry index %u: CurrentTime = %.3f, WakeTime = %.3f, WaitingNextFrame = %s, HasWaitUntil = %s",
+                index++,
+                CurrentTime,
+                It->WakeTime,
+                It->WaitingNextFrame ? "true" : "false",
+                It->WaitUntil ? "true" : "false");
             UE_LOG("[Coroutine] Ready: WakeTime reached (CurrentTime: %.3f >= WakeTime: %.3f)", 
                    CurrentTime, It->WakeTime);
             Ready = true;
