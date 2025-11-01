@@ -46,7 +46,10 @@ void UAmbientLightComponent::OnRegister(UWorld* InWorld)
 
 void UAmbientLightComponent::OnUnregister()
 {
-	GWorld->GetLightManager()->DeRegisterLight(this);
+	if (bPendingDestroy == false)
+	{
+		GWorld->GetLightManager()->DeRegisterLight(this);
+	}
 }
 
 void UAmbientLightComponent::OnSerialized()

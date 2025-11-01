@@ -5,6 +5,8 @@
 #include <ObjManager.h>
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 #include "Source/Runtime/Event/Event.h"
+#include "GameModeBase.h"
+#include "GameStateBase.h"
 
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;
@@ -349,32 +351,27 @@ void UEditorEngine::Shutdown()
 
 void UEditorEngine::StartPIE()
 {
-    //UWorld* EditorWorld = GEditor->GetEditorWorldContext().World();
-
-    //UWorld* PIEWorld = UWorld::DuplicateWorldForPIE(EditorWorld, ...);
-
-    //GWorld = PIEWorld;
-
-    //// AActor::BeginPlay()
-    //PIEWorld->InitializeActorsForPlay();
-
     UWorld* EditorWorld = WorldContexts[0].World;
     UWorld* PIEWorld = UWorld::DuplicateWorldForPIE(EditorWorld);
 
     GWorld = PIEWorld;
-    SLATE.SetPIEWorld(GWorld);
 
     bPIEActive = true;
 
     // PIE 모드에서 충돌 컴포넌트 디버그 활성화
     PIEWorld->GetRenderSettings().EnableShowFlag(EEngineShowFlags::SF_Collision);
 
-    //// 슬레이트 매니저 (singleton)
-    //FRect ScreenRect(0, 0, ClientWidth, ClientHeight);
-    //SLATE.Initialize(RHIDevice.GetDevice(), PIEWorld, ScreenRect);
+    // PIE World에 GameMode/GameState 자동 생성
+    PIEWorld->GameState = PIEWorld->SpawnActor<AGameStateBase>();
+    PIEWorld->GameMode = PIEWorld->SpawnActor<AGameModeBase>();
+    if (PIEWorld->GameMode)
+    {
+        PIEWorld->GameMode->SetGameState(PIEWorld->GameState);
+    }
+    UE_LOG("PIE: GameMode/GameState 생성 완료");
 
-    ////스폰을 위한 월드셋
-    //UI.SetWorld(PIEWorld);
+    // GameHUD에 GameState 설정
+    SLATE.SetPIEWorld(GWorld);
 
     for (AActor* Actor : GWorld->GetLevel()->GetActors())
     {
@@ -386,16 +383,4 @@ void UEditorEngine::StartPIE()
 void UEditorEngine::EndPIE()
 {
     bChangedPieToEditor = true;
-
-    /*if (GWorld && bPIEActive)
-    {
-        WorldContexts.pop_back();
-        ObjectFactory::DeleteObject(GWorld);
-    }
-
-    GWorld = WorldContexts[0].World;
-    SLATE.SetWorld(GWorld);
-
-    bPIEActive = false;
-    UE_LOG("END PIE CLICKED");*/
 }
