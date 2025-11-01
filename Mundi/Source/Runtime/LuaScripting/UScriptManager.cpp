@@ -359,5 +359,11 @@ FScript* UScriptManager::GetOrCreate(FString InScriptName)
     NewScript->Table = Table;
     NewScript->LuaTemplateFunctions = LuaTemplateFunctions;
 
+    // Hot reload를 위해 초기 수정 시간 설정
+    if (fs::exists(Path))
+    {
+        NewScript->LastModifiedTime = fs::last_write_time(Path);
+    }
+
     return NewScript;
 }
