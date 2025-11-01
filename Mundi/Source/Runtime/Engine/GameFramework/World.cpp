@@ -25,6 +25,7 @@
 #include "Level.h"
 #include "LightManager.h"
 #include "ShadowManager.h"
+#include "CollisionManager.h"
 
 IMPLEMENT_CLASS(UWorld)
 
@@ -36,6 +37,8 @@ UWorld::UWorld()
 	Level = std::make_unique<ULevel>();
 	LightManager = std::make_unique<FLightManager>();
 	ShadowManager = std::make_unique<FShadowManager>();
+	CollisionManager = std::make_unique<UCollisionManager>();
+	CollisionManager->SetWorld(this);
 
 }
 
@@ -104,6 +107,12 @@ void UWorld::Tick(float DeltaSeconds)
 	for (AActor* EditorActor : EditorActors)
 	{
 		if (EditorActor && !bPie) EditorActor->Tick(DeltaSeconds);
+	}
+
+	// 충돌 감지 업데이트
+	if (CollisionManager)
+	{
+		CollisionManager->UpdateCollisions(DeltaSeconds);
 	}
 }
 

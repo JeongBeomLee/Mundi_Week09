@@ -221,6 +221,15 @@ void UConsoleWidget::VAddLog(const char* fmt, va_list args)
 	buf[sizeof(buf) - 1] = 0;
 
 	Items.Add(FString(buf));
+
+	// Limit console items to prevent memory leak (keep last 1000 items)
+	constexpr int32 MaxConsoleItems = 1000;
+	if (Items.Num() > MaxConsoleItems)
+	{
+		int32 NumToRemove = Items.Num() - MaxConsoleItems;
+		Items.erase(Items.begin(), Items.begin() + NumToRemove);
+	}
+
 	ScrollToBottom = true;
 }
 
