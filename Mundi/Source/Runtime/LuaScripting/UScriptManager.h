@@ -1,6 +1,7 @@
 ﻿#pragma once
 #define SOL_ALL_SAFETIES_ON 1
 #include <sol/sol.hpp>
+#include "Source/Runtime/Core/Misc/Delegate.h"
 
 struct FLuaTemplateFunctions
 {
@@ -8,6 +9,8 @@ struct FLuaTemplateFunctions
     sol::function EndPlay;
     sol::function OnOverlap;
     sol::function Tick;
+
+    TMulticastDelegate<>::DelegateHandle OnOverlapDelegateHandle;
 };
 
 struct FLuaLocalValue
@@ -41,9 +44,14 @@ public:
     UScriptManager();
     ~UScriptManager() override;
 
-    void AttachScriptTo(FLuaLocalValue LuaLocalValue, FString ScriptName);
+    void AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString& ScriptName);
+    void DetachScriptFrom(AActor* InActor, const FString& ScriptName);
+    void DetachAllScriptFrom(AActor* InActor);
+
+    void PrintDebugLog();
 
     TMap<AActor*, TArray<FScript*>>& GetScriptsByOwner();
+    TArray<FScript*> GetScriptsOfActor(AActor* InActor);
     
     void CheckAndHotReloadLuaScript();
 public:

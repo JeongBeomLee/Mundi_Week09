@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Actor.h"
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 class USpotLightComponent;
 
@@ -17,7 +18,7 @@ public:
 	USpotLightComponent* GetLightComponent() const { return LightComponent; }
 
 	void DuplicateSubObjects() override;
-	DECLARE_DUPLICATE(ASpotLightActor)
+	DECLARE_ACTOR_DUPLICATE(ASpotLightActor)
 
 	void OnSerialized() override;
 

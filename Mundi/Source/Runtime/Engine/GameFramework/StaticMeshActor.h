@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Actor.h"
 #include "Enums.h"
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 class UStaticMeshComponent;
 class AStaticMeshActor : public AActor
@@ -21,7 +22,7 @@ public:
 
 	// ───── 복사 관련 ────────────────────────────
 	void DuplicateSubObjects() override;
-	DECLARE_DUPLICATE(AStaticMeshActor)
+	DECLARE_ACTOR_DUPLICATE(AStaticMeshActor)
 
 	// Serialize
 	void OnSerialized() override;
