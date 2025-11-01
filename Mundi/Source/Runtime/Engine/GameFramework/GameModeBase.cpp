@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "GameModeBase.h"
 #include "GameStateBase.h"
+#include "PlayerController.h"
+#include "Pawn.h"
 #include "World.h"
 
 // AGameModeBase를 ObjectFactory에 등록
@@ -14,15 +16,23 @@ END_PROPERTIES()
 
 AGameModeBase::AGameModeBase()
 	: GameState(nullptr)
-	, PlayerSpawnLocation(FVector(0.0f, 0.0f, 0.0f))
+	, PlayerSpawnLocation(FVector(0.0f, 0.0f, 100.0f))
+	, DefaultPawnClass(nullptr)
+	, PlayerControllerClass(nullptr)
+	, PlayerController(nullptr)
 	, bGameStarted(false)
+	, bAutoSpawnPlayer(true)
 {
-	// GameMode는 물리/렌더링 대상이 아님 (Info 상속)
+	// 기본 클래스 설정
+	PlayerControllerClass = APlayerController::StaticClass();
+	DefaultPawnClass = APawn::StaticClass();
 }
 
 void AGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG("[GameMode] BeginPlay");
 
 	// GameState 자동 생성 (없는 경우)
 	if (!GameState.IsValid())
@@ -33,9 +43,15 @@ void AGameModeBase::BeginPlay()
 			if (NewGameState)
 			{
 				GameState = TWeakPtr<AGameStateBase>(NewGameState);
-				UE_LOG("GameMode: GameState 자동 생성됨");
+				UE_LOG("[GameMode] GameState 자동 생성됨");
 			}
 		}
+	}
+
+	// 플레이어 초기화
+	if (bAutoSpawnPlayer)
+	{
+		InitPlayer();
 	}
 }
 
@@ -171,4 +187,131 @@ void AGameModeBase::DuplicateSubObjects()
 	Super::DuplicateSubObjects();
 	// GameMode 복제 시 게임 상태 초기화
 	bGameStarted = false;
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 플레이어 초기화
+// ────────────────────────────────────────────────────────────────────────────
+
+void AGameModeBase::InitPlayer()
+{
+	UE_LOG("[GameMode] Initializing Player...");
+
+	// 1. PlayerController 생성
+	PlayerController = SpawnPlayerController();
+
+	if (!PlayerController)
+	{
+		UE_LOG("[GameMode] ERROR: Failed to spawn PlayerController!");
+		return;
+	}
+
+	// 2. Pawn 스폰 위치 결정
+	FTransform SpawnTransform;
+	SpawnTransform.Translation = PlayerSpawnLocation;
+	SpawnTransform.Rotation = FQuat::Identity();
+	SpawnTransform.Scale3D = FVector(1.0f, 1.0f, 1.0f);
+
+	// 3. Pawn 스폰 및 빙의
+	APawn* SpawnedPawn = SpawnDefaultPawnFor(PlayerController, SpawnTransform);
+
+	if (SpawnedPawn)
+	{
+		UE_LOG("[GameMode] Player initialized successfully!");
+		UE_LOG("  PlayerController: %s", PlayerController->GetName().ToString());
+		UE_LOG("  Pawn: %s", SpawnedPawn->GetName().ToString());
+	}
+	else
+	{
+		UE_LOG("[GameMode] ERROR: Failed to spawn Pawn!");
+	}
+}
+
+APlayerController* AGameModeBase::SpawnPlayerController()
+{
+	if (!World || !PlayerControllerClass)
+	{
+		return nullptr;
+	}
+
+	// PlayerController 스폰 (위치는 중요하지 않음)
+	AActor* NewActor = World->SpawnActor(PlayerControllerClass);
+	APlayerController* NewController = Cast<APlayerController>(NewActor);
+
+	if (NewController)
+	{
+		UE_LOG("[GameMode] PlayerController spawned: %s", NewController->GetName().ToString());
+	}
+
+	return NewController;
+}
+
+APawn* AGameModeBase::SpawnDefaultPawnFor(APlayerController* NewPlayer, const FTransform& SpawnTransform)
+{
+	if (!NewPlayer || !World)
+	{
+		return nullptr;
+	}
+
+	// Pawn 클래스 결정
+	UClass* PawnClass = GetDefaultPawnClassForController(NewPlayer);
+
+	if (!PawnClass)
+	{
+		UE_LOG("[GameMode] ERROR: No DefaultPawnClass set!");
+		return nullptr;
+	}
+
+	// Pawn 스폰
+	AActor* NewActor = World->SpawnActor(PawnClass, SpawnTransform);
+	APawn* NewPawn = Cast<APawn>(NewActor);
+
+	if (NewPawn)
+	{
+		UE_LOG("[GameMode] Pawn spawned: %s at (%.1f, %.1f, %.1f)",
+			   NewPawn->GetName().ToString(),
+			   SpawnTransform.Translation.X,
+			   SpawnTransform.Translation.Y,
+			   SpawnTransform.Translation.Z);
+
+		// PlayerController가 Pawn을 빙의
+		NewPlayer->Possess(NewPawn);
+	}
+
+	return NewPawn;
+}
+
+UClass* AGameModeBase::GetDefaultPawnClassForController(APlayerController* InController)
+{
+	return DefaultPawnClass;
+}
+
+void AGameModeBase::RestartPlayer(APlayerController* Player)
+{
+	if (!Player)
+	{
+		return;
+	}
+
+	UE_LOG("[GameMode] Restarting player...");
+
+	// 기존 Pawn 제거
+	if (Player->GetPawn())
+	{
+		Player->UnPossess();
+		World->DestroyActor(Player->GetPawn());
+	}
+
+	// 새 Pawn 스폰
+	FTransform SpawnTransform;
+	SpawnTransform.Translation = PlayerSpawnLocation;
+	SpawnTransform.Rotation = FQuat::Identity();
+	SpawnTransform.Scale3D = FVector(1.0f, 1.0f, 1.0f);
+
+	APawn* NewPawn = SpawnDefaultPawnFor(Player, SpawnTransform);
+
+	if (NewPawn)
+	{
+		UE_LOG("[GameMode] Player restarted!");
+	}
 }
