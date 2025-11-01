@@ -310,7 +310,8 @@ void UWorld::AddActorToLevel(AActor* Actor)
 		// Lua Scripting 작동을 확인하기 위한 임시 코드
 		FLuaLocalValue LuaLocalValue = {Actor};
 		
-		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "print_debug_log.lua");
+		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "actor_transform.lua");
+		// UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "print_debug_log.lua");
 		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.BeginPlay();
 		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.EndPlay();
 		UScriptManager::GetInstance().GetScriptsByOwner()[Actor][0]->LuaTemplateFunctions.OnOverlap();

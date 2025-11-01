@@ -42,6 +42,7 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, FString Script
     catch (std::exception& e)
     {
         FString ErrorMessage = FString("[Script Manager] ") + ScriptName + " creation failed : " + e.what();
+        MessageBoxA(nullptr, ErrorMessage.c_str(), ErrorMessage.c_str(), 0);
         UE_LOG(ErrorMessage.c_str());
     }
 }
