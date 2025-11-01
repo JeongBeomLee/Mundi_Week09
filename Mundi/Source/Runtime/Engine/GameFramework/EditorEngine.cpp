@@ -366,6 +366,9 @@ void UEditorEngine::StartPIE()
 
     bPIEActive = true;
 
+    // PIE 모드에서 충돌 컴포넌트 디버그 활성화
+    PIEWorld->GetRenderSettings().EnableShowFlag(EEngineShowFlags::SF_Collision);
+
     //// 슬레이트 매니저 (singleton)
     //FRect ScreenRect(0, 0, ClientWidth, ClientHeight);
     //SLATE.Initialize(RHIDevice.GetDevice(), PIEWorld, ScreenRect);

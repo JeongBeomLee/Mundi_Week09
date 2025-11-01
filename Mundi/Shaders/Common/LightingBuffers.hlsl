@@ -6,6 +6,15 @@
 
 // 주의: 이 파일은 LightStructures.hlsl 이후에 include 되어야 함
 
+// b1: ViewProjBuffer (VS+PS) - View, Projection 행렬 (CSM, 조명 계산에 필요)
+cbuffer ViewProjBuffer : register(b1)
+{
+    row_major float4x4 ViewMatrix;
+    row_major float4x4 ProjectionMatrix;
+    row_major float4x4 InverseViewMatrix;
+    row_major float4x4 InverseProjectionMatrix;
+};
+
 // b7: CameraBuffer (VS+PS) - 카메라 속성
 cbuffer CameraBuffer : register(b7)
 {

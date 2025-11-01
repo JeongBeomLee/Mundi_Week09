@@ -204,6 +204,10 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\ShapeComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\DirectionalLightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\LightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\LightComponentBase.cpp" />
@@ -301,6 +305,8 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\Collision\AABB.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Collision\BoundingSphere.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Collision\Collision.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionBVH.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionManager.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Collision\Frustum.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Collision\OBB.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Collision\Picking.cpp" />
@@ -479,12 +485,17 @@ if "$(Configuration)"=="Debug" (
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BoxSphereBounds.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\WeakPtr.h" />
     <ClInclude Include="Source\Runtime\Core\Object\Property.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\ShapeComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\MovementComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\ProjectileMovementComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\RotatingMovementComponent.h" />
@@ -518,6 +529,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\RHI\SwapGuard.h" />
     <ClInclude Include="Source\Runtime\RHI\ConstantBufferType.h" />
     <ClInclude Include="Source\Slate\Widgets\PropertyRenderer.h" />
+    <ClInclude Include="Sphere.h" />
     <ClInclude Include="ThirdParty\ImGui\imconfig.h" />
     <ClInclude Include="ThirdParty\ImGui\imgui.h" />
     <ClInclude Include="ThirdParty\ImGui\imgui_impl_dx11.h" />
@@ -567,6 +579,8 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\Collision\AABB.h" />
     <ClInclude Include="Source\Runtime\Engine\Collision\BoundingSphere.h" />
     <ClInclude Include="Source\Runtime\Engine\Collision\Collision.h" />
+    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionBVH.h" />
+    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionManager.h" />
     <ClInclude Include="Source\Runtime\Engine\Collision\Frustum.h" />
     <ClInclude Include="Source\Runtime\Engine\Collision\OBB.h" />
     <ClInclude Include="Source\Runtime\Engine\Collision\Picking.h" />
