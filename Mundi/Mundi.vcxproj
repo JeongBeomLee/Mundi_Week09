@@ -222,6 +222,7 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\GameFramework\EmptyActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\HeightFogActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GameStateBase.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp" />
@@ -503,6 +504,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\EmptyActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\HeightFogActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GameStateBase.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h" />
