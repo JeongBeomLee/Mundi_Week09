@@ -23,9 +23,9 @@ class USphereComponent : public UShapeComponent
 {
 public:
 	DECLARE_CLASS(USphereComponent, UShapeComponent)
-	DECLARE_DUPLICATE(USphereComponent)
+	
 	GENERATED_REFLECTION_BODY()
-
+	DECLARE_DUPLICATE(USphereComponent)
 	USphereComponent();
 
 protected:

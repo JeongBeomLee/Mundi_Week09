@@ -23,7 +23,7 @@ class UBoxComponent : public UShapeComponent
 {
 public:
 	DECLARE_CLASS(UBoxComponent, UShapeComponent)
-	DECLARE_DUPLICATE(UBoxComponent)
+
 	GENERATED_REFLECTION_BODY()
 
 	UBoxComponent();
@@ -139,7 +139,7 @@ public:
 	 * @return 포함되어 있으면 true
 	 */
 	bool ContainsPoint(const FVector& Point) const;
-
+	DECLARE_DUPLICATE(UBoxComponent)
 private:
 	/** 현재 Bounds (캐시됨) */
 	FBoxSphereBounds CachedBounds;

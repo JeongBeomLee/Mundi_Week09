@@ -30,6 +30,7 @@ class FOcclusionCullingManagerCPU;
 struct Frustum;
 struct FCandidateDrawable;
 class FShadowManager;
+class UCollisionManager;
 
 class UWorld final : public UObject
 {
@@ -70,6 +71,7 @@ public:
     ULevel* GetLevel() const { return Level.get(); }
     FLightManager* GetLightManager() const { return LightManager.get(); }
     FShadowManager* GetShadowManager() const { return ShadowManager.get(); }
+    UCollisionManager* GetCollisionManager() const { return CollisionManager.get(); }
 
     ACameraActor* GetCameraActor() { return MainCameraActor; }
     void SetCameraActor(ACameraActor* InCamera) 
@@ -119,6 +121,9 @@ private:
 
     /** === 섀도우 매니저 ===*/
     std::unique_ptr<FShadowManager> ShadowManager;
+
+    /** === 충돌 매니저 ===*/
+    std::unique_ptr<UCollisionManager> CollisionManager;
 
     // Object naming system
     TMap<FString, int32> ObjectTypeCounts;

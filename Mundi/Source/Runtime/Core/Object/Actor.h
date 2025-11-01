@@ -38,7 +38,7 @@ public:
 
     // 루트/컴포넌트
     void SetRootComponent(USceneComponent* InRoot);
-    USceneComponent* GetRootComponent() const { return RootComponent; }
+   USceneComponent* GetRootComponent() const { return RootComponent; }
    
 
     // 소유 컴포넌트(모든 타입)

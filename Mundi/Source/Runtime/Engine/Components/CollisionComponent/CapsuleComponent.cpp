@@ -114,10 +114,40 @@ void UCapsuleComponent::UpdateBounds()
 	float ScaledHalfHeight = GetScaledCapsuleHalfHeight();
 	FVector Center = GetCapsuleCenter();
 
-	// Bounds는 Capsule을 감싸는 Box (반지름 + 높이)
-	FVector Extent(ScaledRadius, ScaledRadius, ScaledHalfHeight + ScaledRadius);
+	// 회전 정보 가져오기
+	FQuat Rotation = GetWorldRotation();
 
-	CachedBounds = FBoxSphereBounds(Center, Extent);
+	// 회전이 없으면 기존 방식 사용 (Z축 정렬 가정)
+	if (Rotation.IsIdentity())
+	{
+		FVector Extent(ScaledRadius, ScaledRadius, ScaledHalfHeight + ScaledRadius);
+		CachedBounds = FBoxSphereBounds(Center, Extent);
+		return;
+	}
+
+	// 회전된 Capsule의 끝점 계산
+	FVector SegmentStart, SegmentEnd;
+	GetCapsuleSegment(SegmentStart, SegmentEnd);
+
+	// Capsule을 감싸는 AABB 계산
+	// 선분의 끝점 + 반지름을 고려
+	FVector Min = FVector(
+		FMath::Min(SegmentStart.X, SegmentEnd.X) - ScaledRadius,
+		FMath::Min(SegmentStart.Y, SegmentEnd.Y) - ScaledRadius,
+		FMath::Min(SegmentStart.Z, SegmentEnd.Z) - ScaledRadius
+	);
+
+	FVector Max = FVector(
+		FMath::Max(SegmentStart.X, SegmentEnd.X) + ScaledRadius,
+		FMath::Max(SegmentStart.Y, SegmentEnd.Y) + ScaledRadius,
+		FMath::Max(SegmentStart.Z, SegmentEnd.Z) + ScaledRadius
+	);
+
+	// AABB의 중심과 Extent 계산
+	FVector AABBCenter = (Min + Max) * 0.5f;
+	FVector AABBExtent = (Max - Min) * 0.5f;
+
+	CachedBounds = FBoxSphereBounds(AABBCenter, AABBExtent);
 }
 
 /**
@@ -163,118 +193,127 @@ void UCapsuleComponent::RenderDebugVolume(URenderer* Renderer) const
 	FVector SegmentStart, SegmentEnd;
 	GetCapsuleSegment(SegmentStart, SegmentEnd);
 
+	// 회전 정보 가져오기
+	FQuat Rotation = GetWorldRotation();
+	FVector UpVector = Rotation.GetUpVector();
+	FVector RightVector = Rotation.GetRightVector();
+	FVector ForwardVector = Rotation.GetForwardVector();
+
 	// 라인 데이터 준비
 	TArray<FVector> StartPoints;
 	TArray<FVector> EndPoints;
 	TArray<FVector4> Colors;
 
-	const FVector4 LineColor(ShapeColor.X, ShapeColor.Y, ShapeColor.Z, 1.0f);
+	// 충돌 중이면 빨간색, 아니면 원래 색상
+	const FVector4 LineColor = bIsOverlapping ?
+		FVector4(1.0f, 0.0f, 0.0f, 1.0f) :
+		FVector4(ShapeColor.X, ShapeColor.Y, ShapeColor.Z, 1.0f);
 	const int32 NumSegments = 16; // 원의 세그먼트 수
 
-	// 상단 반구 (XY 평면 원)
+	// 상단 반구 (회전이 적용된 원 - Z축에 수직)
 	for (int32 i = 0; i < NumSegments; ++i)
 	{
 		float Angle1 = (static_cast<float>(i) / NumSegments) * 2.0f * PI;
 		float Angle2 = (static_cast<float>((i + 1) % NumSegments) / NumSegments) * 2.0f * PI;
 
-		FVector Point1 = SegmentEnd + FVector(cos(Angle1) * Radius, sin(Angle1) * Radius, 0.0f);
-		FVector Point2 = SegmentEnd + FVector(cos(Angle2) * Radius, sin(Angle2) * Radius, 0.0f);
+		FVector Offset1 = (RightVector * cos(Angle1) + ForwardVector * sin(Angle1)) * Radius;
+		FVector Offset2 = (RightVector * cos(Angle2) + ForwardVector * sin(Angle2)) * Radius;
 
-		StartPoints.push_back(Point1);
-		EndPoints.push_back(Point2);
+		StartPoints.push_back(SegmentEnd + Offset1);
+		EndPoints.push_back(SegmentEnd + Offset2);
 		Colors.push_back(LineColor);
 	}
 
-	// 하단 반구 (XY 평면 원)
+	// 하단 반구 (회전이 적용된 원 - Z축에 수직)
 	for (int32 i = 0; i < NumSegments; ++i)
 	{
 		float Angle1 = (static_cast<float>(i) / NumSegments) * 2.0f * PI;
 		float Angle2 = (static_cast<float>((i + 1) % NumSegments) / NumSegments) * 2.0f * PI;
 
-		FVector Point1 = SegmentStart + FVector(cos(Angle1) * Radius, sin(Angle1) * Radius, 0.0f);
-		FVector Point2 = SegmentStart + FVector(cos(Angle2) * Radius, sin(Angle2) * Radius, 0.0f);
+		FVector Offset1 = (RightVector * cos(Angle1) + ForwardVector * sin(Angle1)) * Radius;
+		FVector Offset2 = (RightVector * cos(Angle2) + ForwardVector * sin(Angle2)) * Radius;
 
-		StartPoints.push_back(Point1);
-		EndPoints.push_back(Point2);
+		StartPoints.push_back(SegmentStart + Offset1);
+		EndPoints.push_back(SegmentStart + Offset2);
 		Colors.push_back(LineColor);
 	}
 
-	// 중앙 원 (XY 평면, 중심)
+	// 중앙 원 (회전이 적용된 원 - Z축에 수직)
 	for (int32 i = 0; i < NumSegments; ++i)
 	{
 		float Angle1 = (static_cast<float>(i) / NumSegments) * 2.0f * PI;
 		float Angle2 = (static_cast<float>((i + 1) % NumSegments) / NumSegments) * 2.0f * PI;
 
-		FVector Point1 = Center + FVector(cos(Angle1) * Radius, sin(Angle1) * Radius, 0.0f);
-		FVector Point2 = Center + FVector(cos(Angle2) * Radius, sin(Angle2) * Radius, 0.0f);
+		FVector Offset1 = (RightVector * cos(Angle1) + ForwardVector * sin(Angle1)) * Radius;
+		FVector Offset2 = (RightVector * cos(Angle2) + ForwardVector * sin(Angle2)) * Radius;
 
-		StartPoints.push_back(Point1);
-		EndPoints.push_back(Point2);
+		StartPoints.push_back(Center + Offset1);
+		EndPoints.push_back(Center + Offset2);
 		Colors.push_back(LineColor);
 	}
 
-	// 상단 반원 호 (XZ 평면)
+	// 상단 반원 호 (Right 방향)
 	for (int32 i = 0; i < NumSegments / 2; ++i)
 	{
 		float Angle1 = (static_cast<float>(i) / NumSegments) * 2.0f * PI;
 		float Angle2 = (static_cast<float>(i + 1) / NumSegments) * 2.0f * PI;
 
-		FVector Point1 = SegmentEnd + FVector(cos(Angle1) * Radius, 0.0f, sin(Angle1) * Radius);
-		FVector Point2 = SegmentEnd + FVector(cos(Angle2) * Radius, 0.0f, sin(Angle2) * Radius);
+		FVector Offset1 = (RightVector * cos(Angle1) + UpVector * sin(Angle1)) * Radius;
+		FVector Offset2 = (RightVector * cos(Angle2) + UpVector * sin(Angle2)) * Radius;
 
-		StartPoints.push_back(Point1);
-		EndPoints.push_back(Point2);
+		StartPoints.push_back(SegmentEnd + Offset1);
+		EndPoints.push_back(SegmentEnd + Offset2);
 		Colors.push_back(LineColor);
 	}
 
-	// 하단 반원 호 (XZ 평면)
+	// 하단 반원 호 (Right 방향)
 	for (int32 i = NumSegments / 2; i < NumSegments; ++i)
 	{
 		float Angle1 = (static_cast<float>(i) / NumSegments) * 2.0f * PI;
 		float Angle2 = (static_cast<float>(i + 1) / NumSegments) * 2.0f * PI;
 
-		FVector Point1 = SegmentStart + FVector(cos(Angle1) * Radius, 0.0f, sin(Angle1) * Radius);
-		FVector Point2 = SegmentStart + FVector(cos(Angle2) * Radius, 0.0f, sin(Angle2) * Radius);
+		FVector Offset1 = (RightVector * cos(Angle1) + UpVector * sin(Angle1)) * Radius;
+		FVector Offset2 = (RightVector * cos(Angle2) + UpVector * sin(Angle2)) * Radius;
 
-		StartPoints.push_back(Point1);
-		EndPoints.push_back(Point2);
+		StartPoints.push_back(SegmentStart + Offset1);
+		EndPoints.push_back(SegmentStart + Offset2);
 		Colors.push_back(LineColor);
 	}
 
-	// 상단 반원 호 (YZ 평면)
+	// 상단 반원 호 (Forward 방향)
 	for (int32 i = 0; i < NumSegments / 2; ++i)
 	{
 		float Angle1 = (static_cast<float>(i) / NumSegments) * 2.0f * PI;
 		float Angle2 = (static_cast<float>(i + 1) / NumSegments) * 2.0f * PI;
 
-		FVector Point1 = SegmentEnd + FVector(0.0f, cos(Angle1) * Radius, sin(Angle1) * Radius);
-		FVector Point2 = SegmentEnd + FVector(0.0f, cos(Angle2) * Radius, sin(Angle2) * Radius);
+		FVector Offset1 = (ForwardVector * cos(Angle1) + UpVector * sin(Angle1)) * Radius;
+		FVector Offset2 = (ForwardVector * cos(Angle2) + UpVector * sin(Angle2)) * Radius;
 
-		StartPoints.push_back(Point1);
-		EndPoints.push_back(Point2);
+		StartPoints.push_back(SegmentEnd + Offset1);
+		EndPoints.push_back(SegmentEnd + Offset2);
 		Colors.push_back(LineColor);
 	}
 
-	// 하단 반원 호 (YZ 평면)
+	// 하단 반원 호 (Forward 방향)
 	for (int32 i = NumSegments / 2; i < NumSegments; ++i)
 	{
 		float Angle1 = (static_cast<float>(i) / NumSegments) * 2.0f * PI;
 		float Angle2 = (static_cast<float>(i + 1) / NumSegments) * 2.0f * PI;
 
-		FVector Point1 = SegmentStart + FVector(0.0f, cos(Angle1) * Radius, sin(Angle1) * Radius);
-		FVector Point2 = SegmentStart + FVector(0.0f, cos(Angle2) * Radius, sin(Angle2) * Radius);
+		FVector Offset1 = (ForwardVector * cos(Angle1) + UpVector * sin(Angle1)) * Radius;
+		FVector Offset2 = (ForwardVector * cos(Angle2) + UpVector * sin(Angle2)) * Radius;
 
-		StartPoints.push_back(Point1);
-		EndPoints.push_back(Point2);
+		StartPoints.push_back(SegmentStart + Offset1);
+		EndPoints.push_back(SegmentStart + Offset2);
 		Colors.push_back(LineColor);
 	}
 
-	// 수직 연결 라인 (4개 방향)
+	// 수직 연결 라인 (4개 방향 - 회전 적용)
 	FVector Offsets[4] = {
-		FVector(Radius, 0.0f, 0.0f),
-		FVector(-Radius, 0.0f, 0.0f),
-		FVector(0.0f, Radius, 0.0f),
-		FVector(0.0f, -Radius, 0.0f)
+		RightVector * Radius,
+		RightVector * -Radius,
+		ForwardVector * Radius,
+		ForwardVector * -Radius
 	};
 
 	for (int32 i = 0; i < 4; ++i)

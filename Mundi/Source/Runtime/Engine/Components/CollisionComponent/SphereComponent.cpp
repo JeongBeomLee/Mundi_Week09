@@ -143,7 +143,10 @@ void USphereComponent::RenderDebugVolume(URenderer* Renderer) const
 	TArray<FVector> EndPoints;
 	TArray<FVector4> Colors;
 
-	const FVector4 LineColor(ShapeColor.X, ShapeColor.Y, ShapeColor.Z, 1.0f);
+	// 충돌 중이면 빨간색, 아니면 원래 색상
+	const FVector4 LineColor = bIsOverlapping ?
+		FVector4(1.0f, 0.0f, 0.0f, 1.0f) :
+		FVector4(ShapeColor.X, ShapeColor.Y, ShapeColor.Z, 1.0f);
 	const int32 NumSegments = 32; // 원의 세그먼트 수
 
 	// XY 평면 원 (Z축 중심)

@@ -35,6 +35,7 @@ UBoxComponent::~UBoxComponent()
 void UBoxComponent::DuplicateSubObjects()
 {
 	Super::DuplicateSubObjects();
+	
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -95,7 +96,47 @@ void UBoxComponent::UpdateBounds()
 	FVector ScaledExtent = GetScaledBoxExtent();
 	FVector Center = GetBoxCenter();
 
-	CachedBounds = FBoxSphereBounds(Center, ScaledExtent);
+	// 회전을 고려한 AABB 계산
+	FQuat Rotation = GetWorldRotation();
+
+	// 회전이 없으면 기존 방식 사용
+	if (Rotation.IsIdentity())
+	{
+		CachedBounds = FBoxSphereBounds(Center, ScaledExtent);
+		return;
+	}
+
+	// 회전된 Box의 8개 꼭짓점을 계산하여 AABB 구하기
+	FVector Corners[8];
+	Corners[0] = FVector(-ScaledExtent.X, -ScaledExtent.Y, -ScaledExtent.Z);
+	Corners[1] = FVector(+ScaledExtent.X, -ScaledExtent.Y, -ScaledExtent.Z);
+	Corners[2] = FVector(+ScaledExtent.X, +ScaledExtent.Y, -ScaledExtent.Z);
+	Corners[3] = FVector(-ScaledExtent.X, +ScaledExtent.Y, -ScaledExtent.Z);
+	Corners[4] = FVector(-ScaledExtent.X, -ScaledExtent.Y, +ScaledExtent.Z);
+	Corners[5] = FVector(+ScaledExtent.X, -ScaledExtent.Y, +ScaledExtent.Z);
+	Corners[6] = FVector(+ScaledExtent.X, +ScaledExtent.Y, +ScaledExtent.Z);
+	Corners[7] = FVector(-ScaledExtent.X, +ScaledExtent.Y, +ScaledExtent.Z);
+
+	// 회전 적용
+	FVector Min = FVector(FLT_MAX, FLT_MAX, FLT_MAX);
+	FVector Max = FVector(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	for (int32 i = 0; i < 8; ++i)
+	{
+		FVector RotatedCorner = Rotation.RotateVector(Corners[i]) + Center;
+		Min.X = FMath::Min(Min.X, RotatedCorner.X);
+		Min.Y = FMath::Min(Min.Y, RotatedCorner.Y);
+		Min.Z = FMath::Min(Min.Z, RotatedCorner.Z);
+		Max.X = FMath::Max(Max.X, RotatedCorner.X);
+		Max.Y = FMath::Max(Max.Y, RotatedCorner.Y);
+		Max.Z = FMath::Max(Max.Z, RotatedCorner.Z);
+	}
+
+	// AABB의 중심과 Extent 계산
+	FVector AABBCenter = (Min + Max) * 0.5f;
+	FVector AABBExtent = (Max - Min) * 0.5f;
+
+	CachedBounds = FBoxSphereBounds(AABBCenter, AABBExtent);
 }
 
 /**
@@ -151,7 +192,10 @@ void UBoxComponent::RenderDebugVolume(URenderer* Renderer) const
 	TArray<FVector> EndPoints;
 	TArray<FVector4> Colors;
 
-	const FVector4 LineColor(ShapeColor.X, ShapeColor.Y, ShapeColor.Z, 1.0f);
+	// 충돌 중이면 빨간색, 아니면 원래 색상
+	const FVector4 LineColor = bIsOverlapping ?
+		FVector4(1.0f, 0.0f, 0.0f, 1.0f) :
+		FVector4(ShapeColor.X, ShapeColor.Y, ShapeColor.Z, 1.0f);
 
 	// 뒤쪽 면 (4개 선분)
 	StartPoints.push_back(Corners[0]); EndPoints.push_back(Corners[1]); Colors.push_back(LineColor);

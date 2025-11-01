@@ -47,7 +47,7 @@ class UShapeComponent : public UPrimitiveComponent
 public:
 	DECLARE_CLASS(UShapeComponent, UPrimitiveComponent)
 	GENERATED_REFLECTION_BODY()
-	DECLARE_DUPLICATE(UShapeComponent)
+
 
 	UShapeComponent();
 
@@ -87,6 +87,9 @@ public:
 
 	/** 현재 겹쳐있는 컴포넌트들의 정보 */
 	TArray<FOverlapInfo> OverlapInfos;
+
+	/** 현재 충돌 중인지 여부 (디버그 시각화용) */
+	bool bIsOverlapping = false;
 
 	// ────────────────────────────────────────────────
 	// Overlap 델리게이트
@@ -164,4 +167,29 @@ public:
 	 * @return 제거 성공 여부
 	 */
 	bool RemoveOverlapInfo(const UShapeComponent* OtherComponent);
+	
+	
+	DECLARE_DUPLICATE(UShapeComponent)
+protected:
+	// ────────────────────────────────────────────────
+	// 생명주기 함수
+	// ────────────────────────────────────────────────
+
+	/**
+	 * 컴포넌트가 생성되어 게임에 활성화될 때 호출됩니다.
+	 * CollisionManager에 자동 등록됩니다.
+	 */
+	virtual void BeginPlay();
+
+	/**
+	 * 컴포넌트가 파괴될 때 호출됩니다.
+	 * CollisionManager에서 자동 해제됩니다.
+	 */
+	virtual void EndPlay();
+
+	/**
+	 * Transform이 변경될 때 호출됩니다.
+	 * CollisionManager에 Dirty 마킹합니다.
+	 */
+	virtual void OnTransformChanged();
 };

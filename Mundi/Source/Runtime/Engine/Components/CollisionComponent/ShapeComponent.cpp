@@ -5,6 +5,8 @@
 #include "pch.h"
 #include "ShapeComponent.h"
 #include "Actor.h"
+#include "World.h"
+#include "CollisionManager.h"
 
 // UShapeComponent는 추상 클래스이므로 IMPLEMENT_ABSTRACT_CLASS 사용
 IMPLEMENT_CLASS(UShapeComponent)
@@ -120,6 +122,14 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 			FOverlapInfo NewInfo(OtherComp, OtherActor, ContactPoint, PenetrationDepth, false);
 			OverlapInfos.push_back(NewInfo);
 
+			// 충돌 상태 업데이트
+			bIsOverlapping = true;
+
+			// 충돌 로그 출력
+			UE_LOG("COLLISION BEGIN: {} ({}) <-> {} ({})",
+				GetOwner() ? GetOwner()->GetName() : "Unknown", GetName(),
+				OtherActor ? OtherActor->GetName() : "Unknown", OtherComp ? OtherComp->GetName() : "Unknown");
+
 			// Begin Overlap 이벤트 발생
 			OnComponentBeginOverlap.Broadcast(this, OtherActor, OtherComp, ContactPoint, PenetrationDepth);
 		}
@@ -146,6 +156,12 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 			// Overlap 종료
 			OverlapsToRemove.push_back(Info.OtherComponent);
 
+			// 충돌 로그 출력
+			UE_LOG("COLLISION END: {} ({}) <-> {} ({})",
+				GetOwner() ? GetOwner()->GetName() : "Unknown", GetName(),
+				Info.OtherActor ? Info.OtherActor->GetName() : "Unknown",
+				Info.OtherComponent ? Info.OtherComponent->GetName() : "Unknown");
+
 			// End Overlap 이벤트 발생
 			OnComponentEndOverlap.Broadcast(
 				this,
@@ -162,6 +178,9 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 	{
 		RemoveOverlapInfo(CompToRemove);
 	}
+
+	// 5단계: 충돌 상태 업데이트
+	bIsOverlapping = !OverlapInfos.empty();
 }
 
 /**
@@ -217,4 +236,68 @@ void UShapeComponent::RenderDebugVolume(URenderer* Renderer) const
 {
 	// 기본 구현: 아무것도 렌더링하지 않음
 	// 자식 클래스(BoxComponent, SphereComponent 등)에서 오버라이드
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 생명주기 함수
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * 컴포넌트가 생성되어 게임에 활성화될 때 호출됩니다.
+ * CollisionManager에 자동 등록됩니다.
+ */
+void UShapeComponent::BeginPlay()
+{
+	// World의 CollisionManager에 등록
+	if (AActor* Owner = GetOwner())
+	{
+		if (UWorld* World = Owner->GetWorld())
+		{
+			if (UCollisionManager* Manager = World->GetCollisionManager())
+			{
+				Manager->RegisterComponent(this);
+			}
+		}
+	}
+}
+
+/**
+ * 컴포넌트가 파괴될 때 호출됩니다.
+ * CollisionManager에서 자동 해제됩니다.
+ */
+void UShapeComponent::EndPlay()
+{
+	// World의 CollisionManager에서 해제
+	if (AActor* Owner = GetOwner())
+	{
+		if (UWorld* World = Owner->GetWorld())
+		{
+			if (UCollisionManager* Manager = World->GetCollisionManager())
+			{
+				Manager->UnregisterComponent(this);
+			}
+		}
+	}
+}
+
+/**
+ * Transform이 변경될 때 호출됩니다.
+ * CollisionManager에 Dirty 마킹합니다.
+ */
+void UShapeComponent::OnTransformChanged()
+{
+	// Bounds 업데이트
+	UpdateBounds();
+
+	// World의 CollisionManager에 Dirty 마킹
+	if (AActor* Owner = GetOwner())
+	{
+		if (UWorld* World = Owner->GetWorld())
+		{
+			if (UCollisionManager* Manager = World->GetCollisionManager())
+			{
+				Manager->MarkComponentDirty(this);
+			}
+		}
+	}
 }

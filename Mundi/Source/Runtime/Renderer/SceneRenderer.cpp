@@ -41,7 +41,9 @@
 #include "TileLightCuller.h"
 #include "LineComponent.h"
 #include "ShadowManager.h"
+#include"CollisionManager.h"
 #include "ShadowViewProjection.h"
+#include"CollisionComponent/ShapeComponent.h"
 
 FSceneRenderer::FSceneRenderer(UWorld* InWorld, FSceneView* InView, URenderer* InOwnerRenderer)
 	: World(InWorld)
@@ -1256,6 +1258,28 @@ void FSceneRenderer::RenderDebugPass()
 		if (FBVHierarchy* BVH = World->GetPartitionManager()->GetBVH())
 		{
 			BVH->DebugDraw(OwnerRenderer); // DebugDraw가 LineBatcher를 직접 받도록 수정 필요
+		}
+	}
+
+	// Collision BVH Debug draw
+	if (World->GetCollisionManager() && World->GetCollisionManager()->bDebugDrawBVH)
+	{
+		World->GetCollisionManager()->DebugDrawBVH(OwnerRenderer);
+	}
+
+	// Collision Components Debug draw
+	if (World->GetRenderSettings().IsShowFlagEnabled(EEngineShowFlags::SF_Collision))
+	{
+		if (UCollisionManager* CollisionMgr = World->GetCollisionManager())
+		{
+			const TArray<UShapeComponent*>& CollisionComponents = CollisionMgr->GetRegisteredComponents();
+			for (UShapeComponent* Component : CollisionComponents)
+			{
+				if (Component)
+				{
+					Component->RenderDebugVolume(OwnerRenderer);
+				}
+			}
 		}
 	}
 
