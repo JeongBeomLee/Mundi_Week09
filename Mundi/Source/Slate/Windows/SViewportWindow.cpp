@@ -1530,6 +1530,19 @@ void SViewportWindow::RenderShowFlagDropdownMenu()
 			ImGui::SetTooltip("충돌 컴포넌트(Box, Sphere, Capsule)의 디버그 와이어프레임을 표시합니다.");
 		}
 
+		// Collision BVH
+		bool bCollisionBVH = RenderSettings.IsShowFlagEnabled(EEngineShowFlags::SF_CollisionBVH);
+		if (ImGui::Checkbox("##CollisionBVH", &bCollisionBVH))
+		{
+			RenderSettings.ToggleShowFlag(EEngineShowFlags::SF_CollisionBVH);
+		}
+		ImGui::SameLine();
+		ImGui::Text(" 충돌 BVH");
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("충돌 시스템의 BVH(Bounding Volume Hierarchy) 디버그 시각화를 표시합니다.");
+		}
+
 		// Grid
 		bool bGrid = RenderSettings.IsShowFlagEnabled(EEngineShowFlags::SF_Grid);
 		if (ImGui::Checkbox("##Grid", &bGrid))

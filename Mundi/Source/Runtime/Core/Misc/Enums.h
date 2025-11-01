@@ -397,6 +397,7 @@ enum class EEngineShowFlags : uint64
     SF_BoundingBoxes = 1ull << 4, // Show/hide collision bounds
     SF_Grid = 1ull << 5,          // Show/hide world grid
     SF_Collision = 1ull << 16,    // Show/hide collision component debug shapes
+    SF_CollisionBVH = 1ull << 17, // Show/hide collision BVH debug visualization
 
     // Lighting
     SF_Lighting = 1ull << 6,      // Enable/disable lighting

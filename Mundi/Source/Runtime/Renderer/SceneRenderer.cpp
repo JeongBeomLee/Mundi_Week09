@@ -1262,9 +1262,12 @@ void FSceneRenderer::RenderDebugPass()
 	}
 
 	// Collision BVH Debug draw
-	if (World->GetCollisionManager() && World->GetCollisionManager()->bDebugDrawBVH)
+	if (World->GetRenderSettings().IsShowFlagEnabled(EEngineShowFlags::SF_CollisionBVH))
 	{
-		World->GetCollisionManager()->DebugDrawBVH(OwnerRenderer);
+		if (UCollisionManager* CollisionMgr = World->GetCollisionManager())
+		{
+			CollisionMgr->DebugDrawBVH(OwnerRenderer);
+		}
 	}
 
 	// Collision Components Debug draw
