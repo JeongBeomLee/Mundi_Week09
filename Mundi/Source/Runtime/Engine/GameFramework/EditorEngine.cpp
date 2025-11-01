@@ -4,7 +4,6 @@
 #include "SelectionManager.h"
 #include <ObjManager.h>
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
-#include "Source/Runtime/Event/Event.h"
 
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;
@@ -386,6 +385,11 @@ void UEditorEngine::StartPIE()
 void UEditorEngine::EndPIE()
 {
     bChangedPieToEditor = true;
+    
+    for (AActor* Actor : GWorld->GetLevel()->GetActors())
+    {
+        Actor->EndPlay(EEndPlayReason::EndPlayInEditor);
+    }
 
     /*if (GWorld && bPIEActive)
     {

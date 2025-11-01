@@ -13,7 +13,13 @@ function EndPlay()
 end
 
 -- OnOverlap: 다른 Actor와 충돌했을 때 호출
-function OnOverlap(OtherActor)
+function OnOverlap(
+    OverlappedComponent,
+    OtherActor,
+    OtherComp,
+    ContactPoint,
+    PenetrationDepth
+)
     PrintToConsole("[template.lue Overlap] ");
 end
 

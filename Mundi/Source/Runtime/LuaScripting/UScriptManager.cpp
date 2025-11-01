@@ -2,10 +2,10 @@
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CameraActor.h"
+#include "CollisionComponent/ShapeComponent.h"
 #include "Source/Runtime/Core/Object/Actor.h"
 #include "Source/Runtime/Engine/Components/SceneComponent.h"
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
-#include "Source/Runtime/Event/Event.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -42,11 +42,14 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString&
         FScript* Script = GetOrCreate(ScriptName);
         RegisterLocalValueToLua(Script->Env, LuaLocalValue);
         ScriptsByOwner[LuaLocalValue.MyActor].push_back(Script);
+        LinkOnOverlapWithShapeComponent(
+            LuaLocalValue.MyActor,
+            Script->LuaTemplateFunctions.OnOverlap
+        );
     }
     catch (std::exception& e)
     {
         FString ErrorMessage = FString("[Script Manager] ") + ScriptName + " creation failed : " + e.what();
-        MessageBoxA(nullptr, ErrorMessage.c_str(), ErrorMessage.c_str(), 0);
         UE_LOG(ErrorMessage.c_str());
     }
 }
@@ -216,6 +219,11 @@ void UScriptManager::RegisterUserTypeToLua()
         sol::constructors<USceneComponent()>());
     SceneComponentType["GetSceneId"] = &USceneComponent::GetSceneId;
 
+    // UShapeComponent 등록 (충돌 컴포넌트)
+    Lua.new_usertype<UShapeComponent>("UShapeComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>()
+    );
+
     // FVector 타입을 Lua에 등록
     Lua.new_usertype<FVector>("FVector",
         sol::constructors<FVector(), FVector(float, float, float)>(),
@@ -270,6 +278,21 @@ void UScriptManager::RegisterGlobalFuncToLua()
 void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)
 {
     InEnv["MyActor"] = LuaLocalValue.MyActor;
+}
+
+// 스크립트를 Actor에 부착할 때 Actor의 ShapeComponent에 Lua의 OnOverlap 함수를 연결한다
+void UScriptManager::LinkOnOverlapWithShapeComponent(AActor* MyActor, sol::function OnOverlap)
+{
+    for (UActorComponent* ActorComponent : MyActor->GetOwnedComponents())
+    {
+        UShapeComponent* ShapeComponent = Cast<UShapeComponent>(ActorComponent);
+        if (ShapeComponent)
+        {
+            auto DelegateHandle = ShapeComponent->OnComponentBeginOverlap.Add(
+            OnOverlap
+            );
+        }
+    }
 }
 
 // Lua로부터 Template 함수를 가져온다.
