@@ -4,6 +4,7 @@
 #include "SelectionManager.h"
 #include <ObjManager.h>
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include "Source/Runtime/Event/Event.h"
 
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;

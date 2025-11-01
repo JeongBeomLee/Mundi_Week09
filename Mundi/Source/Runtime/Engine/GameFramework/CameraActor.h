@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Actor.h"
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 class UCameraComponent;
 class UUIManager;
 class UInputManager;
@@ -63,7 +64,7 @@ public:
 
     // ───── 복사 관련 ────────────────────────────
     void DuplicateSubObjects() override;
-    DECLARE_DUPLICATE(ACameraActor)
+    DECLARE_ACTOR_DUPLICATE(ACameraActor)
 private:
     UCameraComponent* CameraComponent = nullptr;
     

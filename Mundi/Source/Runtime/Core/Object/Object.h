@@ -283,4 +283,22 @@ public:                                                                       \
         return NewObject;                                                     \
     }
 
+// Actor 전용 Duplicate() 자동 생성 매크로
+#define DECLARE_ACTOR_DUPLICATE(ActorClass)                                   \
+public:                                                                       \
+    ActorClass(const ActorClass&) = default; /* 디폴트 복사 생성자 명시: 아래 DuplicateObject 호출이 모든 멤버에 대해 단순 = 대입을 수행한다고 가정하기 때문.*/ \
+    ActorClass* Duplicate() const override                                         \
+    {                                                                         \
+        ActorClass* NewObject = ObjectFactory::DuplicateObject<ActorClass>(this); /*모든 멤버 단순 = 대입 수행(즉, 포인터 멤버들은 얕은복사)*/ \
+        NewObject->DuplicateSubObjects(); /*메뉴얼한 복사 수행 로직(ex: 포인터 멤버 깊은 복사, 독립적인 값 생성, Uobject계열 Duplicate 재호출)*/ \
+        NewObject->PostDuplicate();                                           \
+        UScriptManager& ScriptManager = UScriptManager::GetInstance();        \
+	    FLuaLocalValue LuaLocalValue = {NewObject};                           \
+	    for (FScript* Script : ScriptManager.GetScriptsOfActor(const_cast<ActorClass*>(this)))  \
+	    {                                                                     \
+		    ScriptManager.AttachScriptTo(LuaLocalValue, Script->ScriptName);  \
+	    }                                                                     \
+        return NewObject;                                                     \
+    }
+
 

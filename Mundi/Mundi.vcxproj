@@ -220,6 +220,84 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp" />
+    <ClCompile Include="Source\Runtime\Event\Event.cpp">
+      <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <UseDynamicDebugging>false</UseDynamicDebugging>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\Mundi.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\Mundi.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Intermediate\Mundi\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_UNICODE;UNICODE;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Core\Object;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Core\Math;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Core\Containers;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Core\Misc;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Core\Memory;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Engine\GameFramework;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Engine\Components;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Engine\Collision;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Engine\Spatial;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\RHI;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\Renderer;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\AssetManagement;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Runtime\InputCore;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Editor;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\Source\Slate;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\ThirdParty;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\ThirdParty\DirectXTex\Include;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\ThirdParty\sol;C:\Users\GameTeckLab\Desktop\Krafton GTL\Week9\Mundi\ThirdParty\lua\Include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 </AdditionalOptions>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp" />
@@ -494,6 +572,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h" />
+    <ClInclude Include="Source\Runtime\Event\Event.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h" />
     <ClInclude Include="Source\Runtime\Renderer\LightManager.h" />
