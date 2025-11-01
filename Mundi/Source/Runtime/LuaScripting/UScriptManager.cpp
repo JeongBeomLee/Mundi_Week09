@@ -5,6 +5,7 @@
 #include "Source/Runtime/Core/Object/Actor.h"
 #include "Source/Runtime/Engine/Components/SceneComponent.h"
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
+#include "Source/Runtime/Event/Event.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -15,10 +16,10 @@ UScriptManager::UScriptManager()
 
 UScriptManager::~UScriptManager()
 {
-    //Shutdown();
+    // Shutdown();
 }
 
-void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, FString ScriptName)
+void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString& ScriptName)
 {
     // 이미 같은 스크립트가 부착되어 있으면 return
     for (const TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
@@ -28,7 +29,10 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, FString Script
             for (FScript* ScriptData : Script.second)
             {
                 if (ScriptData && ScriptData->ScriptName == ScriptName)
+                {
+                    UE_LOG("[Script Manager] Actor alreay have %s", ScriptName.c_str());
                     return;
+                }
             }
         }
     }
@@ -42,13 +46,78 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, FString Script
     catch (std::exception& e)
     {
         FString ErrorMessage = FString("[Script Manager] ") + ScriptName + " creation failed : " + e.what();
+        MessageBoxA(nullptr, ErrorMessage.c_str(), ErrorMessage.c_str(), 0);
         UE_LOG(ErrorMessage.c_str());
+    }
+}
+
+void UScriptManager::PrintDebugLog()
+{
+    // 이미 같은 스크립트가 부착되어 있으면 return
+    for (const TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
+    {
+        for (FScript* ScriptData : Script.second)
+        {
+            UE_LOG(
+                "[Script Manager] Debug Log - Owner %s, Script %s",
+                Script.first->GetName().ToString(),
+                ScriptData->ScriptName.c_str()
+            );
+        }
+    }
+}
+
+void UScriptManager::DetachScriptFrom(AActor* InActor, const FString& ScriptName)
+{
+    // Actor에 부착된 Script를 찾는다.
+    for (TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
+    {
+        if (InActor == Script.first)
+        {
+            for (auto Iter = Script.second.begin(); Iter != Script.second.end(); Iter++)
+            {
+                if (*Iter && (*Iter)->ScriptName == ScriptName)
+                {
+                    FScript* Tmp = *Iter;
+                    Script.second.erase(Iter);
+
+                    delete Tmp;
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void UScriptManager::DetachAllScriptFrom(AActor* InActor)
+{
+    for (TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
+    {
+        if (InActor == Script.first)
+        {
+            while (!Script.second.empty())
+            {
+                FScript* Tmp = Script.second.back();
+                Script.second.RemoveAt(Script.second.size() - 1);
+                delete Tmp;
+            }
+        }
     }
 }
 
 TMap<AActor*, TArray<FScript*>>& UScriptManager::GetScriptsByOwner()
 {
     return ScriptsByOwner;
+}
+
+TArray<FScript*> UScriptManager::GetScriptsOfActor(AActor* InActor)
+{
+    auto Found = ScriptsByOwner.find(InActor);
+    // Cache에 Actor가 등록이 되어있지 않으면 빈 배열을 반환한다.
+    if (Found == ScriptsByOwner.end())
+        return {};
+
+    return Found->second;
 }
 
 void UScriptManager::CheckAndHotReloadLuaScript()
@@ -274,8 +343,6 @@ FScript* UScriptManager::GetOrCreate(FString InScriptName)
      */
     if (!fs::exists(Path))
     {
-        Path = fs::path(ScriptName);
-
         fs::copy_file(DEFAULT_FILE_PATH, Path, fs::copy_options::overwrite_existing);
     }
     
@@ -291,6 +358,12 @@ FScript* UScriptManager::GetOrCreate(FString InScriptName)
     NewScript->Env = Env;
     NewScript->Table = Table;
     NewScript->LuaTemplateFunctions = LuaTemplateFunctions;
+
+    // Hot reload를 위해 초기 수정 시간 설정
+    if (fs::exists(Path))
+    {
+        NewScript->LastModifiedTime = fs::last_write_time(Path);
+    }
 
     return NewScript;
 }

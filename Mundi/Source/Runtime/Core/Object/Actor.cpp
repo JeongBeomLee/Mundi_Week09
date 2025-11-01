@@ -25,6 +25,8 @@ AActor::~AActor()
 	OwnedComponents.clear();
 	SceneComponents.Empty();
 	RootComponent = nullptr;
+
+	UScriptManager::GetInstance().DetachAllScriptFrom(const_cast<AActor*>(this));
 }
 
 void AActor::BeginPlay()
@@ -34,6 +36,11 @@ void AActor::BeginPlay()
 		if (Comp) Comp->InitializeComponent();
 	for (UActorComponent* Comp : OwnedComponents)
 		if (Comp) Comp->BeginPlay();
+
+	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	{
+		Script->LuaTemplateFunctions.BeginPlay();
+	}
 }
 
 void AActor::Tick(float DeltaSeconds)
@@ -48,11 +55,21 @@ void AActor::Tick(float DeltaSeconds)
 			Comp->TickComponent(DeltaSeconds /*, … 필요 인자*/);
 		}
 	}
+
+	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	{
+		Script->LuaTemplateFunctions.Tick(DeltaSeconds);
+	}
 }
 void AActor::EndPlay(EEndPlayReason Reason)
 {
 	for (UActorComponent* Comp : OwnedComponents)
 		if (Comp) Comp->EndPlay(Reason);
+
+	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	{
+		Script->LuaTemplateFunctions.EndPlay();
+	}
 }
 void AActor::Destroy()
 {
@@ -217,8 +234,6 @@ void AActor::ClearSceneComponentCaches()
 	SceneComponents.Empty();
 	RootComponent = nullptr;
 }
-
-
 
 // ───────────────
 // Transform API
@@ -570,8 +585,24 @@ void AActor::Serialize(const bool bInIsLoading, JSON& InOutHandle)
 				{
 					USceneComponent** ParentP = SceneComp->GetSceneIdMap().Find(ParentId);
 					USceneComponent* Parent = *ParentP;
-	
+
 					SceneComp->SetupAttachment(Parent, EAttachmentRule::KeepRelative);
+				}
+			}
+		}
+
+		// Script 역직렬화
+		JSON ScriptsJson;
+		if (FJsonSerializer::ReadArray(InOutHandle, "Scripts", ScriptsJson))
+		{
+			for (uint32 i = 0; i < static_cast<uint32>(ScriptsJson.size()); ++i)
+			{
+				FString ScriptName = ScriptsJson.at(i).ToString();
+				if (!ScriptName.empty())
+				{
+					FLuaLocalValue LuaLocalValue;
+					LuaLocalValue.MyActor = this;
+					UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, ScriptName);
 				}
 			}
 		}
@@ -599,6 +630,21 @@ void AActor::Serialize(const bool bInIsLoading, JSON& InOutHandle)
 		}
 		InOutHandle["OwnedComponents"] = Components;
 		InOutHandle["Name"] = GetName().ToString();
+
+		// Script 직렬화
+		TArray<FScript*> Scripts = UScriptManager::GetInstance().GetScriptsOfActor(this);
+		if (!Scripts.empty())
+		{
+			JSON ScriptsJson = JSON::Make(JSON::Class::Array);
+			for (FScript* Script : Scripts)
+			{
+				if (Script && !Script->ScriptName.empty())
+				{
+					ScriptsJson.append(Script->ScriptName);
+				}
+			}
+			InOutHandle["Scripts"] = ScriptsJson;
+		}
 	}
 }
 

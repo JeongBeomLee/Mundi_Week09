@@ -4,6 +4,7 @@
 #include "SelectionManager.h"
 #include <ObjManager.h>
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include "Source/Runtime/Event/Event.h"
 #include "GameModeBase.h"
 #include "GameStateBase.h"
 

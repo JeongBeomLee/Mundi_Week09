@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Actor.h"
+#include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 class UBillboardComponent;
 class UPerspectiveDecalComponent;
@@ -19,7 +20,7 @@ public:
 	UPerspectiveDecalComponent* GetDecalComponent() const { return DecalComponent; }
 
 	void DuplicateSubObjects() override;
-	DECLARE_DUPLICATE(AFakeSpotLightActor)
+	DECLARE_ACTOR_DUPLICATE(AFakeSpotLightActor)
 
 	void OnSerialized() override;
 protected:
