@@ -9,6 +9,7 @@ class SSceneIOWindow; // 새로 추가할 UI
 class SDetailsWindow;
 class UMainToolbarWidget;
 class UConsoleWindow; // 오버레이 콘솔 윈도우
+class UGameHUDWidget; // 게임 HUD 오버레이
 
 // 중앙 레이아웃/입력 라우팅/뷰포트 관리 매니저 (위젯 아님)
 class USlateManager : public UObject
@@ -102,6 +103,9 @@ private:
 
     // 메인 툴바 관련
     UMainToolbarWidget* MainToolbar;
+
+    // 게임 HUD 오버레이 (PIE 전용)
+    UGameHUDWidget* GameHUD = nullptr;
 
     // 콘솔 오버레이
     UConsoleWindow* ConsoleWindow = nullptr;

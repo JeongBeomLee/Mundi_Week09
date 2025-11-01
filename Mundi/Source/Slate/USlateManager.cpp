@@ -8,6 +8,7 @@
 #include "Windows/SViewportWindow.h"
 #include "Windows/ConsoleWindow.h"
 #include "Widgets/MainToolbarWidget.h"
+#include "Widgets/GameHUDWidget.h"
 #include "FViewportClient.h"
 #include "UIManager.h"
 #include "GlobalConsole.h"
@@ -73,6 +74,10 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
     // MainToolbar 생성
     MainToolbar = NewObject<UMainToolbarWidget>();
     MainToolbar->Initialize();
+
+    // GameHUD 생성 (PIE 전용)
+    GameHUD = NewObject<UGameHUDWidget>();
+    GameHUD->Initialize();
 
     Device = InDevice;
     World = InWorld;
@@ -188,6 +193,13 @@ void USlateManager::Render()
     if (TopPanel)
     {
         TopPanel->OnRender();
+    }
+
+    // 게임 HUD 오버레이 렌더링 (PIE 모드에서만)
+    if (GameHUD)
+    {
+        GameHUD->Update();
+        GameHUD->RenderWidget();
     }
 
     // 콘솔 오버레이 렌더링 (모든 것 위에 표시)
@@ -459,6 +471,13 @@ void USlateManager::Shutdown()
 void USlateManager::SetPIEWorld(UWorld* InWorld)
 {
     MainViewport->SetVClientWorld(InWorld);
+
+    // PIE World의 GameState를 GameHUD에 설정
+    if (GameHUD && InWorld)
+    {
+        AGameStateBase* GameState = InWorld->GetGameState();
+        GameHUD->SetGameState(GameState);
+    }
 }
 
 void USlateManager::ToggleConsole()

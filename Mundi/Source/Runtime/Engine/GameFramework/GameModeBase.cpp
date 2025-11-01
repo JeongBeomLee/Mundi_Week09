@@ -14,7 +14,6 @@ END_PROPERTIES()
 
 AGameModeBase::AGameModeBase()
 	: GameState(nullptr)
-	, OwningWorld(nullptr)
 	, PlayerSpawnLocation(FVector(0.0f, 0.0f, 0.0f))
 	, bGameStarted(false)
 {
@@ -28,9 +27,9 @@ void AGameModeBase::BeginPlay()
 	// GameState 자동 생성 (없는 경우)
 	if (!GameState.IsValid())
 	{
-		if (OwningWorld)
+		if (World)
 		{
-			AGameStateBase* NewGameState = OwningWorld->SpawnActor<AGameStateBase>();
+			AGameStateBase* NewGameState = World->SpawnActor<AGameStateBase>();
 			if (NewGameState)
 			{
 				GameState = TWeakPtr<AGameStateBase>(NewGameState);

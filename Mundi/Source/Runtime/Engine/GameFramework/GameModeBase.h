@@ -46,10 +46,6 @@ public:
 	AGameStateBase* GetGameState() const { return GameState.Get(); }
 	void SetGameState(AGameStateBase* NewGameState);
 
-	// World 접근자
-	UWorld* GetWorld() const { return OwningWorld; }
-	void SetWorld(UWorld* World) { OwningWorld = World; }
-
 	// 델리게이트
 	FOnGameStarted OnGameStarted;
 	FOnGameEnded OnGameEnded;
@@ -61,9 +57,6 @@ public:
 protected:
 	// GameState 참조
 	TWeakPtr<AGameStateBase> GameState;
-
-	// 소유하는 World
-	UWorld* OwningWorld;
 
 	// 플레이어 스폰 위치
 	FVector PlayerSpawnLocation;

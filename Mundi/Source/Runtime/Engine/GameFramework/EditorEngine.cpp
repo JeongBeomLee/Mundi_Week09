@@ -382,7 +382,6 @@ void UEditorEngine::StartPIE()
     PIEWorld->GameMode = PIEWorld->SpawnActor<AGameModeBase>();
     if (PIEWorld->GameMode)
     {
-        PIEWorld->GameMode->SetWorld(PIEWorld);
         PIEWorld->GameMode->SetGameState(PIEWorld->GameState);
     }
     UE_LOG("PIE: GameMode/GameState 생성 완료");
