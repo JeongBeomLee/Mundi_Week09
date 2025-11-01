@@ -1,6 +1,4 @@
--- template.lua
--- Actor에 연결되는 기본 스크립트 템플릿
--- obj 변수를 통해 해당 Actor에 접근할 수 있습니다.
+local _ENV = ...
 
 -- BeginPlay: Actor가 생성되거나 레벨이 시작될 때 호출
 function BeginPlay()

@@ -190,7 +190,7 @@ void UScriptManager::Initialize()
      * Lua Script에서 별도로 Library를 include하지 않아도 되도록
      * 전역으로 Include하는 설정
      */
-    Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+    Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::coroutine);
 
     RegisterUserTypeToLua();
     RegisterGlobalFuncToLua();
@@ -265,6 +265,7 @@ void UScriptManager::RegisterUserTypeToLua()
 void UScriptManager::RegisterGlobalFuncToLua()
 {
     Lua["PrintToConsole"] = PrintToConsole;
+	CoroutineScheduler.RegisterCoroutineTo(Lua);
 }
 
 void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)
