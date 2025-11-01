@@ -4,6 +4,8 @@
 #include "SelectionManager.h"
 #include <ObjManager.h>
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include "GameModeBase.h"
+#include "GameStateBase.h"
 
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;
@@ -375,6 +377,16 @@ void UEditorEngine::StartPIE()
     ////스폰을 위한 월드셋
     //UI.SetWorld(PIEWorld);
 
+    // PIE World에 GameMode/GameState 자동 생성
+    PIEWorld->GameState = PIEWorld->SpawnActor<AGameStateBase>();
+    PIEWorld->GameMode = PIEWorld->SpawnActor<AGameModeBase>();
+    if (PIEWorld->GameMode)
+    {
+        PIEWorld->GameMode->SetWorld(PIEWorld);
+        PIEWorld->GameMode->SetGameState(PIEWorld->GameState);
+    }
+    UE_LOG("PIE: GameMode/GameState 생성 완료");
+
     for (AActor* Actor : GWorld->GetLevel()->GetActors())
     {
         Actor->BeginPlay();
@@ -385,16 +397,4 @@ void UEditorEngine::StartPIE()
 void UEditorEngine::EndPIE()
 {
     bChangedPieToEditor = true;
-
-    /*if (GWorld && bPIEActive)
-    {
-        WorldContexts.pop_back();
-        ObjectFactory::DeleteObject(GWorld);
-    }
-
-    GWorld = WorldContexts[0].World;
-    SLATE.SetWorld(GWorld);
-
-    bPIEActive = false;
-    UE_LOG("END PIE CLICKED");*/
 }

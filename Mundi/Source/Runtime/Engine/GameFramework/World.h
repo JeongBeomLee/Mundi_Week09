@@ -32,6 +32,8 @@ struct Frustum;
 struct FCandidateDrawable;
 class FShadowManager;
 class UCollisionManager;
+class AGameModeBase;
+class AGameStateBase;
 
 class UWorld final : public UObject
 {
@@ -104,8 +106,16 @@ public:
     // Per-world SelectionManager accessor
     USelectionManager* GetSelectionManager() { return SelectionMgr.get(); }
 
+    // GameMode/GameState accessor (PIE 전용)
+    AGameModeBase* GetGameMode() const { return GameMode; }
+    AGameStateBase* GetGameState() const { return GameState; }
+
     // PIE용 World 생성
     static UWorld* DuplicateWorldForPIE(UWorld* InEditorWorld);
+
+    /** === 게임 프레임워크 (PIE 전용) === */
+    AGameModeBase* GameMode = nullptr;
+    AGameStateBase* GameState = nullptr;
 
 private:
     /** === 에디터 특수 액터 관리 === */
