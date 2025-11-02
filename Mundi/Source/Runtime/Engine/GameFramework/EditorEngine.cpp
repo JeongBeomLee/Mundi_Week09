@@ -131,6 +131,16 @@ UWorld* UEditorEngine::GetDefaultWorld()
     return nullptr;
 }
 
+UWorld* UEditorEngine::GetPIEWorld() const
+{
+    for (const auto& Context : WorldContexts)
+    {
+        if (Context.WorldType == EWorldType::Game)
+            return Context.World;
+    }
+    return nullptr;
+}
+
 bool UEditorEngine::CreateMainWindow(HINSTANCE hInstance)
 {
     // 윈도우 생성

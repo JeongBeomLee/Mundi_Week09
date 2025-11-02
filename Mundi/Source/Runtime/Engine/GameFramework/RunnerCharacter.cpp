@@ -24,7 +24,7 @@ ARunnerCharacter::ARunnerCharacter()
 	// 기본 설정 (Lua에서 오버라이드 가능)
 	if (CharacterMovement)
 	{
-		CharacterMovement->MaxWalkSpeed = 500.0f;
+		CharacterMovement->MaxWalkSpeed = 10.0f;
 		CharacterMovement->JumpZVelocity = 600.0f;
 		CharacterMovement->GravityScale = 1.5f;
 		CharacterMovement->AirControl = 0.3f;
@@ -51,7 +51,8 @@ void ARunnerCharacter::BeginPlay()
 	LuaLocalValue.GameMode = World ? World->GetGameMode() : nullptr;
 
 	UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "RunnerCharacter.lua");
-	UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua");
+	UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "MapGenerator.lua");
+	UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua, MapGenerator.lua");
 }
 
 // ────────────────────────────────────────────────────────────────────────────
