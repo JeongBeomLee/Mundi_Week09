@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CameraActor.h"
@@ -14,6 +14,10 @@
 #include "Source/Runtime/Engine/GameFramework/RunnerGameMode.h"
 #include "Source/Runtime/Engine/Components/CharacterMovementComponent.h"
 #include "Source/Runtime/Engine/Components/InputComponent.h"
+#include "Source/Runtime/Engine/GameFramework/World.h"
+#include "Source/Runtime/Engine/GameFramework/EditorEngine.h"
+#include "Source/Runtime/Engine/GameFramework/StaticMeshActor.h"
+#include "Source/Runtime/Engine/Components/StaticMeshComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -244,6 +248,7 @@ void UScriptManager::Initialize()
     Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::coroutine);
 
     RegisterUserTypeToLua();
+    RegisterGlobalValueToLua();
     RegisterGlobalFuncToLua();
 }
 
@@ -295,11 +300,14 @@ void UScriptManager::RegisterUserTypeToLua()
 
     // FQuat 타입을 Lua에 등록
     Lua.new_usertype<FQuat>("FQuat",
-        sol::constructors<FQuat()>(),
-        "MakeFromEuler", [](float pitch, float yaw, float roll) {
-            return FQuat::MakeFromEulerZYX(FVector(pitch, yaw, roll));
-        }
+        sol::call_constructor, sol::factories(
+            []() { return FQuat(); }
+        )
     );
+    // Static 함수는 별도로 등록
+    Lua["FQuat"]["MakeFromEuler"] = [](float pitch, float yaw, float roll) {
+        return FQuat::MakeFromEulerZYX(FVector(pitch, yaw, roll));
+    };
 
     // Actor 래퍼 클래스 등록
     Lua.new_usertype<AActor>("AActor",
@@ -401,6 +409,51 @@ void UScriptManager::RegisterUserTypeToLua()
         "IsGameStarted", [](AGameModeBase* gm) { return gm->GetGameState() && gm->GetGameState()->GetGameState() == EGameState::Playing; }
     );
 
+    // FTransform 타입 등록
+    Lua.new_usertype<FTransform>("FTransform",
+        sol::call_constructor, sol::factories(
+            []() { return FTransform(); },
+            [](const FVector& t, const FQuat& r, const FVector& s) { return FTransform(t, r, s); }
+        ),
+        "Translation", &FTransform::Translation,
+        "Rotation", &FTransform::Rotation,
+        "Scale3D", &FTransform::Scale3D
+    );
+
+    // UStaticMeshComponent 클래스 등록
+    Lua.new_usertype<UStaticMeshComponent>("UStaticMeshComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>(),
+        "SetStaticMesh", &UStaticMeshComponent::SetStaticMesh,
+        "GetStaticMesh", &UStaticMeshComponent::GetStaticMesh
+    );
+
+    // AStaticMeshActor 클래스 등록
+    Lua.new_usertype<AStaticMeshActor>("AStaticMeshActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetStaticMeshComponent", &AStaticMeshActor::GetStaticMeshComponent,
+        "SetStaticMeshComponent", &AStaticMeshActor::SetStaticMeshComponent
+    );
+
+    // UWorld 클래스 등록
+    Lua.new_usertype<UWorld>("UWorld",
+        sol::no_constructor,
+        "SpawnActor", [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
+            return World->SpawnActor<AStaticMeshActor>(Transform);
+        },
+        "DestroyActor", &UWorld::DestroyActor,
+        "GetActors", &UWorld::GetActors
+    );
+
+    // UEditorEngine 클래스 등록
+    Lua.new_usertype<UEditorEngine>("UEditorEngine",
+        sol::no_constructor,
+        "GetDefaultWorld", &UEditorEngine::GetDefaultWorld,
+        "GetPIEWorld", &UEditorEngine::GetPIEWorld,
+        "IsPIEActive", &UEditorEngine::IsPIEActive,
+        "StartPIE", &UEditorEngine::StartPIE,
+        "EndPIE", &UEditorEngine::EndPIE
+    );
+
     // ARunnerGameMode 클래스 등록 (AGameModeBase 상속)
     Lua.new_usertype<ARunnerGameMode>("ARunnerGameMode",
         sol::base_classes, sol::bases<AGameModeBase>(),
@@ -419,6 +472,13 @@ void UScriptManager::RegisterUserTypeToLua()
     );
 
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
+}
+
+void UScriptManager::RegisterGlobalValueToLua()
+{
+#ifdef _EDITOR
+    Lua["GEngine"] = &GEngine;
+#endif
 }
 
 void UScriptManager::RegisterGlobalFuncToLua()

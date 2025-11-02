@@ -33,10 +33,11 @@ public:
     bool IsPIEActive() const { return bPIEActive; }
     
     HWND GetHWND() const { return HWnd; }
-    
+
     URenderer* GetRenderer() const { return Renderer.get(); }
     D3D11RHI* GetRHIDevice() { return &RHIDevice; }
     UWorld* GetDefaultWorld();
+    UWorld* GetPIEWorld() const;
     const TArray<FWorldContext>& GetWorldContexts() { return WorldContexts; }
 
     void AddWorldContext(const FWorldContext& InWorldContext)

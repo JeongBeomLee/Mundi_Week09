@@ -31,7 +31,7 @@ ARunnerGameMode::ARunnerGameMode()
 	DefaultPawnClass = ARunnerCharacter::StaticClass();
 
 	// 플레이어 스폰 위치 (런2 게임 시작 위치)
-	PlayerSpawnLocation = FVector(0.0f, 0.0f, 30.0f);
+	PlayerSpawnLocation = FVector(0.0f, 0.0f, 3.0f);
 
 	// 자동 스폰 활성화
 	bAutoSpawnPlayer = true;
@@ -66,7 +66,7 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 		FVector PlayerLocation = PlayerPawn->GetActorLocation();
 
 		// 카메라 위치: 플레이어 뒤쪽(-600) 위쪽(+300)
-		FVector CameraOffset(-10.0f, 0.0f, 10.0f);
+		FVector CameraOffset(-3.0f, 0.0f, 3.0f);
 		FVector CameraLocation = PlayerLocation + CameraOffset;
 
 		// 카메라 위치 설정
@@ -93,10 +93,6 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 void ARunnerGameMode::RestartGame()
 {
 	UE_LOG("[RunnerGameMode] RestartGame called!");
-
-	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
-	Super::RestartGame();
-
 	// 플레이어 리스폰
 	if (PlayerController)
 	{
@@ -118,6 +114,10 @@ void ARunnerGameMode::RestartGame()
 			UE_LOG("[RunnerGameMode] ERROR: Failed to get spawned pawn after restart!");
 		}
 	}
+	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
+	Super::RestartGame();
+
+	
 }
 
 // ────────────────────────────────────────────────────────────────────────────

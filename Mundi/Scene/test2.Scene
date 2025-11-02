@@ -1,0 +1,87 @@
+{
+  "Actors" : {
+    "262" : {
+      "Name" : "Directional Light Actor",
+      "OwnedComponents" : [{
+          "CSMLambda" : 0.500000,
+          "Id" : 263,
+          "Intensity" : 1.000000,
+          "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+          "NumCascades" : 3,
+          "ParentId" : 0,
+          "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+          "RelativeRotationEuler" : [-62.900280, 16.769619, -62.900280],
+          "RelativeScale" : [1.000000, 1.000000, 1.000000],
+          "ShadowBias" : 0.005000,
+          "ShadowMapType" : 1,
+          "ShadowProjectionType" : 0,
+          "ShadowSharpen" : 1.000000,
+          "ShadowSlopeBias" : 2.000000,
+          "Temperature" : 6500.000000,
+          "Type" : "UDirectionalLightComponent",
+          "bHiddenInGame" : false,
+          "bIsActive" : true,
+          "bIsCastShadows" : true,
+          "bIsVisible" : true,
+          "bTickEnabled" : true
+        }],
+      "RootComponentId" : 263,
+      "Type" : "ADirectionalLightActor"
+    },
+    "264" : {
+      "Name" : "Ambient Light Actor",
+      "OwnedComponents" : [{
+          "Id" : 265,
+          "Intensity" : 0.100000,
+          "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+          "ParentId" : 0,
+          "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+          "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+          "RelativeScale" : [1.000000, 1.000000, 1.000000],
+          "ShadowBias" : 0.001000,
+          "ShadowSharpen" : 1.000000,
+          "ShadowSlopeBias" : 0.000000,
+          "Temperature" : 6500.000000,
+          "Type" : "UAmbientLightComponent",
+          "bHiddenInGame" : false,
+          "bIsActive" : true,
+          "bIsCastShadows" : true,
+          "bIsVisible" : true,
+          "bTickEnabled" : true
+        }],
+      "RootComponentId" : 265,
+      "Type" : "AAmbientLightActor"
+    },
+    "877" : {
+      "Name" : "스태틱 메시_0",
+      "OwnedComponents" : [{
+          "Id" : 878,
+          "MaterialSlots" : [{
+              "AssetPath" : "texture",
+              "Type" : "UMaterial"
+            }],
+          "ParentId" : 0,
+          "RelativeLocation" : [1.532815, -1.532816, 1.173165],
+          "RelativeRotationEuler" : [0.000000, -0.000000, 0.000000],
+          "RelativeScale" : [1.000000, 1.000000, 1.000000],
+          "StaticMesh" : "Data/cube-tex.obj",
+          "Type" : "UStaticMeshComponent",
+          "bHiddenInGame" : false,
+          "bIsActive" : true,
+          "bIsVisible" : true,
+          "bTickEnabled" : true
+        }],
+      "RootComponentId" : 878,
+      "Type" : "AStaticMeshActor"
+    }
+  },
+  "NextUUID" : 879,
+  "PerspectiveCamera" : {
+    "FOV" : [60.000000],
+    "FarClip" : [1000.000000],
+    "Location" : [-7.750788, 8.127327, 7.586970],
+    "NearClip" : [0.100000],
+    "Rotation" : [0.000000, 33.099991, -49.099976]
+  },
+  "Version" : 1
+}

@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "SelectionManager.h"
 #include "Picking.h"
 #include "CameraActor.h"
@@ -110,21 +110,23 @@ void UWorld::Tick(float DeltaSeconds)
 	//순서 바꾸면 안댐
 	if (Level)
 	{
-		for (AActor* Actor : Level->GetActors())
+		// Index-based iteration: Tick 중에 Actor가 추가/삭제되어도 안전
+		const TArray<AActor*>& Actors = Level->GetActors();
+		for (size_t i = 0; i < Actors.size(); ++i)
 		{
-			// PendingKill 상태인 Actor는 Tick하지 않음
-			if (Actor && !Actor->IsPendingKill() && (Actor->CanTickInEditor() || bPie))
+			AActor* Actor = Actors[i];
+			if (Actor && (Actor->CanTickInEditor() || bPie))
 			{
 				Actor->Tick(DeltaSeconds);
 			}
 		}
 	}
-	for (AActor* EditorActor : EditorActors)
+
+	// EditorActors도 인덱스 기반 순회로 변경
+	for (size_t i = 0; i < EditorActors.size(); ++i)
 	{
-		if (EditorActor && !EditorActor->IsPendingKill() && !bPie)
-		{
-			EditorActor->Tick(DeltaSeconds);
-		}
+		AActor* EditorActor = EditorActors[i];
+		if (EditorActor && !bPie) EditorActor->Tick(DeltaSeconds);
 	}
 
 	// 충돌 감지 업데이트
