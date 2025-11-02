@@ -117,13 +117,27 @@ public:
 	// 모든 함수 실행
 	void Broadcast(Args... InArgs) const
 	{
-		for (const auto& Pair : Functions)
+		// 재진입 방지
+		if (bIsBroadcasting)
+		{
+			//UE_LOG("[Delegate] Warning: Recursive broadcast detected!");
+			return;
+		}
+
+		bIsBroadcasting = true;
+
+		// 복사본으로 안전하게 실행
+		TArray<TPair<DelegateHandle, HandlerType>> FunctionsCopy = Functions;
+
+		for (const auto& Pair : FunctionsCopy)
 		{
 			if (Pair.second)
 			{
 				Pair.second(InArgs...);
 			}
 		}
+
+		bIsBroadcasting = false;
 	}
 
 	// () 연산자 오버로딩
@@ -135,6 +149,7 @@ public:
 private:
 	TArray<TPair<DelegateHandle, HandlerType>> Functions;
 	DelegateHandle NextHandle = 0;
+	mutable bool bIsBroadcasting = false;  // 브로드캐스트 중 플래그
 };
 
 // 매크로 정의 (언리얼 스타일)

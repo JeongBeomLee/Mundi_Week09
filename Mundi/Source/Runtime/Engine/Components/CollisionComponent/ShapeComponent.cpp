@@ -138,6 +138,11 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 	// 3단계: 끝난 Overlap 감지 (End)
 	TArray<UShapeComponent*> OverlapsToRemove;
 
+	if (OverlapInfos.empty())
+	{
+		return;
+	}
+
 	for (const FOverlapInfo& Info : OverlapInfos)
 	{
 		bool bStillOverlapping = false;
