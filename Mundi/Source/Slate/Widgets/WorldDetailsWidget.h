@@ -32,6 +32,7 @@ private:
 
 	/** UI 렌더링 */
 	void RenderGameModeSettings();
+	void RenderGameModeClassSelector();
 	void RenderPawnClassSelector();
 	void RenderControllerClassSelector();
 	void RenderSpawnLocationEditor();
@@ -40,14 +41,17 @@ private:
 	void UpdateAvailableClasses();
 
 	/** 클래스 이름 리스트 (ImGui Combo용) */
+	TArray<const char*> GameModeClassNames;
 	TArray<const char*> PawnClassNames;
 	TArray<const char*> ControllerClassNames;
 
 	/** 사용 가능한 클래스 목록 */
+	TArray<UClass*> AvailableGameModeClasses;
 	TArray<UClass*> AvailablePawnClasses;
 	TArray<UClass*> AvailableControllerClasses;
 
 	/** 현재 선택된 인덱스 */
+	int SelectedGameModeClassIndex = 0;
 	int SelectedPawnClassIndex = 0;
 	int SelectedControllerClassIndex = 0;
 

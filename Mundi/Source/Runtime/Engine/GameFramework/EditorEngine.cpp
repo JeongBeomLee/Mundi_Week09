@@ -369,7 +369,7 @@ void UEditorEngine::StartPIE()
     UClass* GameModeClassToSpawn = PIEWorld->GetGameModeClass();
     if (!GameModeClassToSpawn)
     {
-        GameModeClassToSpawn = ARunnerGameMode::StaticClass(); // 기본값
+        GameModeClassToSpawn = AGameModeBase::StaticClass(); // 기본값
         UE_LOG("[PIE] No GameModeClass set in World, using default: ARunnerGameMode");
     }
 

@@ -85,6 +85,11 @@ void UWorldDetailsWidget::RenderGameModeSettings()
 	// PIE 모드에서는 읽기 전용
 	bool bReadOnly = World->bPie;
 
+	// GameModeClass 선택
+	RenderGameModeClassSelector();
+
+	ImGui::Spacing();
+
 	// DefaultPawnClass 선택
 	RenderPawnClassSelector();
 
@@ -98,6 +103,67 @@ void UWorldDetailsWidget::RenderGameModeSettings()
 
 	// Player Spawn Location
 	RenderSpawnLocationEditor();
+}
+
+void UWorldDetailsWidget::RenderGameModeClassSelector()
+{
+	if (!World)
+		return;
+
+	ImGui::Text("GameMode Class:");
+
+	// 현재 World 설정에서 클래스 가져오기
+	UClass* CurrentGameModeClass = World->GetGameModeClass();
+
+	if (CurrentGameModeClass)
+	{
+		// 현재 클래스가 목록에 있는지 찾기
+		for (int i = 0; i < AvailableGameModeClasses.size(); ++i)
+		{
+			if (AvailableGameModeClasses[i] == CurrentGameModeClass)
+			{
+				SelectedGameModeClassIndex = i;
+				break;
+			}
+		}
+	}
+
+	// Combo Box
+	if (!GameModeClassNames.empty())
+	{
+		// PIE 모드에서는 비활성화
+		if (World->bPie)
+		{
+			ImGui::BeginDisabled();
+		}
+
+		if (ImGui::Combo("##GameModeClass", &SelectedGameModeClassIndex,
+			GameModeClassNames.data(), static_cast<int>(GameModeClassNames.size())))
+		{
+			// 선택 변경됨 - World 설정에 반영
+			if (SelectedGameModeClassIndex >= 0 && SelectedGameModeClassIndex < AvailableGameModeClasses.size())
+			{
+				World->SetGameModeClass(AvailableGameModeClasses[SelectedGameModeClassIndex]);
+				UE_LOG("WorldDetailsWidget: GameMode class set to %s",
+					AvailableGameModeClasses[SelectedGameModeClassIndex]->Name);
+			}
+		}
+
+		if (World->bPie)
+		{
+			ImGui::EndDisabled();
+		}
+	}
+	else
+	{
+		ImGui::TextDisabled("No available GameMode classes");
+	}
+
+	// 현재 선택된 클래스 설명
+	if (CurrentGameModeClass && CurrentGameModeClass->Description)
+	{
+		ImGui::TextWrapped("%s", CurrentGameModeClass->Description);
+	}
 }
 
 void UWorldDetailsWidget::RenderPawnClassSelector()
@@ -279,18 +345,27 @@ void UWorldDetailsWidget::RenderSpawnLocationEditor()
 void UWorldDetailsWidget::UpdateAvailableClasses()
 {
 	// Clear previous data
+	AvailableGameModeClasses.clear();
 	AvailablePawnClasses.clear();
 	AvailableControllerClasses.clear();
+	GameModeClassNames.clear();
 	PawnClassNames.clear();
 	ControllerClassNames.clear();
 
-	// Pawn 클래스들 찾기
+	// 모든 클래스 찾기
 	TArray<UClass*> AllClasses = UClass::GetAllClasses();
 
 	for (UClass* Class : AllClasses)
 	{
 		if (!Class)
 			continue;
+
+		// GameModeBase 및 자식 클래스 찾기
+		if (Class->IsChildOf(AGameModeBase::StaticClass()))
+		{
+			AvailableGameModeClasses.push_back(Class);
+			GameModeClassNames.push_back(Class->Name);
+		}
 
 		// Pawn 및 자식 클래스 찾기
 		if (Class->IsChildOf(APawn::StaticClass()))
@@ -307,6 +382,6 @@ void UWorldDetailsWidget::UpdateAvailableClasses()
 		}
 	}
 
-	UE_LOG("WorldDetailsWidget: Found %d Pawn classes, %d Controller classes",
-		AvailablePawnClasses.size(), AvailableControllerClasses.size());
+	UE_LOG("WorldDetailsWidget: Found %d GameMode classes, %d Pawn classes, %d Controller classes",
+		AvailableGameModeClasses.size(), AvailablePawnClasses.size(), AvailableControllerClasses.size());
 }

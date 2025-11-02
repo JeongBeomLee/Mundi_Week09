@@ -520,11 +520,38 @@ void UMainToolbarWidget::OnSaveScene()
 
         FString FilePath = "Scene/" + SceneName + ".Scene";
 
+        // Scene JSON 생성
+        JSON SceneJson;
+
+        // Level 데이터 저장
         JSON LevelJson;
         CurrentWorld->GetLevel()->Serialize(false, LevelJson);
-        bool bSuccess = FJsonSerializer::SaveJsonToFile(LevelJson, FilePath);
+        SceneJson["Level"] = LevelJson;
 
-        UE_LOG("MainToolbar: Scene saved: %s", SceneName.c_str());
+        // World 설정 저장 (PIE 설정)
+        JSON WorldSettingsJson;
+        if (CurrentWorld->GetGameModeClass())
+        {
+            WorldSettingsJson["GameModeClass"] = CurrentWorld->GetGameModeClass()->Name;
+        }
+        if (CurrentWorld->GetDefaultPawnClass())
+        {
+            WorldSettingsJson["DefaultPawnClass"] = CurrentWorld->GetDefaultPawnClass()->Name;
+        }
+        if (CurrentWorld->GetPlayerControllerClass())
+        {
+            WorldSettingsJson["PlayerControllerClass"] = CurrentWorld->GetPlayerControllerClass()->Name;
+        }
+
+        FVector SpawnLoc = CurrentWorld->GetPlayerSpawnLocation();
+        WorldSettingsJson["PlayerSpawnLocation"] = FJsonSerializer::VectorToJson(SpawnLoc);
+
+        SceneJson["WorldSettings"] = WorldSettingsJson;
+
+        // 파일 저장
+        bool bSuccess = FJsonSerializer::SaveJsonToFile(SceneJson, FilePath);
+
+        UE_LOG("MainToolbar: Scene saved: %s (with World settings)", SceneName.c_str());
     }
     catch (const std::exception& Exception)
     {
@@ -568,20 +595,62 @@ void UMainToolbarWidget::OnLoadScene()
         UUIManager::GetInstance().ClearTransformWidgetSelection();
         GWorld->GetSelectionManager()->ClearSelection();
 
+        // Scene JSON 로드
+        JSON SceneJson;
+        if (!FJsonSerializer::LoadJsonFromFile(SceneJson, InFilePath))
+        {
+            UE_LOG("MainToolbar: Failed To Load Scene From: %s", InFilePath.c_str());
+            return;
+        }
+
+        // Level 데이터 로드
         std::unique_ptr<ULevel> NewLevel = ULevelService::CreateDefaultLevel();
         JSON LevelJsonData;
-        if (FJsonSerializer::LoadJsonFromFile(LevelJsonData, InFilePath))
+        if (FJsonSerializer::ReadObject(SceneJson, "Level", LevelJsonData, nullptr, false))
         {
             NewLevel->Serialize(true, LevelJsonData);
         }
         else
         {
-            UE_LOG("MainToolbar: Failed To Load Level From: %s", InFilePath.c_str());
-            return;
+            // 구버전 호환: 직접 Level 데이터인 경우
+            NewLevel->Serialize(true, SceneJson);
         }
         CurrentWorld->SetLevel(std::move(NewLevel));
 
-        UE_LOG("MainToolbar: Scene loaded successfully: %s", InFilePath.c_str());
+        // World 설정 로드
+        JSON WorldSettingsJson;
+        if (FJsonSerializer::ReadObject(SceneJson, "WorldSettings", WorldSettingsJson, nullptr, false))
+        {
+            // Helper lambda: 클래스 이름으로부터 UClass 로드
+            auto LoadClass = [&](const char* Key, auto SetterFunc) {
+                FString ClassName;
+                if (FJsonSerializer::ReadString(WorldSettingsJson, Key, ClassName, "", false))
+                {
+                    UClass* Class = UClass::FindClass(ClassName);
+                    if (Class)
+                    {
+                        (CurrentWorld->*SetterFunc)(Class);
+                        UE_LOG("MainToolbar: Loaded %s: %s", Key, ClassName.c_str());
+                    }
+                }
+            };
+
+            // 클래스 설정 로드
+            LoadClass("GameModeClass", &UWorld::SetGameModeClass);
+            LoadClass("DefaultPawnClass", &UWorld::SetDefaultPawnClass);
+            LoadClass("PlayerControllerClass", &UWorld::SetPlayerControllerClass);
+
+            // PlayerSpawnLocation 로드
+            FVector SpawnLoc;
+            if (FJsonSerializer::ReadVector(WorldSettingsJson, "PlayerSpawnLocation", SpawnLoc, FVector(0.0f, 0.0f, 100.0f), false))
+            {
+                CurrentWorld->SetPlayerSpawnLocation(SpawnLoc);
+                UE_LOG("MainToolbar: Loaded PlayerSpawnLocation: (%.1f, %.1f, %.1f)",
+                    SpawnLoc.X, SpawnLoc.Y, SpawnLoc.Z);
+            }
+        }
+
+        UE_LOG("MainToolbar: Scene loaded successfully: %s (with World settings)", InFilePath.c_str());
     }
     catch (const std::exception& Exception)
     {
