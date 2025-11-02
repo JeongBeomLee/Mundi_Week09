@@ -27,7 +27,8 @@ AActor::~AActor()
 	SceneComponents.Empty();
 	RootComponent = nullptr;
 
-	UScriptManager::GetInstance().DetachAllScriptFrom(const_cast<AActor*>(this));
+	// Lua 스크립트는 이미 DestroyImmediate에서 정리되었으므로 제거
+	// UScriptManager::GetInstance().DetachAllScriptFrom(const_cast<AActor*>(this));
 }
 
 void AActor::BeginPlay()
@@ -67,7 +68,18 @@ void AActor::Tick(float DeltaSeconds)
 void AActor::EndPlay(EEndPlayReason Reason)
 {
 	for (UActorComponent* Comp : OwnedComponents)
-		if (Comp) Comp->EndPlay(Reason);
+	{
+		if (Comp)
+		{
+			//if(UShapeComponent* ShapeComp = Cast<UShapeComponent>(Comp))
+			//{
+			//	// 충돌 처리 컴포넌트일 경우 Script의 OnOverlap function 연결 해제
+			//	TArray<FScript*> Scripts = UScriptManager::GetInstance().GetScriptsOfActor(this);
+			//	ShapeComp->OnComponentBeginOverlap.RemoveAll();
+			//}
+			Comp->EndPlay(Reason);
+		}
+	}
 
 	if (Reason == EEndPlayReason::EndPlayInEditor)
 	{
@@ -79,26 +91,36 @@ void AActor::EndPlay(EEndPlayReason Reason)
 }
 void AActor::Destroy()
 {
-	// 재진입/중복 방지
-	if (IsPendingDestroy())
+	// 이미 파괴 예약 중이면 중복 호출 방지
+	if (bPendingKill)
 	{
 		return;
 	}
-	MarkPendingDestroy();
-	// 월드가 있으면 월드에 위임 (여기서 더 이상 this 만지지 않기)
+
+	// 파괴 예약 플래그 설정
+	bPendingKill = true;
+
+	// 월드가 있으면 월드의 지연 삭제 큐에 추가
 	if (World) 
 	{ 
-		World->DestroyActor(this); 
+		World->MarkActorForDestruction(this);
 		return; 
 	}
 
-	// 월드가 없을 때만 자체 정리
+	// 월드가 없을 때만 즉시 정리 (예외 상황)
+	DestroyImmediate();
+}
+
+void AActor::DestroyImmediate()
+{
+	// 실제 파괴 로직
 	EndPlay(EEndPlayReason::Destroyed);
 	UnregisterAllComponents(true);
 	DestroyAllComponents();
 	ClearSceneComponentCaches();
-	// 최종 delete (ObjectFactory가 소유권 관리 중이면 그 경로 사용)
-	ObjectFactory::DeleteObject(this);
+	
+	// Lua 스크립트 정리
+	UScriptManager::GetInstance().DetachAllScriptFrom(this);
 }
 
 

@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "SelectionManager.h"
 #include "Picking.h"
 #include "CameraActor.h"
@@ -102,9 +102,12 @@ void UWorld::InitializeGizmo()
 
 void UWorld::Tick(float DeltaSeconds)
 {
+	// ⭐ 프레임 끝에 지연 삭제된 Actor들 처리
+	ProcessPendingActorDestruction();
+
 	Partition->Update(DeltaSeconds, /*budget*/256);
 
-//순서 바꾸면 안댐
+	//순서 바꾸면 안댐
 	if (Level)
 	{
 		// Index-based iteration: Tick 중에 Actor가 추가/삭제되어도 안전
@@ -204,52 +207,11 @@ bool UWorld::DestroyActor(AActor* Actor)
 	if (!Actor) return false;
 
 	// 재진입 가드
-	if (Actor->IsPendingDestroy()) return false;
-	Actor->MarkPendingDestroy();
+	if (Actor->IsPendingKill()) return false;
 
-	// 선택/UI 해제
-	if (SelectionMgr) SelectionMgr->DeselectActor(Actor);
-
-	// 게임 수명 종료
-	Actor->EndPlay(EEndPlayReason::Destroyed);
-
-	// 컴포넌트 정리 (등록 해제 → 파괴)
-	TArray<USceneComponent*> Components = Actor->GetSceneComponents();
-	for(USceneComponent* Comp : Components)
-	{
-		if (Comp)
-		{
-			Comp->SetOwner(nullptr); // 소유자 해제
-		}
-	}
-
-	// 월드 자료구조에서 소유한 컴포넌트 내리기
-	OnActorDestroyed(Actor);
-
-	Actor->UnregisterAllComponents(/*bCallEndPlayOnBegun=*/true);
-	Actor->DestroyAllComponents();
-	Actor->ClearSceneComponentCaches();
-
-// 레벨에서 제거 시도
-	if (Level && Level->RemoveActor(Actor))
-	{
-		// 옥트리에서 제거
-		OnActorDestroyed(Actor);
-
-		// 메모리 해제
-		ObjectFactory::DeleteObject(Actor);
-
-		// 삭제된 액터 정리
-		if (SelectionMgr)
-		{
-			SelectionMgr->CleanupInvalidActors();
-			SelectionMgr->ClearSelection();
-		}
-
-		return true; // 성공적으로 삭제
-	}
-
-	return false; // 레벨에 없는 액터
+	// 지연 삭제 큐에 추가
+	MarkActorForDestruction(Actor);
+	return true;
 }
 
 void UWorld::OnActorSpawned(AActor* Actor)
@@ -268,28 +230,72 @@ void UWorld::OnActorDestroyed(AActor* Actor)
 	}
 }
 
-inline FString RemoveObjExtension(const FString& FileName)
+// 지연 삭제 큐에 Actor 추가
+void UWorld::MarkActorForDestruction(AActor* Actor)
 {
-	const FString Extension = ".obj";
-
-	// 마지막 경로 구분자 위치 탐색 (POSIX/Windows 모두 지원)
-	const uint64 Sep = FileName.find_last_of("/\\");
-	const uint64 Start = (Sep == FString::npos) ? 0 : Sep + 1;
-
-	// 확장자 제거 위치 결정
-	uint64 End = FileName.size();
-	if (End >= Extension.size() &&
-		FileName.compare(End - Extension.size(), Extension.size(), Extension) == 0)
+	if (!Actor)
 	{
-		End -= Extension.size();
+		return;
 	}
 
-	// 베이스 이름(확장자 없는 파일명) 반환
-	if (Start <= End)
-		return FileName.substr(Start, End - Start);
+	Actor->MarkPendingKill();
+	PendingDestroyActors.push_back(Actor);
 
-	// 비정상 입력 시 원본 반환 (안전장치)
-	return FileName;
+	UE_LOG("[World] Marked actor '%s' for destruction (deferred)", 
+		Actor->GetName().ToString().c_str());
+}
+
+// 지연 삭제 큐의 Actor들을 실제로 삭제
+void UWorld::ProcessPendingActorDestruction()
+{
+	if (PendingDestroyActors.empty())
+	{
+		return;
+	}
+
+	UE_LOG("[World] Processing %d pending actor destruction(s)", 
+		static_cast<int>(PendingDestroyActors.size()));
+
+	// 복사본으로 처리 (처리 중 새로운 삭제 요청이 들어올 수 있음)
+	TArray<AActor*> ActorsToDestroy = PendingDestroyActors;
+	PendingDestroyActors.clear();
+
+	for (AActor* Actor : ActorsToDestroy)
+	{
+		if (!Actor)
+		{
+			continue;
+		}
+
+		// 선택/UI 해제
+		if (SelectionMgr)
+		{
+			SelectionMgr->DeselectActor(Actor);
+		}
+
+		// 실제 파괴 수행
+		Actor->DestroyImmediate();
+
+		// 레벨에서 제거
+		if (Level)
+		{
+			Level->RemoveActor(Actor);
+		}
+
+		// 옥트리에서 제거
+		OnActorDestroyed(Actor);
+
+		// 메모리 해제
+		ObjectFactory::DeleteObject(Actor);
+	}
+
+	// 삭제된 액터 정리
+	if (SelectionMgr)
+	{
+		SelectionMgr->CleanupInvalidActors();
+	}
+
+	UE_LOG("[World] Finished processing pending destructions");
 }
 
 void UWorld::CreateLevel()

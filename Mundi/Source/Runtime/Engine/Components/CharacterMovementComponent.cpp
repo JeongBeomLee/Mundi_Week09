@@ -253,7 +253,7 @@ void UCharacterMovementComponent::ApplyGravity(float DeltaTime)
 	// 최대 낙하 속도 제한 (터미널 속도)
 	// 중력 방향으로의 속도 성분을 체크
 	float VelocityInGravityDir = FVector::Dot(Velocity, GravityDirection);
-	constexpr float MaxFallSpeed = 4000.0f; // 40 m/s
+	constexpr float MaxFallSpeed = 40.0f; // 40 m/s
 	if (VelocityInGravityDir > MaxFallSpeed)
 	{
 		// 중력 방향 속도 성분만 제한
@@ -305,7 +305,7 @@ bool UCharacterMovementComponent::CheckGround()
 	// 간단한 지면 체크: Y = 0을 지면으로 가정
 	// 나중에 충돌 시스템과 연결하여 제대로 구현
 	constexpr float GroundLevel = 0.0f;
-	constexpr float GroundTolerance = 1.0f; // 1cm 오차 허용
+	constexpr float GroundTolerance = 0.01f; // 1cm 오차 허용
 
 	// 지면 근처에 있고, 아래로 떨어지지 않고 있으면 지면에 있음
 	bool bNearGround = Location.Z <= (GroundLevel + GroundTolerance);

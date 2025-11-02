@@ -51,6 +51,11 @@ public:
     void DetachScriptFrom(AActor* InActor, const FString& ScriptName);
     void DetachAllScriptFrom(AActor* InActor);
 
+    void ModifyGameModeValueInScript(
+        AActor* InActor,
+        class AGameModeBase* InNewGameMode
+	);
+
     void PrintDebugLog();
 
     TMap<AActor*, TArray<FScript*>>& GetScriptsByOwner();

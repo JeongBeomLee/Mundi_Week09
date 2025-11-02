@@ -236,7 +236,10 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\CoroutineScheduler.cpp" />
     <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp" />
-    <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp" />
+    <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\SceneView.cpp" />
     <ClCompile Include="Source\Runtime\Renderer\ShadowConfiguration.cpp" />
@@ -678,6 +681,7 @@ if "$(Configuration)"=="Debug" (
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\actor_transform.lua" />
+    <None Include="Scripts\MapGenerator.lua" />
     <None Include="Scripts\print_debug_log.lua" />
     <None Include="Scripts\RunnerCharacter.lua" />
     <None Include="Scripts\template.lua" />

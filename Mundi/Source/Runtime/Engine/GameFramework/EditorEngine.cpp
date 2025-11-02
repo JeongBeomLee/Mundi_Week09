@@ -400,8 +400,12 @@ void UEditorEngine::StartPIE()
         {
             PIEWorld->SetCameraActor(CameraActor);
             UE_LOG("PIE: MainCamera set to %s", CameraActor->GetName().ToString());
-            break;
         }
+
+        UScriptManager::GetInstance().ModifyGameModeValueInScript(
+            Actor,
+            PIEWorld->GameMode
+        );
     }
 
     if (!PIEWorld->GetCameraActor())
