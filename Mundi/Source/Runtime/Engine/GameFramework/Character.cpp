@@ -262,7 +262,7 @@ void ACharacter::OnGameEndedHandler(bool bVictory)
 
 void ACharacter::OnGameRestartedHandler()
 {
-	bGameStarted = false;
+	bGameStarted = true;
 	UE_LOG("[Character] Game Restarted - Waiting for StartGame");
 }
 

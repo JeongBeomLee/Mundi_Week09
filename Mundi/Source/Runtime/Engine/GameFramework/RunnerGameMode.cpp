@@ -93,10 +93,6 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 void ARunnerGameMode::RestartGame()
 {
 	UE_LOG("[RunnerGameMode] RestartGame called!");
-
-	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
-	Super::RestartGame();
-
 	// 플레이어 리스폰
 	if (PlayerController)
 	{
@@ -118,6 +114,10 @@ void ARunnerGameMode::RestartGame()
 			UE_LOG("[RunnerGameMode] ERROR: Failed to get spawned pawn after restart!");
 		}
 	}
+	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
+	Super::RestartGame();
+
+	
 }
 
 // ────────────────────────────────────────────────────────────────────────────
