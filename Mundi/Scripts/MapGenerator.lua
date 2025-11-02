@@ -6,29 +6,45 @@ local _ENV = ...
 -- 대문자로 작성한 변수명은 상수로 정의합니다.
 local DEFAULT_WIDTH = 5;
 local DEFAULT_HEIGHT = 5;
-local DEFAULT_DEPTH = 10;
+local DEFAULT_DEPTH = 1;
+local DEFAULT_MAP_SIZE = 30;
 local DEFAULT_SCALE = 2.0;
+local DEFAULT_FILLRATE = 0.5;
 
 local Width = DEFAULT_WIDTH;
 local Height = DEFAULT_HEIGHT;
 local Depth = DEFAULT_DEPTH;
 local Scale = DEFAULT_SCALE;
+local MapSize = DEFAULT_MAP_SIZE;
+local FillRate = DEFAULT_FILLRATE;
 
 local CellChunks = {};
 local MapChunks = {};
 local CurrentMapId = 0;
 local ChunkRemovalId = 0;
 
--- TODO: 나중에 랜덤 맵 생성 로직으로 바꿔야 함
+local function SetNewRandomSeed()
+    local Seed = math.floor(os.clock() * 1000);  -- 정수로 변환
+    math.randomseed(Seed);
+end
+
 local function CreateCellChunk()
     local CellChunk = {};
+
+    -- 랜덤 시드는 청크당 한 번만 설정
+    SetNewRandomSeed();
 
     for i = 1, 4 do
         local Plane = {};
         for j = 1, Depth do
             local PlaneLow = {};
             for k = 1, Width do
-                PlaneLow[k] = 1.0;
+                local Random = math.random();
+                if (Random < FillRate) then
+                    PlaneLow[k] = 1;
+                else
+                    PlaneLow[k] = 0;
+                end
             end
             Plane[j] = PlaneLow;
         end
@@ -184,16 +200,10 @@ local function DeleteMapChunks(MapChunk)
 end
 
 local function Initialize()
-    local CellChunk1 = CreateCellChunk();
-    local CellChunk2 = CreateCellChunk();
-    local CellChunk3 = CreateCellChunk();
-
-    CellChunks = { CellChunk1, CellChunk2, CellChunk3 };
-    MapChunks = {
-        CreateMapChunkWithCellChunk(CellChunk1, 0),
-        CreateMapChunkWithCellChunk(CellChunk2, Depth * Scale),
-        CreateMapChunkWithCellChunk(CellChunk3, Depth * Scale * 2)
-    };
+    for i = 1, MapSize do
+        CellChunks[i] = CreateCellChunk();
+        MapChunks[i] = CreateMapChunkWithCellChunk(CreateCellChunk(), Depth * Scale * (i - 1));
+    end
 end
 
 local function Update()
@@ -214,21 +224,21 @@ local function Update()
         if ChunkToDelete == nil then
             PrintToConsole("[MapGenerator] ERROR: ChunkToDelete is nil at index " .. (ChunkRemovalId + 1));
         else
-            PrintToConsole("[MapGenerator] Deleting chunk at index " .. (ChunkRemovalId + 1));
+            -- PrintToConsole("[MapGenerator] Deleting chunk at index " .. (ChunkRemovalId + 1));
             DeleteMapChunks(ChunkToDelete);
         end
 
         -- 새 청크 생성 (플레이어 앞쪽에)
-        local NewChunkXPosition = (CurrentMapId + 2) * Depth * Scale;
-        PrintToConsole("[MapGenerator] Creating new chunk at X: " .. NewChunkXPosition);
-
+        local NewChunkXPosition = (CurrentMapId + MapSize) * Depth * Scale;
+        -- PrintToConsole("[MapGenerator] Creating new chunk at X: " .. NewChunkXPosition);
+        
         local NewChunk = CreateCellChunk();
         CellChunks[ChunkRemovalId + 1] = NewChunk;
         MapChunks[ChunkRemovalId + 1] = CreateMapChunkWithCellChunk(NewChunk, NewChunkXPosition);
 
         -- 다음 삭제 대상 청크 인덱스 업데이트 (0, 1, 2 순환)
-        ChunkRemovalId = (ChunkRemovalId + 1) % 3;
-        PrintToConsole("[MapGenerator] New ChunkRemovalId: " .. ChunkRemovalId);
+        ChunkRemovalId = (ChunkRemovalId + 1) % MapSize;
+        -- PrintToConsole("[MapGenerator] New ChunkRemovalId: " .. ChunkRemovalId);
     end
 end
 

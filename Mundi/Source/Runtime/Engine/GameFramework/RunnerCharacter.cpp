@@ -63,9 +63,17 @@ void ARunnerCharacter::BeginPlay()
 	LuaLocalValue.MyActor = this;
 	LuaLocalValue.GameMode = World ? World->GetGameMode() : nullptr;
 
-	UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "RunnerCharacter.lua");
-	UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "MapGenerator.lua");
-	UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua, MapGenerator.lua");
+	try
+	{
+		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "RunnerCharacter.lua");
+		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "MapGenerator.lua");
+		UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua, MapGenerator.lua");
+	}
+	catch (std::exception& e)
+	{
+		UE_LOG("[RunnerCharacter] ERROR: Lua script attachment failed: %s", e.what());
+		// 스크립트 로드 실패 시에도 프로그램은 계속 실행됨
+	}
 
 	// 이제 Super::BeginPlay() 호출 → Actor::BeginPlay()에서 Lua BeginPlay 호출됨
 	Super::BeginPlay();

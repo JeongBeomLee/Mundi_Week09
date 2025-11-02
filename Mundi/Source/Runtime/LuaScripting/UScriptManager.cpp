@@ -206,7 +206,7 @@ void UScriptManager::Initialize()
      * Lua Script에서 별도로 Library를 include하지 않아도 되도록
      * 전역으로 Include하는 설정
      */
-    Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::coroutine);
+    Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::coroutine, sol::lib::os);
 
     RegisterUserTypeToLua();
     RegisterGlobalValueToLua();
@@ -513,17 +513,18 @@ void UScriptManager::SetLuaScriptField(
     // 새 environment 생성 (globals 기반)
     InEnv = sol::environment (Lua, sol::create, Lua.globals());
 
-    // 스크립트 실행
+    // 스크립트 로드 및 컴파일 (문법 오류 체크)
     sol::load_result scriptLoad = Lua.load_file(Path.string());
     if (!scriptLoad.valid()) {
         sol::error Err = scriptLoad;
-        throw Err;
+        throw Err;  // 컴파일 타임 문법 오류 발생 시 throw
     }
 
+    // 스크립트 실행 (런타임 오류 체크, InEnv를 '...' 가변인자로 전달)
     sol::protected_function_result result = scriptLoad(InEnv);
     if (!result.valid()) {
         sol::error Err = result;
-        throw Err;
+        throw Err;  // 런타임 오류 발생 시 throw
     }
     
     // 혹은 스크립트가 return table이면 result 반환값 사용 가능
@@ -552,7 +553,7 @@ FScript* UScriptManager::GetOrCreate(FString InScriptName)
     sol::environment Env;
     sol::table Table;
     FLuaTemplateFunctions LuaTemplateFunctions;
-
+    
     SetLuaScriptField(Path, Env, Table, LuaTemplateFunctions);
 
     FScript* NewScript = new FScript;
