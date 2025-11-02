@@ -8,6 +8,8 @@
 #include "InputComponent.h"
 #include "World.h"
 #include "GameModeBase.h"
+#include "CollisionComponent/BoxComponent.h"
+#include "ObjectFactory.h"
 
 IMPLEMENT_CLASS(ARunnerCharacter)
 
@@ -20,7 +22,27 @@ END_PROPERTIES()
 // ────────────────────────────────────────────────────────────────────────────
 
 ARunnerCharacter::ARunnerCharacter()
+	: CollisionBox(nullptr)
 {
+	// BoxComponent 생성 및 설정
+	CollisionBox = CreateDefaultSubobject<UBoxComponent>("CollisionBox");
+	if (CollisionBox)
+	{
+		CollisionBox->SetOwner(this);
+
+		// MeshComponent가 있다면 그것에 부착, 없으면 RootComponent에 부착
+		if (MeshComponent)
+		{
+			CollisionBox->SetupAttachment(MeshComponent);
+		}
+		else
+		{
+			CollisionBox->SetupAttachment(GetRootComponent());
+		}
+
+		CollisionBox->SetBoxExtent(FVector(0.50f, 0.50f, 0.50f));
+	}
+
 	// 기본 설정 (Lua에서 오버라이드 가능)
 	if (CharacterMovement)
 	{
@@ -112,5 +134,17 @@ FVector ARunnerCharacter::GetGravityDirection() const
 		return CharacterMovement->GetGravityDirection();
 	}
 	return FVector(0.0f, 0.0f, -1.0f);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 복제 (Duplication)
+// ────────────────────────────────────────────────────────────────────────────
+
+void ARunnerCharacter::DuplicateSubObjects()
+{
+	Super::DuplicateSubObjects();
+
+	// CollisionBox는 CreateDefaultSubobject로 생성되므로 자동으로 복제됩니다.
+	// 추가적인 설정이 필요하면 여기서 처리합니다.
 }
 

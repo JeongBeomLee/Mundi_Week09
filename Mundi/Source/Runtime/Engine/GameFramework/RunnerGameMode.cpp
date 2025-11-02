@@ -28,7 +28,7 @@ ARunnerGameMode::ARunnerGameMode()
 	PlayerControllerClass = APlayerController::StaticClass();
 
 	// Character를 기본 Pawn으로 설정
-	DefaultPawnClass = ACharacter::StaticClass();
+	DefaultPawnClass = ARunnerCharacter::StaticClass();
 
 	// 플레이어 스폰 위치 (런2 게임 시작 위치)
 	PlayerSpawnLocation = FVector(0.0f, 0.0f, 30.0f);

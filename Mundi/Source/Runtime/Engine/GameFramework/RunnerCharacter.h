@@ -6,6 +6,9 @@
 
 #include "Character.h"
 
+// 전방 선언
+class UBoxComponent;
+
 /**
  * ARunnerCharacter
  *
@@ -27,6 +30,13 @@ public:
 
 	ARunnerCharacter();
 	virtual ~ARunnerCharacter() override;
+
+	// ────────────────────────────────────────────────
+	// 컴포넌트 접근
+	// ────────────────────────────────────────────────
+
+	/** 충돌 BoxComponent를 반환합니다 */
+	UBoxComponent* GetCollisionBox() const { return CollisionBox; }
 
 	// ────────────────────────────────────────────────
 	// 유틸리티 함수 (Lua에서 호출)
@@ -68,4 +78,17 @@ protected:
 	// ────────────────────────────────────────────────
 
 	virtual void BeginPlay() override;
+
+	// ────────────────────────────────────────────────
+	// 복제 (Duplication)
+	// ────────────────────────────────────────────────
+
+	virtual void DuplicateSubObjects() override;
+
+	// ────────────────────────────────────────────────
+	// 컴포넌트
+	// ────────────────────────────────────────────────
+
+	/** 충돌 감지용 Box 컴포넌트 */
+	UBoxComponent* CollisionBox;
 };
