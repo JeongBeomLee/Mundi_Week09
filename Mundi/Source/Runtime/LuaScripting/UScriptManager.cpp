@@ -316,7 +316,10 @@ void UScriptManager::RegisterUserTypeToLua()
         "AddWorldRotation", sol::overload(
             static_cast<void(AActor::*)(const FQuat&)>(&AActor::AddActorWorldRotation)
         ),
-        "GetName", &AActor::GetName
+        "GetName", &AActor::GetName,
+		"SetActorHiddenInGame", &AActor::SetActorHiddenInGame,
+		"DestroyAllComponents", &AActor::DestroyAllComponents,
+		"Destroy", &AActor::Destroy
     );
 
     // APawn 클래스 등록 (AActor 상속)

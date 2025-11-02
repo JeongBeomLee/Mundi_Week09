@@ -185,7 +185,7 @@ protected:
 	 * 컴포넌트가 파괴될 때 호출됩니다.
 	 * CollisionManager에서 자동 해제됩니다.
 	 */
-	virtual void EndPlay();
+	void EndPlay(EEndPlayReason Reason) override;
 
 	/**
 	 * Transform이 변경될 때 호출됩니다.

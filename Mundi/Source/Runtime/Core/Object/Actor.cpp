@@ -67,7 +67,18 @@ void AActor::Tick(float DeltaSeconds)
 void AActor::EndPlay(EEndPlayReason Reason)
 {
 	for (UActorComponent* Comp : OwnedComponents)
-		if (Comp) Comp->EndPlay(Reason);
+	{
+		if (Comp)
+		{
+			//if(UShapeComponent* ShapeComp = Cast<UShapeComponent>(Comp))
+			//{
+			//	// 충돌 처리 컴포넌트일 경우 Script의 OnOverlap function 연결 해제
+			//	TArray<FScript*> Scripts = UScriptManager::GetInstance().GetScriptsOfActor(this);
+			//	ShapeComp->OnComponentBeginOverlap.RemoveAll();
+			//}
+			Comp->EndPlay(Reason);
+		}
+	}
 
 	if (Reason == EEndPlayReason::EndPlayInEditor)
 	{
@@ -84,7 +95,7 @@ void AActor::Destroy()
 	{
 		return;
 	}
-	MarkPendingDestroy();
+	//MarkPendingDestroy();
 	// 월드가 있으면 월드에 위임 (여기서 더 이상 this 만지지 않기)
 	if (World) 
 	{ 

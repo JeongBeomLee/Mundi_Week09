@@ -261,12 +261,9 @@ void UShapeComponent::BeginPlay()
 	}
 }
 
-/**
- * 컴포넌트가 파괴될 때 호출됩니다.
- * CollisionManager에서 자동 해제됩니다.
- */
-void UShapeComponent::EndPlay()
+void UShapeComponent::EndPlay(EEndPlayReason Reason)
 {
+	Super::EndPlay(Reason);
 	// World의 CollisionManager에서 해제
 	if (AActor* Owner = GetOwner())
 	{
@@ -279,6 +276,15 @@ void UShapeComponent::EndPlay()
 		}
 	}
 }
+
+/**
+ * 컴포넌트가 파괴될 때 호출됩니다.
+ * CollisionManager에서 자동 해제됩니다.
+ */
+//void UShapeComponent::EndPlay()
+//{
+//	
+//}
 
 /**
  * Transform이 변경될 때 호출됩니다.

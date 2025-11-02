@@ -18,9 +18,16 @@ function OnOverlap(
     ContactPoint,
     PenetrationDepth
 )
-    PrintToConsole("[coin_collision] Collided with: " .. OtherActor:GetName():ToString())
+    local actorName = OtherActor:GetName():ToString()
+    PrintToConsole("[coin_collision] Collided with: " .. actorName)
 
-    GameMode:OnCoinCollected(3)
+    if actorName == "DefaultActor" then
+        PrintToConsole("[coin_collision] Coin collected!")
+        GameMode:OnCoinCollected(1)
+        -- MyActor:SetActorHiddenInGame(true)
+        -- MyActor:DestroyAllComponents()
+        MyActor:Destroy()
+    end
 end
 
 -- Tick: 매 프레임마다 호출 (dt: 델타 타임)

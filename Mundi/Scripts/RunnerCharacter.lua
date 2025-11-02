@@ -317,8 +317,9 @@ end
 -- ════════════════════════════════════════════════════════════════════════════
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
+    PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
     if Config.bDebugLog then
-        PrintToConsole("[RunnerCharacter] ⚡ Overlapped: " .. OtherActor:GetName():ToString())
+        PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
     end
 
     -- TODO: 벽면 감지 및 중력 방향 전환 로직
