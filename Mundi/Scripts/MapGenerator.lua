@@ -1,11 +1,13 @@
 local _ENV = ...
 
+local Queue = require("Queue");
+
 -- lua는 클래스 개념이 없는 언어이므로 파일을 class 취급하여 작성하겠습니다.
 -- local 키워드는 해당 파일에서만 접근할 수 있어 private처럼 활용합니다.
 
 -- 대문자로 작성한 변수명은 상수로 정의합니다.
-local DEFAULT_WIDTH = 5;
-local DEFAULT_HEIGHT = 5;
+local DEFAULT_WIDTH = 10;
+local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
 local DEFAULT_MAP_SIZE = 30;
 local DEFAULT_SCALE = 2.0;
@@ -23,6 +25,13 @@ local MapChunks = {};
 local CurrentMapId = 0;
 local ChunkRemovalId = 0;
 
+local PlaceOfExile = FTransform();
+PlaceOfExile.Translation = FVector(-1000.0, 0.0, 0.0);
+PlaceOfExile.Scale3D = FVector(Scale, Scale, Scale);
+PlaceOfExile.Rotation = FQuat.MakeFromEuler(0, 0, 0);
+
+local ChunkPool = Queue.new();
+
 local function SetNewRandomSeed()
     local Seed = math.floor(os.clock() * 1000);  -- 정수로 변환
     math.randomseed(Seed);
@@ -31,8 +40,7 @@ end
 local function CreateCellChunk()
     local CellChunk = {};
 
-    -- 랜덤 시드는 청크당 한 번만 설정
-    SetNewRandomSeed();
+    -- 랜덤 시드는 Initialize에서 한 번만 설정하므로 여기서는 제거
 
     for i = 1, 4 do
         local Plane = {};
@@ -55,12 +63,6 @@ local function CreateCellChunk()
 end
 
 local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
-    local world = GEngine:GetPIEWorld();
-    if world == nil then
-        PrintToConsole("[MapGenerator] ERROR: PIE World is nil!");
-        return {};
-    end
-
     local MapChunk = {};
 
     -- 상단 (Top)
@@ -70,15 +72,15 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
         local Row = {};
         for j = 1, Width do
             if Top[i][j] > 0.01 then
-                local transform = FTransform();
-                transform.Translation = FVector(
+                local Location = FVector(
                     XPosition + (i - 1) * Scale,
                     (j - 1 - (Width - 1) / 2.0) * Scale,
                     (Height / 2.0 + 0.5) * Scale
                 );
-                transform.Scale3D = FVector(Scale, Scale, Scale);
-                transform.Rotation = FQuat.MakeFromEuler(0, 0, 0);
-                Row[j] = world:SpawnActor(transform);
+                Row[j] = Queue.pop(ChunkPool);
+                if Row[j] then
+                    Row[j]:SetLocation(Location);
+                end
             else
                 Row[j] = nil;
             end
@@ -93,15 +95,15 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
         local Row = {};
         for j = 1, Width do
             if Bottom[i][j] > 0.01 then
-                local transform = FTransform();
-                transform.Translation = FVector(
+                local Location = FVector(
                     XPosition + (i - 1) * Scale,
                     (j - 1 - (Width - 1) / 2.0) * Scale,
                     -(Height / 2.0 + 0.5) * Scale
                 );
-                transform.Scale3D = FVector(Scale, Scale, Scale);
-                transform.Rotation = FQuat.MakeFromEuler(0, 0, 0);
-                Row[j] = world:SpawnActor(transform);
+                Row[j] = Queue.pop(ChunkPool);
+                if Row[j] then
+                    Row[j]:SetLocation(Location);
+                end
             else
                 Row[j] = nil;
             end
@@ -116,15 +118,15 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
         local Row = {};
         for j = 1, Height do
             if Left[i][j] > 0.01 then
-                local transform = FTransform();
-                transform.Translation = FVector(
+                local Location = FVector(
                     XPosition + (i - 1) * Scale,
                     -(Width / 2.0 + 0.5) * Scale,
                     (j - 1 - (Height - 1) / 2.0) * Scale
                 );
-                transform.Scale3D = FVector(Scale, Scale, Scale);
-                transform.Rotation = FQuat.MakeFromEuler(0, 0, 0);
-                Row[j] = world:SpawnActor(transform);
+                Row[j] = Queue.pop(ChunkPool);
+                if Row[j] then
+                    Row[j]:SetLocation(Location);
+                end
             else
                 Row[j] = nil;
             end
@@ -139,15 +141,15 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
         local Row = {};
         for j = 1, Height do
             if Right[i][j] > 0.01 then
-                local transform = FTransform();
-                transform.Translation = FVector(
+                local Location = FVector(
                     XPosition + (i - 1) * Scale,
                     (Width / 2.0 + 0.5) * Scale,
                     (j - 1 - (Height - 1) / 2.0) * Scale
                 );
-                transform.Scale3D = FVector(Scale, Scale, Scale);
-                transform.Rotation = FQuat.MakeFromEuler(0, 0, 0);
-                Row[j] = world:SpawnActor(transform);
+                Row[j] = Queue.pop(ChunkPool);
+                if Row[j] then
+                    Row[j]:SetLocation(Location);
+                end
             else
                 Row[j] = nil;
             end
@@ -164,22 +166,18 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
 end
 
 local function DeleteMapChunks(MapChunk)
-    local world = GEngine:GetPIEWorld();
-    if world == nil then
-        PrintToConsole("[MapGenerator] ERROR: PIE World is nil!");
-        return;
-    end
-
     -- 상단 (Top), 하단 (Bottom)을 삭제
     for i = 1, Depth do
         for j = 1, Width do
             local TargetTop = MapChunk.Top[i][j];
             if TargetTop ~= nil then
-                world:DestroyActor(TargetTop);
+                TargetTop:SetTransform(PlaceOfExile);
+                Queue.push(ChunkPool, TargetTop);
             end
             local TargetBottom = MapChunk.Bottom[i][j];
             if TargetBottom ~= nil then
-                world:DestroyActor(TargetBottom);
+                TargetBottom:SetTransform(PlaceOfExile);
+                Queue.push(ChunkPool, TargetBottom);
             end
         end
     end
@@ -189,30 +187,49 @@ local function DeleteMapChunks(MapChunk)
         for j = 1, Height do
             local TargetLeft = MapChunk.Left[i][j];
             if TargetLeft ~= nil then
-                world:DestroyActor(TargetLeft);
+                TargetLeft:SetTransform(PlaceOfExile);
+                Queue.push(ChunkPool, TargetLeft);
             end
             local TargetRight = MapChunk.Right[i][j];
             if TargetRight ~= nil then
-                world:DestroyActor(TargetRight);
+                TargetRight:SetTransform(PlaceOfExile);
+                Queue.push(ChunkPool, TargetRight);
             end
         end
     end
 end
 
-local function Initialize()
-    for i = 1, MapSize do
-        CellChunks[i] = CreateCellChunk();
-        MapChunks[i] = CreateMapChunkWithCellChunk(CreateCellChunk(), Depth * Scale * (i - 1));
-    end
-end
-
-local function Update()
-    -- MyActor 존재 확인
-    if MyActor == nil then
-        PrintToConsole("[MapGenerator] ERROR: MyActor is nil!");
+local function InitializePool()
+    local world = GEngine:GetPIEWorld();
+    if world == nil then
+        PrintToConsole("[MapGenerator] ERROR: PIE World is nil!");
         return;
     end
 
+    -- Pool의 청크들은 시야에 보이지 않는 곳에 대기
+    local PoolSize = (Width + Height) * Depth * 2 * MapSize;
+    PrintToConsole("[MapGenerator] Creating pool with " .. PoolSize .. " actors");
+
+    for i = 1, PoolSize do 
+        Queue.push(ChunkPool, world:SpawnActor(PlaceOfExile));
+    end
+
+    PrintToConsole("[MapGenerator] Pool initialized. Queue size: " .. (ChunkPool.last - ChunkPool.first + 1));
+end
+
+local function InitializeMap()
+    for i = 1, MapSize do
+        CellChunks[i] = CreateCellChunk();
+        MapChunks[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i - 1));
+    end
+end
+
+local function Initialize()
+    InitializePool();
+    InitializeMap();
+end
+
+local function Update()
     local ActorLocation = MyActor:GetLocation();
     local Tmp = CurrentMapId;
     CurrentMapId = math.floor(ActorLocation.X / (Depth * Scale));
@@ -222,7 +239,7 @@ local function Update()
         -- 가장 오래된 청크 삭제
         local ChunkToDelete = MapChunks[ChunkRemovalId + 1];
         if ChunkToDelete == nil then
-            PrintToConsole("[MapGenerator] ERROR: ChunkToDelete is nil at index " .. (ChunkRemovalId + 1));
+            -- PrintToConsole("[MapGenerator] ERROR: ChunkToDelete is nil at index " .. (ChunkRemovalId + 1));
         else
             -- PrintToConsole("[MapGenerator] Deleting chunk at index " .. (ChunkRemovalId + 1));
             DeleteMapChunks(ChunkToDelete);
@@ -279,16 +296,9 @@ end
 function BeginPlay()
     PrintToConsole("[MapGenerator] Begin Play");
 
-    if MyActor == nil then
-        PrintToConsole("[MapGenerator] ERROR: MyActor is nil in BeginPlay!");
-    else
-        local loc = MyActor:GetLocation();
-        PrintToConsole("[MapGenerator] MyActor location: X=" .. loc.X .. ", Y=" .. loc.Y .. ", Z=" .. loc.Z);
-    end
-
-    PrintToConsole("[MapGenerator] Calling Initialize...");
+    -- 랜덤 시드를 한 번만 설정 (모든 청크가 다른 패턴을 가지도록)
+    SetNewRandomSeed();
     Initialize();
-    PrintToConsole("[MapGenerator] Initialize complete. MapChunks count: " .. #MapChunks);
 end
 
 function EndPlay()
@@ -300,8 +310,5 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
 end
 
 function Tick(dt)
-    local success, err = pcall(Update);
-    if not success then
-        PrintToConsole("[MapGenerator] ERROR in Tick: " .. tostring(err));
-    end
+    Update();
 end

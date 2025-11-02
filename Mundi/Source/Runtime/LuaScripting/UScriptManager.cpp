@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CameraActor.h"
@@ -245,7 +245,12 @@ void UScriptManager::Initialize()
      * Lua Script에서 별도로 Library를 include하지 않아도 되도록
      * 전역으로 Include하는 설정
      */
-    Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::coroutine, sol::lib::os);
+    Lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::coroutine, sol::lib::os, sol::lib::package);
+
+    // Lua require()가 Scripts 디렉토리에서 모듈을 찾을 수 있도록 package.path 설정
+    std::string packagePath = Lua["package"]["path"];
+    packagePath = "Scripts/?.lua;Scripts/?/init.lua;" + packagePath;
+    Lua["package"]["path"] = packagePath;
 
     RegisterUserTypeToLua();
     RegisterGlobalValueToLua();
@@ -320,6 +325,8 @@ void UScriptManager::RegisterUserTypeToLua()
         ),
         "GetScale", &AActor::GetActorScale,
         "SetScale", &AActor::SetActorScale,
+        "GetTransform", &AActor::GetActorTransform,
+        "SetTransform", &AActor::SetActorTransform,
         "AddWorldLocation", &AActor::AddActorWorldLocation,
         "AddWorldRotation", sol::overload(
             static_cast<void(AActor::*)(const FQuat&)>(&AActor::AddActorWorldRotation)

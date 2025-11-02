@@ -216,7 +216,7 @@ void UConsoleWidget::AddLog(const char* fmt, ...)
 
 void UConsoleWidget::VAddLog(const char* fmt, va_list args)
 {
-	char buf[1024];
+	char buf[4096];
 	vsnprintf_s(buf, sizeof(buf), fmt, args);
 	buf[sizeof(buf) - 1] = 0;
 

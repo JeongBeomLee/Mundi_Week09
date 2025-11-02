@@ -50,7 +50,7 @@ void UGlobalConsole::LogV(const char* fmt, va_list args)
     else
     {
         // Fallback to OutputDebugString if console widget not available
-        char tmp[1024];
+        char tmp[4096];
         vsnprintf_s(tmp, _countof(tmp), fmt, args);
         OutputDebugStringA("[No Console] ");
         OutputDebugStringA(tmp);
