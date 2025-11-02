@@ -76,6 +76,7 @@ private:
     void Shutdown();
 
     void RegisterUserTypeToLua();
+    void RegisterGlobalValueToLua();
     void RegisterGlobalFuncToLua();
     void RegisterLocalValueToLua(
         sol::environment& InEnv,

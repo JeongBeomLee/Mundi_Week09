@@ -64,46 +64,46 @@ void USceneManagerWidget::Update()
 	{
 		size_t CurrentActorCount = World->GetActors().size();
 		ULevel* CurrentLevel = World->GetLevel();
-		if (CurrentActorCount != LastActorCount || CurrentLevel != LastLevel)
-		{
+		//if (CurrentActorCount != LastActorCount || CurrentLevel != LastLevel)
+		//{
 			RefreshActorTree();
 			LastActorCount = CurrentActorCount;
 			LastLevel = CurrentLevel;
 			return; // 새로고침 후 이번 프레임은 더 이상 처리하지 않음
-		}
+		//}
 
-		// 비용이 많이 드는 유효성 검사를 5초마다만 수행
-		static int32 ValidationCounter = 0;
-		ValidationCounter++;
-		if (ValidationCounter % 300 == 0) // 5초마다 (60FPS 기준)
-		{
-			// 느린 유효성 검사 - 몇 개만 샘플링
-			bool bNeedRefresh = false;
-			const TArray<AActor*>& WorldActors = World->GetActors();
+		//// 비용이 많이 드는 유효성 검사를 5초마다만 수행
+		//static int32 ValidationCounter = 0;
+		//ValidationCounter++;
+		//if (ValidationCounter % 300 == 0) // 5초마다 (60FPS 기준)
+		//{
+		//	// 느린 유효성 검사 - 몇 개만 샘플링
+		//	bool bNeedRefresh = false;
+		//	const TArray<AActor*>& WorldActors = World->GetActors();
 
-			// 전체 검사 대신 몇 개만 샘플링
-			int32 CheckCount = 0;
-			for (auto* RootNode : RootNodes)
-			{
-				if (++CheckCount > 10) break; // 최대 10개만 검사
+		//	// 전체 검사 대신 몇 개만 샘플링
+		//	int32 CheckCount = 0;
+		//	for (auto* RootNode : RootNodes)
+		//	{
+		//		if (++CheckCount > 10) break; // 최대 10개만 검사
 
-				if (RootNode && RootNode->IsActor())
-				{
-					if (!RootNode->Actor ||
-						std::find(WorldActors.begin(), WorldActors.end(), RootNode->Actor) == WorldActors.end())
-					{
-						bNeedRefresh = true;
-						break;
-					}
-				}
-			}
+		//		if (RootNode && RootNode->IsActor())
+		//		{
+		//			if (!RootNode->Actor ||
+		//				std::find(WorldActors.begin(), WorldActors.end(), RootNode->Actor) == WorldActors.end())
+		//			{
+		//				bNeedRefresh = true;
+		//				break;
+		//			}
+		//		}
+		//	}
 
-			if (bNeedRefresh)
-			{
-				RequestDelayedRefresh();
-				return;
-			}
-		}
+		//	if (bNeedRefresh)
+		//	{
+		//		RequestDelayedRefresh();
+		//		return;
+		//	}
+		//}
 	}
 	else if (LastActorCount != 0)
 	{
@@ -150,8 +150,9 @@ void USceneManagerWidget::RenderWidget()
 	else
 	{
 		// 빠른 렌더링 - 중복 검사 없이 바로 출력
-		for (auto* RootNode : RootNodes)
+		for (int32 i = 0; i < RootNodes.size(); ++i)
 		{
+			FActorTreeNode* RootNode = RootNodes[i];
 			if (RootNode)
 			{
 				// Categories are always shown, individual actors are filtered

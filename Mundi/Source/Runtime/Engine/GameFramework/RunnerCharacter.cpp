@@ -64,7 +64,8 @@ void ARunnerCharacter::BeginPlay()
 	LuaLocalValue.GameMode = World ? World->GetGameMode() : nullptr;
 
 	UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "RunnerCharacter.lua");
-	UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua");
+	UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "MapGenerator.lua");
+	UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua, MapGenerator.lua");
 
 	// 이제 Super::BeginPlay() 호출 → Actor::BeginPlay()에서 Lua BeginPlay 호출됨
 	Super::BeginPlay();
