@@ -82,12 +82,17 @@ void UInputComponent::ProcessInput()
 	// 축 바인딩 처리
 	for (FInputAxisBinding& Binding : AxisBindings)
 	{
-		// 키가 눌려있으면 스케일 값 전달
-		if (InputManager.IsKeyDown(Binding.KeyCode))
+		if (Binding.Callback)
 		{
-			if (Binding.Callback)
+			// 키가 눌려있으면 스케일 값 전달, 아니면 0.0 전달
+			if (InputManager.IsKeyDown(Binding.KeyCode))
 			{
 				Binding.Callback(Binding.Scale);
+			}
+			else
+			{
+				// 키를 뗐을 때 0.0 전달 (매우 중요!)
+				Binding.Callback(0.0f);
 			}
 		}
 	}
