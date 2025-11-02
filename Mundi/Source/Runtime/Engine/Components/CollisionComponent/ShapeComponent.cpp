@@ -91,6 +91,13 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 		return;
 	}
 
+	// ⭐ 컴포넌트 소유자가 파괴 예정인지 먼저 확인
+	AActor* Owner = GetOwner();
+	if (!Owner || Owner->IsPendingKill())
+	{
+		return;
+	}
+
 	// 1단계: 현재 프레임에서 겹쳐있는 컴포넌트 확인
 	TArray<UShapeComponent*> CurrentOverlaps;
 
@@ -125,23 +132,21 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 			// 충돌 상태 업데이트
 			bIsOverlapping = true;
 
-			// 충돌 로그 출력 (메모리 누수 방지를 위해 주석처리)
-			// UE_LOG("COLLISION BEGIN: {} ({}) <-> {} ({})",
-			// 	GetOwner() ? GetOwner()->GetName() : "Unknown", GetName(),
-			// 	OtherActor ? OtherActor->GetName() : "Unknown", OtherComp ? OtherComp->GetName() : "Unknown");
-
 			// Begin Overlap 이벤트 발생
 			OnComponentBeginOverlap.Broadcast(this, OtherActor, OtherComp, ContactPoint, PenetrationDepth);
+
+			// ⭐ Broadcast 후 this가 파괴되었는지 확인
+			Owner = GetOwner();
+			if (!Owner || Owner->IsPendingKill())
+			{
+				// this 컴포넌트의 소유자가 파괴 중이므로 더 이상 진행하지 않음
+				return;
+			}
 		}
 	}
 
 	// 3단계: 끝난 Overlap 감지 (End)
 	TArray<UShapeComponent*> OverlapsToRemove;
-
-	if (OverlapInfos.empty())
-	{
-		return;
-	}
 
 	for (const FOverlapInfo& Info : OverlapInfos)
 	{
@@ -161,12 +166,6 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 			// Overlap 종료
 			OverlapsToRemove.push_back(Info.OtherComponent);
 
-			// 충돌 로그 출력 (메모리 누수 방지를 위해 주석처리)
-			// UE_LOG("COLLISION END: {} ({}) <-> {} ({})",
-			// 	GetOwner() ? GetOwner()->GetName() : "Unknown", GetName(),
-			// 	Info.OtherActor ? Info.OtherActor->GetName() : "Unknown",
-			// 	Info.OtherComponent ? Info.OtherComponent->GetName() : "Unknown");
-
 			// End Overlap 이벤트 발생
 			OnComponentEndOverlap.Broadcast(
 				this,
@@ -175,6 +174,13 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 				Info.ContactPoint,
 				Info.PenetrationDepth
 			);
+
+			// ⭐ Broadcast 후 this가 파괴되었는지 확인
+			Owner = GetOwner();
+			if (!Owner || Owner->IsPendingKill())
+			{
+				return;
+			}
 		}
 	}
 
