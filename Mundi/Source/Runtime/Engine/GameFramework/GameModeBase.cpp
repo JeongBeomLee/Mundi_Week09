@@ -157,18 +157,22 @@ void AGameModeBase::PauseGame()
 		UE_LOG("GameMode: 게임이 시작되지 않았습니다.");
 		return;
 	}
-
+	bGameStarted = false;
 	// GameState 상태 변경
 	if (GameState.IsValid())
 	{
 		GameState.Get()->SetGameState(EGameState::Paused);
 	}
 
+	// 델리게이트 브로드캐스트
+	OnGamePaused.Broadcast();
+
 	UE_LOG("GameMode: 게임 일시정지!");
 }
 
 void AGameModeBase::ResumeGame()
 {
+	bGameStarted = true;
 	if (!bGameStarted)
 	{
 		UE_LOG("GameMode: 게임이 시작되지 않았습니다.");
@@ -180,6 +184,9 @@ void AGameModeBase::ResumeGame()
 	{
 		GameState.Get()->SetGameState(EGameState::Playing);
 	}
+
+	// 델리게이트 브로드캐스트
+	OnGameResumed.Broadcast();
 
 	UE_LOG("GameMode: 게임 재개!");
 }

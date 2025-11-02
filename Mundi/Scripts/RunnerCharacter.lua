@@ -11,7 +11,7 @@ local Config = {
     -- 이동 설정
     MaxWalkSpeed = 30.0,        -- 최대 이동 속도 (cm/s) - 실제 속도 결정!
     AutoForwardSpeed = 1.0,     -- 자동 전진 입력 크기 (보통 1.0 유지)
-    StrafeSpeed = 0.1,          -- 좌우 이동 입력 크기 (보통 1.0 유지)
+    StrafeSpeed = 1.0,          -- 좌우 이동 입력 크기 (보통 1.0 유지)
     bAutoForward = true,        -- 자동 전진 활성화
 
     -- 점프 및 중력 설정
@@ -21,6 +21,8 @@ local Config = {
 
     -- 입력 설정
     HorizontalInput = 0.0,      -- 현재 좌우 입력 (-1.0 ~ 1.0)
+    LeftInput = 0.0,            -- A 키 입력
+    RightInput = 0.0,           -- D 키 입력
 
     -- 디버그
     bDebugLog = true,
@@ -38,61 +40,23 @@ local CharacterMovement = nil
 -- ════════════════════════════════════════════════════════════════════════════
 
 function BeginPlay()
-    if Config.bDebugLog then
-        PrintToConsole("═══════════════════════════════════════")
-        PrintToConsole("[RunnerCharacter] Lua Script Initialized!")
-        PrintToConsole("═══════════════════════════════════════")
-        PrintToConsole("Controls:")
-        PrintToConsole("  A/D     - Strafe Left/Right (" .. Config.StrafeSpeed .. " cm/s)")
-        PrintToConsole("  Space   - Jump")
-        PrintToConsole("Settings:")
-        PrintToConsole("  Auto Forward: " .. tostring(Config.bAutoForward))
-        PrintToConsole("  Forward Speed: " .. Config.AutoForwardSpeed .. " cm/s")
-        PrintToConsole("═══════════════════════════════════════")
-    end
-
     -- CharacterMovement 컴포넌트 가져오기 및 설정 적용
     if MyActor.GetCharacterMovement then
         CharacterMovement = MyActor:GetCharacterMovement()
         if CharacterMovement then
-            PrintToConsole("[RunnerCharacter] CharacterMovement component found")
-
-            -- Lua Config 값으로 모든 설정 적용
-            local success, err = pcall(function()
-                PrintToConsole("[DEBUG] Setting MaxWalkSpeed to " .. Config.MaxWalkSpeed)
-                CharacterMovement.MaxWalkSpeed = Config.MaxWalkSpeed
-
-                PrintToConsole("[DEBUG] Setting JumpZVelocity to " .. Config.JumpZVelocity)
-                CharacterMovement.JumpZVelocity = Config.JumpZVelocity
-
-                PrintToConsole("[DEBUG] Setting GravityScale to " .. Config.GravityScale)
-                CharacterMovement.GravityScale = Config.GravityScale
-
-                PrintToConsole("[DEBUG] Setting AirControl to " .. Config.AirControl)
-                CharacterMovement.AirControl = Config.AirControl
-            end)
-
-            if success then
-                PrintToConsole("[RunnerCharacter] Movement settings applied successfully!")
-            else
-                PrintToConsole("[RunnerCharacter] ERROR applying settings: " .. tostring(err))
-            end
+            CharacterMovement.MaxWalkSpeed = Config.MaxWalkSpeed
+            CharacterMovement.JumpZVelocity = Config.JumpZVelocity
+            CharacterMovement.GravityScale = Config.GravityScale
+            CharacterMovement.AirControl = Config.AirControl
         end
     end
 
-    -- InputComponent 가져오기
-    PrintToConsole("[RunnerCharacter] Trying to get InputComponent...")
+    -- InputComponent 가져오기 및 바인딩
     if MyActor.GetInputComponent then
         InputComponent = MyActor:GetInputComponent()
         if InputComponent then
-            PrintToConsole("[RunnerCharacter] InputComponent found! Calling SetupInputBindings...")
             SetupInputBindings()
-            PrintToConsole("[RunnerCharacter] SetupInputBindings completed!")
-        else
-            PrintToConsole("[RunnerCharacter] ERROR: InputComponent is nil!")
         end
-    else
-        PrintToConsole("[RunnerCharacter] ERROR: GetInputComponent method not found!")
     end
 end
 
@@ -112,9 +76,7 @@ function Tick(deltaTime)
 end
 
 function EndPlay()
-    if Config.bDebugLog then
-        PrintToConsole("[RunnerCharacter] Script ended")
-    end
+    -- 스크립트 종료 시 정리 작업
 end
 
 -- ════════════════════════════════════════════════════════════════════════════
@@ -128,23 +90,13 @@ function SetupInputBindings()
 
     -- Axis 바인딩: A/D 키 (좌우 이동)
     if InputComponent.BindAxis then
-        -- D 키 = 오른쪽 (+1.0)
-        InputComponent:BindAxis("MoveRight", string.byte('D'), 1.0, OnMoveHorizontal)
-        -- A 키 = 왼쪽 (-1.0)
-        InputComponent:BindAxis("MoveRight", string.byte('A'), -1.0, OnMoveHorizontal)
-
-        if Config.bDebugLog then
-            PrintToConsole("[RunnerCharacter] ✓ Bound A/D keys to MoveRight axis")
-        end
+        InputComponent:BindAxis("MoveRight", string.byte('D'), 1.0, OnMoveRight)
+        InputComponent:BindAxis("MoveLeft", string.byte('A'), 1.0, OnMoveLeft)
     end
 
     -- Action 바인딩: Space 키 (점프)
     if InputComponent.BindAction then
-        -- VK_SPACE = 0x20 = 32
         InputComponent:BindAction("Jump", 0x20, OnJumpPressed, OnJumpReleased)
-        if Config.bDebugLog then
-            PrintToConsole("[RunnerCharacter] ✓ Bound Space key to Jump action")
-        end
     end
 end
 
@@ -152,19 +104,19 @@ end
 -- 입력 콜백
 -- ════════════════════════════════════════════════════════════════════════════
 
-function OnMoveHorizontal(value)
-    Config.HorizontalInput = value
-    if value ~= 0.0 then
-        PrintToConsole(string.format("[Input] MoveRight value: %.2f", value))
-    end
+function OnMoveLeft(value)
+    Config.LeftInput = value
+    Config.HorizontalInput = Config.RightInput - Config.LeftInput
+end
+
+function OnMoveRight(value)
+    Config.RightInput = value
+    Config.HorizontalInput = Config.RightInput - Config.LeftInput
 end
 
 function OnJumpPressed()
     if MyActor.Jump then
-       local success = MyActor:Jump()
-        if Config.bDebugLog and success then
-            PrintToConsole("[RunnerCharacter] 🦘 Jump!")
-        end
+        MyActor:Jump()
     end
 end
 
@@ -179,86 +131,39 @@ end
 -- ════════════════════════════════════════════════════════════════════════════
 
 function ProcessAutoForward(deltaTime)
-    if not MyActor.GetForwardDirection or not MyActor.AddMovementInput then
-      --  PrintToConsole("[RunnerCharacter] ERROR: Missing methods")
+    if not MyActor.MoveForward then
         return
     end
-    
-    -- 전진 방향 가져오기 (C++에서 제공하는 유틸리티 함수)
-    local forwardDir = MyActor:GetForwardDirection()
 
-    if not forwardDir then
-    --    PrintToConsole("[RunnerCharacter] ERROR: forwardDir is nil")
-        return
-    end
-  
-    -- 정규화된 입력 값 계산 (속도 / 최대속도)
-    local maxWalkSpeed = 500.0
-    if CharacterMovement and CharacterMovement.MaxWalkSpeed then
-        maxWalkSpeed = CharacterMovement.MaxWalkSpeed
-    end
-       
-    local inputScale = Config.AutoForwardSpeed / maxWalkSpeed
-
- --  PrintToConsole("MoveForward")
-    -- AddMovementInput 호출: (FVector, float)
     MyActor:MoveForward(Config.AutoForwardSpeed)
-   -- PrintToConsole(string.format("[Tick] AutoForwardSpeed: (%.2f)", Config.AutoForwardSpeed))
-    -- PrintToConsole(string.format("[Tick] Forward: (%.2f, %.2f, %.2f)", scaledDir.X, scaledDir.Y, scaledDir.Z))
 end
 
 function ProcessHorizontalMovement(deltaTime)
-    PrintToConsole("[ProcessHorizontal] Called with input: " .. Config.HorizontalInput)
-
-    if not MyActor.GetRightDirection then
-        PrintToConsole("[ProcessHorizontal] ERROR: GetRightDirection not found!")
+    -- 입력값이 0이면 조용히 리턴 (키를 뗐을 때)
+    if Config.HorizontalInput == 0.0 then
         return
     end
 
-    if not MyActor.AddMovementInput then
-        PrintToConsole("[ProcessHorizontal] ERROR: AddMovementInput not found!")
+    if not MyActor.GetRightDirection or not MyActor.AddMovementInput then
         return
     end
 
     -- 우측 방향 가져오기 (C++에서 중력 방향 고려해서 계산)
     local rightDir = MyActor:GetRightDirection()
-    PrintToConsole(string.format("[ProcessHorizontal] RightDir: (%.2f, %.2f, %.2f)",
-        rightDir.X, rightDir.Y, rightDir.Z))
-
     if not rightDir then
-        PrintToConsole("[ProcessHorizontal] ERROR: rightDir is nil!")
         return
     end
 
-    -- FVector 생성하여 전달 (입력 크기는 HorizontalInput * StrafeSpeed 사용)
-    local success, result = pcall(function()
-        local scaledDir = FVector(
-            rightDir.X * Config.HorizontalInput * Config.StrafeSpeed,
-            rightDir.Y * Config.HorizontalInput * Config.StrafeSpeed,
-            rightDir.Z * Config.HorizontalInput * Config.StrafeSpeed
-        )
-        return scaledDir
-    end)
+    -- 방향 벡터 생성 (AddInputVector가 방향을 정규화하기 때문에 입력값만 곱함)
+    local direction = FVector(
+        rightDir.X * Config.HorizontalInput,
+        rightDir.Y * Config.HorizontalInput,
+        rightDir.Z * Config.HorizontalInput
+    )
 
-    if not success then
-        PrintToConsole("[ProcessHorizontal] ERROR creating FVector: " .. tostring(result))
-        return
-    end
-
-    local scaledDir = result
-    PrintToConsole(string.format("[ProcessHorizontal] ScaledDir: (%.2f, %.2f, %.2f)",
-        scaledDir.X, scaledDir.Y, scaledDir.Z))
-
-    -- AddMovementInput 호출: (FVector, float)
-    local success2, err2 = pcall(function()
-        MyActor:AddMovementInput(scaledDir, 1.0)
-    end)
-
-    if success2 then
-        PrintToConsole("[ProcessHorizontal] AddMovementInput called!")
-    else
-        PrintToConsole("[ProcessHorizontal] ERROR calling AddMovementInput: " .. tostring(err2))
-    end
+    -- AddMovementInput 호출: (방향 벡터, 입력 크기)
+    -- 중요: AddInputVector가 방향을 정규화하므로, 속도는 ScaleValue로 전달해야 함!
+    MyActor:AddMovementInput(direction, Config.StrafeSpeed)
 end
 
 -- ════════════════════════════════════════════════════════════════════════════

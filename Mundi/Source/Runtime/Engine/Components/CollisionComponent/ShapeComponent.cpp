@@ -40,6 +40,15 @@ UShapeComponent::UShapeComponent()
 
 UShapeComponent::~UShapeComponent()
 {
+	// CollisionManager에서 제거
+		if (GWorld)
+		{
+			if (UCollisionManager* Manager = GWorld->GetCollisionManager())
+			{
+				Manager->UnregisterComponent(this);
+			}
+		}
+
 	// Overlap 정보 정리
 	OverlapInfos.clear();
 }
