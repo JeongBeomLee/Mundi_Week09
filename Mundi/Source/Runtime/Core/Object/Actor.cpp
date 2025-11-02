@@ -49,17 +49,19 @@ void AActor::Tick(float DeltaSeconds)
 	// 에디터에서 틱 Off면 스킵
 	if (!bTickInEditor && World->bPie == false) return;
 
+	// Lua 스크립트 먼저 실행 (입력 처리를 위해)
+	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
+	{
+		Script->LuaTemplateFunctions.Tick(DeltaSeconds);
+	}
+
+	// 컴포넌트 Tick (Lua에서 설정한 입력 사용)
 	for (UActorComponent* Comp : OwnedComponents)
 	{
 		if (Comp && Comp->IsComponentTickEnabled())
 		{
 			Comp->TickComponent(DeltaSeconds /*, … 필요 인자*/);
 		}
-	}
-
-	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
-	{
-		Script->LuaTemplateFunctions.Tick(DeltaSeconds);
 	}
 }
 void AActor::EndPlay(EEndPlayReason Reason)

@@ -18,6 +18,7 @@ struct FLuaTemplateFunctions
 struct FLuaLocalValue
 {
     AActor* MyActor = nullptr;
+    class AGameModeBase* GameMode = nullptr;
 };
 
 struct FScript

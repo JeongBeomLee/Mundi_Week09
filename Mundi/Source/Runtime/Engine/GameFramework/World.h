@@ -77,9 +77,9 @@ public:
     UCollisionManager* GetCollisionManager() const { return CollisionManager.get(); }
 
     ACameraActor* GetCameraActor() { return MainCameraActor; }
-    void SetCameraActor(ACameraActor* InCamera) 
-    { 
-        MainCameraActor = InCamera; 
+    void SetCameraActor(ACameraActor* InCamera)
+    {
+        MainCameraActor = InCamera;
 
         //기즈모 카메라 설정
         if (GizmoActor)

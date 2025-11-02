@@ -47,6 +47,7 @@ ACameraActor::ACameraActor()
 void ACameraActor::SetPerspectiveCameraInput(bool InPerspectiveCameraInput) {
     PerspectiveCameraInput = InPerspectiveCameraInput;
 }
+
 void ACameraActor::Tick(float DeltaSeconds)
 {
     //if (PerspectiveCameraInput) {

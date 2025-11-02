@@ -6,7 +6,8 @@
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 #include "GameModeBase.h"
 #include "GameStateBase.h"
-
+#include"RunnerGameMode.h"
+#include"CameraActor.h"
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;
 
@@ -363,19 +364,40 @@ void UEditorEngine::StartPIE()
 
     // PIE World에 GameMode/GameState 자동 생성
     PIEWorld->GameState = PIEWorld->SpawnActor<AGameStateBase>();
-    PIEWorld->GameMode = PIEWorld->SpawnActor<AGameModeBase>();
+    PIEWorld->GameMode = PIEWorld->SpawnActor<ARunnerGameMode>();
     if (PIEWorld->GameMode)
     {
         PIEWorld->GameMode->SetGameState(PIEWorld->GameState);
     }
     UE_LOG("PIE: GameMode/GameState 생성 완료");
 
+    // PIE World의 MainCamera 설정 (복사된 CameraActor 찾기)
+    for (AActor* Actor : PIEWorld->GetLevel()->GetActors())
+    {
+        if (ACameraActor* CameraActor = Cast<ACameraActor>(Actor))
+        {
+            PIEWorld->SetCameraActor(CameraActor);
+            UE_LOG("PIE: MainCamera set to %s", CameraActor->GetName().ToString());
+            break;
+        }
+    }
+
+    if (!PIEWorld->GetCameraActor())
+    {
+        UE_LOG("PIE: WARNING - No CameraActor found in PIE world!");
+    }
+
     // GameHUD에 GameState 설정
     SLATE.SetPIEWorld(GWorld);
 
-    for (AActor* Actor : GWorld->GetLevel()->GetActors())
+    // Index-based iteration: BeginPlay에서 새 액터가 추가되어도 안전
+    const TArray<AActor*>& Actors = GWorld->GetLevel()->GetActors();
+    for (size_t i = 0; i < Actors.size(); ++i)
     {
-        Actor->BeginPlay();
+        if (Actors[i])
+        {
+            Actors[i]->BeginPlay();
+        }
     }
     UE_LOG("START PIE CLICKED");
 }

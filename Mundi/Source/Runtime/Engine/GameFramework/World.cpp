@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "SelectionManager.h"
 #include "Picking.h"
 #include "CameraActor.h"
@@ -26,6 +26,8 @@
 #include "LightManager.h"
 #include "ShadowManager.h"
 #include "CollisionManager.h"
+#include"Pawn.h"
+#include"PlayerController.h"
 
 IMPLEMENT_CLASS(UWorld)
 
@@ -68,6 +70,15 @@ void UWorld::Initialize()
 
 	InitializeGrid();
 	InitializeGizmo();
+
+	// Pawn 생성
+	APawn* MyPawn = SpawnActor<APawn>();
+
+	// PlayerController 생성
+	APlayerController* PC = NewObject<APlayerController>();
+
+	// Pawn 빙의
+	PC->Possess(MyPawn);
 }
 
 void UWorld::InitializeGrid()
@@ -152,7 +163,7 @@ UWorld* UWorld::DuplicateWorldForPIE(UWorld* InEditorWorld)
 		NewActor->SetWorld(PIEWorld);
 		
 	}
-
+	PIEWorld->MainCameraActor = InEditorWorld->GetCameraActor();
 	return PIEWorld;
 }
 
