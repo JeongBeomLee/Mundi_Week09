@@ -9,14 +9,14 @@ local _ENV = ...
 
 local Config = {
     -- 이동 설정
-    MaxWalkSpeed = 30.0,        -- 최대 이동 속도 (cm/s) - 실제 속도 결정!
+    MaxWalkSpeed = 15.0,        -- 최대 이동 속도 (cm/s) - 실제 속도 결정!
     AutoForwardSpeed = 1.0,     -- 자동 전진 입력 크기 (보통 1.0 유지)
     StrafeSpeed = 1.0,          -- 좌우 이동 입력 크기 (보통 1.0 유지)
     bAutoForward = true,        -- 자동 전진 활성화
 
     -- 점프 및 중력 설정
-    JumpZVelocity = 300.0,      -- 점프 초기 속도 (cm/s, 위로)
-    GravityScale = 1.0,         -- 중력 스케일 (1.0 = 기본 중력)
+    JumpZVelocity = 50.0,      -- 점프 초기 속도 (cm/s, 위로)
+    GravityScale = 0.1,         -- 중력 스케일 (1.0 = 기본 중력)
     AirControl = 0.3,           -- 공중 제어력 (0.0 ~ 1.0)
 
     -- 입력 설정
