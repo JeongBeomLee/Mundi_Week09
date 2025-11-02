@@ -60,6 +60,10 @@ public:
     AActor* SpawnActor(UClass* Class);
 
     bool DestroyActor(AActor* Actor);
+    
+    // 지연 삭제 시스템
+    void MarkActorForDestruction(AActor* Actor);
+    void ProcessPendingActorDestruction();
 
     // Partial hooks
     void OnActorSpawned(AActor* Actor);
@@ -169,6 +173,9 @@ private:
 
     // Per-world selection manager
     std::unique_ptr<USelectionManager> SelectionMgr;
+
+    // 지연 삭제 큐
+    TArray<AActor*> PendingDestroyActors;
 };
 
 template<class T>

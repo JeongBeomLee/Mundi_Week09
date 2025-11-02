@@ -27,6 +27,9 @@ public:
     virtual void Tick(float DeltaSeconds);
     virtual void EndPlay(EEndPlayReason Reason);
     virtual void Destroy();
+    
+    // 즉시 파괴 (내부 사용)
+    void DestroyImmediate();
 
     // 이름
     void SetName(const FString& InName) { Name = InName; }
@@ -73,6 +76,10 @@ public:
     // ===== 파괴 재진입 가드 =====
     bool IsPendingDestroy() const { return bPendingDestroy; }
     void MarkPendingDestroy() { bPendingDestroy = true; }
+
+    // ===== 파괴 상태 확인 =====
+    bool IsPendingKill() const { return bPendingKill; }
+    void MarkPendingKill() { bPendingKill = true; }
 
     // ───────────────
     // Transform API
@@ -164,6 +171,7 @@ protected:
     // Actor의 Visibility는 루트 컴포넌트로 설정
     bool bHiddenInEditor = false;
     bool bPendingDestroy = false;
+    bool bPendingKill = false;  // 지연 삭제 플래그
 
     bool bIsPicked = false;
     bool bCanEverTick = true;

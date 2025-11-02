@@ -64,8 +64,9 @@ function Tick(deltaTime)
     -- 자동 전진 처리 (Lua에서!)
    
     if Config.bAutoForward then
-
+        -- GameMode:OnCoinCollected(3)
         ProcessAutoForward(deltaTime)
+        -- PrintToConsole("[RunnerCharacter] bAutoForward in lua Tick")
     end
 
     -- 좌우 이동 처리
@@ -221,8 +222,9 @@ end
 -- ════════════════════════════════════════════════════════════════════════════
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
+    PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
     if Config.bDebugLog then
-        PrintToConsole("[RunnerCharacter] ⚡ Overlapped: " .. OtherActor:GetName():ToString())
+        PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
     end
 
     -- TODO: 벽면 감지 및 중력 방향 전환 로직
