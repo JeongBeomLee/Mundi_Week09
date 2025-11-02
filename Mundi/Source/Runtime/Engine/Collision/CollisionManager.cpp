@@ -175,7 +175,7 @@ void UCollisionManager::RebuildBVH()
 		return;
 	}
 
-	UE_LOG("CollisionManager: Rebuilding BVH with {} components", RegisteredComponents.Num());
+	//UE_LOG("CollisionManager: Rebuilding BVH with {} components", RegisteredComponents.Num());
 
 	// BVH 완전 재구축
 	BVH->BulkUpdate(RegisteredComponents);

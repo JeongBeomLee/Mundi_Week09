@@ -12,6 +12,7 @@
 #include "Source/Runtime/Engine/GameFramework/GameModeBase.h"
 #include "Source/Runtime/Engine/GameFramework/GameStateBase.h"
 #include "Source/Runtime/Engine/Components/CharacterMovementComponent.h"
+#include "Source/Runtime/Engine/Components/InputComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -234,7 +235,10 @@ void UScriptManager::RegisterUserTypeToLua()
 
     // FVector 타입을 Lua에 등록
     Lua.new_usertype<FVector>("FVector",
-        sol::constructors<FVector(), FVector(float, float, float)>(),
+        sol::call_constructor, sol::factories(
+            []() { return FVector(); },
+            [](float x, float y, float z) { return FVector(x, y, z); }
+        ),
         "X", &FVector::X,
         "Y", &FVector::Y,
         "Z", &FVector::Z,
@@ -246,7 +250,8 @@ void UScriptManager::RegisterUserTypeToLua()
         sol::meta_function::unary_minus, [](const FVector& v) { return -v; },
         "Add", [](const FVector& a, const FVector& b) { return a + b; },
         "Sub", [](const FVector& a, const FVector& b) { return a - b; },
-        "Mul", [](const FVector& v, float scalar) { return v * scalar; }
+        "Mul", [](const FVector& v, float scalar) { return v * scalar; },
+        "New", [](float x, float y, float z) { return FVector(x, y, z); }
     );
 
     // FQuat 타입을 Lua에 등록
@@ -279,7 +284,33 @@ void UScriptManager::RegisterUserTypeToLua()
     Lua.new_usertype<APawn>("APawn",
         sol::base_classes, sol::bases<AActor>(),
         "AddMovementInput", &APawn::AddMovementInput,
-        "ConsumeMovementInput", &APawn::ConsumeMovementInput
+        "ConsumeMovementInput", &APawn::ConsumeMovementInput,
+        "GetInputComponent", &APawn::GetInputComponent
+    );
+
+    // UInputComponent 클래스 등록
+    Lua.new_usertype<UInputComponent>("UInputComponent",
+        sol::no_constructor,
+        "BindAxis", sol::overload(
+            [](UInputComponent* self, const FString& AxisName, int32 KeyCode, float Scale, sol::function callback) {
+                self->BindAxis(AxisName, KeyCode, Scale, [callback](float value) {
+                    callback(value);
+                });
+            }
+        ),
+        "BindAction", sol::overload(
+            // Pressed와 Released를 모두 받는 버전
+            [](UInputComponent* self, const FString& ActionName, int32 KeyCode,
+               sol::function pressedCallback, sol::function releasedCallback) {
+                auto pressed = pressedCallback.valid() ? [pressedCallback]() { pressedCallback(); } : std::function<void()>();
+                auto released = releasedCallback.valid() ? [releasedCallback]() { releasedCallback(); } : std::function<void()>();
+                self->BindAction(ActionName, KeyCode, pressed, released);
+            },
+            // Pressed만 받는 버전 (간단한 경우)
+            [](UInputComponent* self, const FString& ActionName, int32 KeyCode, sol::function callback) {
+                self->BindAction(ActionName, KeyCode, [callback]() { callback(); }, nullptr);
+            }
+        )
     );
 
     // ACharacter 클래스 등록 (APawn 상속)
@@ -304,6 +335,7 @@ void UScriptManager::RegisterUserTypeToLua()
         "MaxWalkSpeed", &UCharacterMovementComponent::MaxWalkSpeed,
         "JumpZVelocity", &UCharacterMovementComponent::JumpZVelocity,
         "GravityScale", &UCharacterMovementComponent::GravityScale,
+        "AirControl", &UCharacterMovementComponent::AirControl,
         "SetGravityDirection", &UCharacterMovementComponent::SetGravityDirection,
         "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection
     );

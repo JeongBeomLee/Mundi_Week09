@@ -79,7 +79,7 @@ public:
 	float GravityScale;
 
 	/** 기본 중력 (-980 cm/s² ≈ -9.8 m/s²) */
-	static constexpr float DefaultGravity = -980.0f;
+	static constexpr float DefaultGravity = 980.0f;
 
 	/** 중력 방향 벡터 (정규화된 방향, 기본값: 아래) */
 	FVector GravityDirection;

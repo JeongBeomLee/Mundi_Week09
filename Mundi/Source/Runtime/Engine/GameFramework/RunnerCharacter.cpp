@@ -43,14 +43,7 @@ ARunnerCharacter::ARunnerCharacter()
 		CollisionBox->SetBoxExtent(FVector(0.50f, 0.50f, 0.50f));
 	}
 
-	// 기본 설정 (Lua에서 오버라이드 가능)
-	if (CharacterMovement)
-	{
-		CharacterMovement->MaxWalkSpeed = 500.0f;
-		CharacterMovement->JumpZVelocity = 600.0f;
-		CharacterMovement->GravityScale = 1.5f;
-		CharacterMovement->AirControl = 0.3f;
-	}
+	// 모든 이동 설정은 Lua에서 관리 (RunnerCharacter.lua의 Config)
 }
 
 ARunnerCharacter::~ARunnerCharacter()
@@ -63,17 +56,33 @@ ARunnerCharacter::~ARunnerCharacter()
 
 void ARunnerCharacter::BeginPlay()
 {
-	Super::BeginPlay();
+	UE_LOG("[RunnerCharacter] BeginPlay - Attaching Lua script first");
 
-	UE_LOG("[RunnerCharacter] BeginPlay");
-
-	// Lua 스크립트 자동 연결
+	// Lua 스크립트 자동 연결 (Super::BeginPlay() 전에!)
 	FLuaLocalValue LuaLocalValue;
 	LuaLocalValue.MyActor = this;
 	LuaLocalValue.GameMode = World ? World->GetGameMode() : nullptr;
 
 	UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "RunnerCharacter.lua");
 	UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua");
+
+	// 이제 Super::BeginPlay() 호출 → Actor::BeginPlay()에서 Lua BeginPlay 호출됨
+	Super::BeginPlay();
+
+	UE_LOG("[RunnerCharacter] BeginPlay complete");
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 입력 바인딩
+// ────────────────────────────────────────────────────────────────────────────
+
+void ARunnerCharacter::SetupPlayerInputComponent(UInputComponent* InInputComponent)
+{
+	Super::SetupPlayerInputComponent(InInputComponent);
+
+	// 모든 입력 바인딩은 Lua에서 처리 (RunnerCharacter.lua의 SetupInputBindings)
+	// Lua에서 A/D (좌우 이동), Space (점프) 등을 바인딩함
+	UE_LOG("[RunnerCharacter] SetupPlayerInputComponent called - All input bindings handled in Lua");
 }
 
 // ────────────────────────────────────────────────────────────────────────────
