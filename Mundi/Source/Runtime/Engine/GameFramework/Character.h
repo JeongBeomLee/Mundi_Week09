@@ -152,4 +152,26 @@ protected:
 
 	/** 웅크릴 때 높이 비율 */
 	float CrouchedHeightRatio;
+
+	/** 게임 시작 여부 (델리게이트로 관리) */
+	bool bGameStarted;
+
+	// ────────────────────────────────────────────────
+	// 델리게이트 핸들러
+	// ────────────────────────────────────────────────
+
+	/** 게임 시작 이벤트 핸들러 */
+	void OnGameStartedHandler();
+
+	/** 게임 종료 이벤트 핸들러 */
+	void OnGameEndedHandler(bool bVictory);
+
+	/** 게임 재시작 이벤트 핸들러 */
+	void OnGameRestartedHandler();
+
+	/** 게임 일시정지 이벤트 핸들러 */
+	void OnGamePausedHandler();
+
+	/** 게임 재개 이벤트 핸들러 */
+	void OnGameResumedHandler();
 };

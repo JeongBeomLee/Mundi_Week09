@@ -16,6 +16,12 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnGameEnded, bool);
 // 게임 재시작 델리게이트
 DECLARE_MULTICAST_DELEGATE(FOnGameRestarted);
 
+// 게임 일시정지 델리게이트
+DECLARE_MULTICAST_DELEGATE(FOnGamePaused);
+
+// 게임 재개 델리게이트
+DECLARE_MULTICAST_DELEGATE(FOnGameResumed);
+
 // 게임 모드를 관리하는 클래스
 // 게임 규칙, 플레이어 스폰, 게임 상태 전환 등을 담당
 class AGameModeBase : public AInfo
@@ -65,6 +71,8 @@ public:
 	FOnGameStarted OnGameStarted;
 	FOnGameEnded OnGameEnded;
 	FOnGameRestarted OnGameRestarted;
+	FOnGamePaused OnGamePaused;
+	FOnGameResumed OnGameResumed;
 
 	DECLARE_DUPLICATE(AGameModeBase)
 	void DuplicateSubObjects() override;

@@ -121,6 +121,11 @@ public:
 	void AddInputVector(FVector WorldDirection, float ScaleValue = 1.0f);
 
 	/**
+	 * 누적된 입력 벡터를 초기화합니다.
+	 */
+	void ConsumeInputVector() { PendingInputVector = FVector::Zero(); }
+
+	/**
 	 * 속도를 직접 설정합니다.
 	 *
 	 * @param NewVelocity - 새로운 속도 벡터
