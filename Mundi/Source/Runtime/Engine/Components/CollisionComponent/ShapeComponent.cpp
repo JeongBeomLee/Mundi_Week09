@@ -40,15 +40,6 @@ UShapeComponent::UShapeComponent()
 
 UShapeComponent::~UShapeComponent()
 {
-	// CollisionManager에서 제거
-		if (GWorld)
-		{
-			if (UCollisionManager* Manager = GWorld->GetCollisionManager())
-			{
-				Manager->UnregisterComponent(this);
-			}
-		}
-
 	// Overlap 정보 정리
 	OverlapInfos.clear();
 }
@@ -292,7 +283,16 @@ void UShapeComponent::EndPlay(EEndPlayReason Reason)
  */
 //void UShapeComponent::EndPlay()
 //{
-//	
+//	if (AActor* Owner = GetOwner())
+//	{
+//		if (UWorld* World = Owner->GetWorld())
+//		{
+//			if (UCollisionManager* Manager = World->GetCollisionManager())
+//			{
+//				Manager->UnregisterComponent(this);
+//			}
+//		}
+//	}
 //}
 
 /**

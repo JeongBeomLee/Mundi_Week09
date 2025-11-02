@@ -187,6 +187,8 @@ protected:
 	 */
 	void EndPlay(EEndPlayReason Reason) override;
 
+	//virtual void EndPlay();
+
 	/**
 	 * Transform이 변경될 때 호출됩니다.
 	 * CollisionManager에 Dirty 마킹합니다.
