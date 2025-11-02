@@ -132,8 +132,10 @@ void ARunnerGameMode::OnPlayerDeath(ACharacter* Player)
 
 void ARunnerGameMode::OnCoinCollected(int32 CoinValue)
 {
-	UE_LOG("[RunnerGameMode] Coin Collected! Value: %d", CoinValue);
+	
 	// TODO: GameState 업데이트
+	CoinScore += CoinValue;
+	UE_LOG("[RunnerGameMode] Coin Collected! Value: %d", CoinValue);
 }
 
 void ARunnerGameMode::OnObstacleAvoided()

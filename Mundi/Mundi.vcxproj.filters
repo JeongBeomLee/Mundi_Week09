@@ -463,6 +463,20 @@
     <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.cpp">
       <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\CharacterMovementComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\InputComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Controller.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GameStateBase.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GameModeBase.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Pawn.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\PlayerController.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionBVH.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionManager.cpp" />
+    <ClCompile Include="Source\Slate\Widgets\GameHUDWidget.cpp" />
+    <ClCompile Include="Source\Slate\Widgets\GameControlWindow.cpp" />
+    <ClCompile Include="Source\Slate\Widgets\WorldDetailsWidget.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -964,6 +978,20 @@
     <ClInclude Include="BoxSphereBounds.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\CharacterMovementComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\InputComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Controller.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Pawn.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\PlayerController.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GameStateBase.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GameModeBase.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.h" />
+    <ClInclude Include="Source\Slate\Widgets\GameControlWindow.h" />
+    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionBVH.h" />
+    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionManager.h" />
+    <ClInclude Include="Source\Slate\Widgets\GameHUDWidget.h" />
+    <ClInclude Include="Source\Slate\Widgets\WorldDetailsWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -1086,5 +1114,9 @@
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\test_coroutine.lua" />
+    <None Include="Scripts\actor_transform.lua" />
+    <None Include="Scripts\PlayerAutoMove.lua" />
+    <None Include="Scripts\print_debug_log.lua" />
+    <None Include="Scripts\coin_collision.lua" />
   </ItemGroup>
 </Project>

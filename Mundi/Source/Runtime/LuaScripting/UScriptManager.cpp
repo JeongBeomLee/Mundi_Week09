@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CameraActor.h"
@@ -11,6 +11,7 @@
 #include "Source/Runtime/Engine/GameFramework/RunnerCharacter.h"
 #include "Source/Runtime/Engine/GameFramework/GameModeBase.h"
 #include "Source/Runtime/Engine/GameFramework/GameStateBase.h"
+#include "Source/Runtime/Engine/GameFramework/RunnerGameMode.h"
 #include "Source/Runtime/Engine/Components/CharacterMovementComponent.h"
 #include "Source/Runtime/Engine/Components/InputComponent.h"
 
@@ -359,6 +360,23 @@ void UScriptManager::RegisterUserTypeToLua()
         "IsGameStarted", [](AGameModeBase* gm) { return gm->GetGameState() && gm->GetGameState()->GetGameState() == EGameState::Playing; }
     );
 
+    // ARunnerGameMode 클래스 등록 (AGameModeBase 상속)
+    Lua.new_usertype<ARunnerGameMode>("ARunnerGameMode",
+        sol::base_classes, sol::bases<AGameModeBase>(),
+        "OnPlayerDeath", &ARunnerGameMode::OnPlayerDeath,
+        "OnCoinCollected", &ARunnerGameMode::OnCoinCollected,
+        "OnObstacleAvoided", &ARunnerGameMode::OnObstacleAvoided,
+        "OnPlayerJump", &ARunnerGameMode::OnPlayerJump,
+        "RestartGame", &ARunnerGameMode::RestartGame
+        //// 난이도 설정
+        //"BaseDifficulty", &ARunnerGameMode::BaseDifficulty,
+        //"DifficultyIncreaseRate", &ARunnerGameMode::DifficultyIncreaseRate,
+        //// 점수 설정
+        //"JumpScore", &ARunnerGameMode::JumpScore,
+        //"CoinScore", &ARunnerGameMode::CoinScore,
+        //"AvoidScore", &ARunnerGameMode::AvoidScore
+    );
+
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
 }
 
@@ -398,7 +416,14 @@ void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalV
     // GameMode 등록
     if (LuaLocalValue.GameMode)
     {
-        InEnv["GameMode"] = LuaLocalValue.GameMode;
+        if(ARunnerGameMode* RunnerGameMode = Cast<ARunnerGameMode>(LuaLocalValue.GameMode))
+        {
+            InEnv["GameMode"] = RunnerGameMode;
+        }
+        else
+        {
+            InEnv["GameMode"] = LuaLocalValue.GameMode;
+        }
     }
 }
 
