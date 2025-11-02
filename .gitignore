@@ -446,8 +446,6 @@ gmae.ini
 ClassDiagram.cd
 editor.ini
 
-Mundi/Scene/*
-
 !Mundi/ThirdParty/DirectXTK/Bin**
 
 # DirectXTex 라이브러리 예외 처리 (디렉토리부터 먼저 예외)
