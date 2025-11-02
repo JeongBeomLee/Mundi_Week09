@@ -81,6 +81,20 @@ public:
 	/** 기본 중력 (-980 cm/s² ≈ -9.8 m/s²) */
 	static constexpr float DefaultGravity = -980.0f;
 
+	/** 중력 방향 벡터 (정규화된 방향, 기본값: 아래) */
+	FVector GravityDirection;
+
+	/**
+	 * 중력 방향을 설정합니다.
+	 * @param NewDirection - 새로운 중력 방향 (자동으로 정규화됨)
+	 */
+	void SetGravityDirection(const FVector& NewDirection);
+
+	/**
+	 * 현재 중력 방향을 반환합니다.
+	 */
+	FVector GetGravityDirection() const { return GravityDirection; }
+
 	// ────────────────────────────────────────────────
 	// 점프 설정
 	// ────────────────────────────────────────────────

@@ -33,6 +33,7 @@ UCharacterMovementComponent::UCharacterMovementComponent()
 	, BrakingDeceleration(2048.0f)
 	// 중력 설정
 	, GravityScale(1.0f)
+	, GravityDirection(0.0f, 0.0f, -1.0f) // 기본값: 아래 방향
 	// 점프 설정
 	, JumpZVelocity(420.0f)          // 4.2 m/s
 	, MaxAirTime(2.0f)
@@ -244,15 +245,35 @@ void UCharacterMovementComponent::ApplyGravity(float DeltaTime)
 		return;
 	}
 
-	// 중력 가속도 적용
-	float Gravity = DefaultGravity * GravityScale;
-	Velocity.Z += Gravity * DeltaTime;
+	// 중력 가속도 적용 (방향 벡터 사용)
+	float GravityMagnitude = DefaultGravity * GravityScale;
+	FVector GravityVector = GravityDirection * GravityMagnitude;
+	Velocity += GravityVector * DeltaTime;
 
 	// 최대 낙하 속도 제한 (터미널 속도)
-	constexpr float MaxFallSpeed = -4000.0f; // -40 m/s
-	if (Velocity.Z < MaxFallSpeed)
+	// 중력 방향으로의 속도 성분을 체크
+	float VelocityInGravityDir = FVector::Dot(Velocity, GravityDirection);
+	constexpr float MaxFallSpeed = 4000.0f; // 40 m/s
+	if (VelocityInGravityDir > MaxFallSpeed)
 	{
-		Velocity.Z = MaxFallSpeed;
+		// 중력 방향 속도 성분만 제한
+		FVector GravityComponent = GravityDirection * VelocityInGravityDir;
+		FVector OtherComponent = Velocity - GravityComponent;
+		Velocity = OtherComponent + GravityDirection * MaxFallSpeed;
+	}
+}
+
+void UCharacterMovementComponent::SetGravityDirection(const FVector& NewDirection)
+{
+	// 벡터를 정규화하여 저장
+	if (NewDirection.SizeSquared() > 0.0f)
+	{
+		GravityDirection = NewDirection.GetNormalized();
+	}
+	else
+	{
+		// 유효하지 않은 방향이면 기본값으로
+		GravityDirection = FVector(0.0f, 0.0f, -1.0f);
 	}
 }
 
