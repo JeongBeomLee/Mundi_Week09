@@ -100,8 +100,9 @@ function Tick(deltaTime)
     -- 자동 전진 처리 (Lua에서!)
    
     if Config.bAutoForward then
-
+        -- GameMode:OnCoinCollected(3)
         ProcessAutoForward(deltaTime)
+        -- PrintToConsole("[RunnerCharacter] bAutoForward in lua Tick")
     end
 
     -- 좌우 이동 처리

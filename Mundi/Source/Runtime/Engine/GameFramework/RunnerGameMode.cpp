@@ -135,7 +135,7 @@ void ARunnerGameMode::OnCoinCollected(int32 CoinValue)
 	
 	// TODO: GameState 업데이트
 	CoinScore += CoinValue;
-	UE_LOG("[RunnerGameMode] Coin Collected! Value: %d", CoinValue);
+	UE_LOG("[RunnerGameMode] Coin Collected! Value: %d, CoinScore: %d", CoinValue, CoinScore);
 }
 
 void ARunnerGameMode::OnObstacleAvoided()

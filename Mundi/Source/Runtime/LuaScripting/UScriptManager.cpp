@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CameraActor.h"
@@ -29,6 +29,11 @@ UScriptManager::~UScriptManager()
 
 void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString& ScriptName)
 {
+    if (GWorld->bPie)
+    {
+		LuaLocalValue.GameMode = GWorld->GetGameMode();
+    }
+
     // 이미 같은 스크립트가 부착되어 있으면 return
     for (const TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
     {
@@ -116,6 +121,39 @@ void UScriptManager::DetachAllScriptFrom(AActor* InActor)
             }
         }
     }
+}
+
+void UScriptManager::ModifyGameModeValueInScript(AActor* InActor, class AGameModeBase* InNewGameMode)
+{
+	assert(InActor);
+	assert(InNewGameMode);
+
+    for (TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
+    {
+        if (InActor == Script.first)
+        {
+            for (FScript* ScriptData : Script.second)
+            {
+                if (ScriptData)
+                {
+                    // 기존 GameMode 값을 새로운 GameMode로 변경
+                    sol::environment& Env = ScriptData->Env;
+                    assert(Env);
+					assert(Env.valid());
+                    if (ARunnerGameMode* RunnerGameMode = Cast<ARunnerGameMode>(InNewGameMode))
+                    {
+                        Env["GameMode"] = RunnerGameMode;
+                    }
+                    UE_LOG(
+                        "[Script Manager] Modified GameMode in script %s for actor %s",
+                        ScriptData->ScriptName.c_str(),
+                        InActor->GetName().ToString().c_str()
+                    );
+                    return;
+                }
+            }
+        }
+	}
 }
 
 TMap<AActor*, TArray<FScript*>>& UScriptManager::GetScriptsByOwner()
@@ -424,6 +462,7 @@ void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalV
         {
             InEnv["GameMode"] = LuaLocalValue.GameMode;
         }
+        //UE_LOG("Params of GameMode %d", InEnv["GameMode"].JumpScore);
     }
 }
 
