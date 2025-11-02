@@ -1,0 +1,71 @@
+// ────────────────────────────────────────────────────────────────────────────
+// RunnerCharacter.h
+// Runner 게임용 캐릭터 클래스
+// ────────────────────────────────────────────────────────────────────────────
+#pragma once
+
+#include "Character.h"
+
+/**
+ * ARunnerCharacter
+ *
+ * Runner 게임에 특화된 캐릭터 클래스입니다.
+ *
+ * 주요 기능:
+ * - 자동 전진 이동 (일정 속도)
+ * - 좌우 자유 이동 (입력 기반)
+ * - 점프 기능
+ * - 동적 중력 방향 변경 지원
+ * - 4방향 벽면 감지 (나중에 구현)
+ */
+class ARunnerCharacter : public ACharacter
+{
+public:
+	DECLARE_CLASS(ARunnerCharacter, ACharacter)
+	GENERATED_REFLECTION_BODY()
+	DECLARE_DUPLICATE(ARunnerCharacter)
+
+	ARunnerCharacter();
+	virtual ~ARunnerCharacter() override;
+
+	// ────────────────────────────────────────────────
+	// 유틸리티 함수 (Lua에서 호출)
+	// ────────────────────────────────────────────────
+
+	/**
+	 * 현재 "위쪽" 방향을 반환합니다 (중력 반대)
+	 */
+	FVector GetUpDirection() const;
+
+	/**
+	 * 현재 "우측" 방향을 반환합니다 (전진 방향과 위쪽에 수직)
+	 */
+	FVector GetRightDirection() const;
+
+	/**
+	 * 전진 방향을 반환합니다 (현재는 항상 X축)
+	 */
+	FVector GetForwardDirection() const;
+
+	// ────────────────────────────────────────────────
+	// 중력 방향 제어
+	// ────────────────────────────────────────────────
+
+	/**
+	 * 중력 방향을 설정합니다 (4방향 벽면 전환용)
+	 * @param NewGravityDir - 새로운 중력 방향 벡터
+	 */
+	void SetGravityDirection(const FVector& NewGravityDir);
+
+	/**
+	 * 현재 중력 방향을 반환합니다.
+	 */
+	FVector GetGravityDirection() const;
+
+protected:
+	// ────────────────────────────────────────────────
+	// 생명주기
+	// ────────────────────────────────────────────────
+
+	virtual void BeginPlay() override;
+};

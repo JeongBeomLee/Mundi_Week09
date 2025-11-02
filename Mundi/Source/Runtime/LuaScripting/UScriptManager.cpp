@@ -8,8 +8,10 @@
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
 #include "Source/Runtime/Engine/GameFramework/Pawn.h"
 #include "Source/Runtime/Engine/GameFramework/Character.h"
+#include "Source/Runtime/Engine/GameFramework/RunnerCharacter.h"
 #include "Source/Runtime/Engine/GameFramework/GameModeBase.h"
 #include "Source/Runtime/Engine/GameFramework/GameStateBase.h"
+#include "Source/Runtime/Engine/Components/CharacterMovementComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -292,7 +294,28 @@ void UScriptManager::RegisterUserTypeToLua()
         "MoveForward", &ACharacter::MoveForward,
         "MoveRight", &ACharacter::MoveRight,
         "Turn", &ACharacter::Turn,
-        "LookUp", &ACharacter::LookUp
+        "LookUp", &ACharacter::LookUp,
+        "GetCharacterMovement", &ACharacter::GetCharacterMovement
+    );
+
+    // UCharacterMovementComponent 클래스 등록
+    Lua.new_usertype<UCharacterMovementComponent>("UCharacterMovementComponent",
+        sol::no_constructor,
+        "MaxWalkSpeed", &UCharacterMovementComponent::MaxWalkSpeed,
+        "JumpZVelocity", &UCharacterMovementComponent::JumpZVelocity,
+        "GravityScale", &UCharacterMovementComponent::GravityScale,
+        "SetGravityDirection", &UCharacterMovementComponent::SetGravityDirection,
+        "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection
+    );
+
+    // ARunnerCharacter 클래스 등록 (ACharacter 상속)
+    Lua.new_usertype<ARunnerCharacter>("ARunnerCharacter",
+        sol::base_classes, sol::bases<ACharacter, APawn, AActor>(),
+        "GetForwardDirection", &ARunnerCharacter::GetForwardDirection,
+        "GetRightDirection", &ARunnerCharacter::GetRightDirection,
+        "GetUpDirection", &ARunnerCharacter::GetUpDirection,
+        "SetGravityDirection", &ARunnerCharacter::SetGravityDirection,
+        "GetGravityDirection", &ARunnerCharacter::GetGravityDirection
     );
 
     // AGameModeBase 클래스 등록
@@ -316,10 +339,16 @@ void UScriptManager::RegisterGlobalFuncToLua()
 void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)
 {
     // MyActor를 실제 타입으로 캐스팅해서 등록
+    // 가장 구체적인 타입부터 시도 (상속 순서 역순)
     AActor* Actor = LuaLocalValue.MyActor;
 
+    // RunnerCharacter로 캐스팅 시도 (가장 구체적)
+    if (ARunnerCharacter* RunnerCharacter = Cast<ARunnerCharacter>(Actor))
+    {
+        InEnv["MyActor"] = RunnerCharacter;
+    }
     // Character로 캐스팅 시도
-    if (ACharacter* Character = Cast<ACharacter>(Actor))
+    else if (ACharacter* Character = Cast<ACharacter>(Actor))
     {
         InEnv["MyActor"] = Character;
     }

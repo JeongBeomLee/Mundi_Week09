@@ -5,9 +5,9 @@
 #include "pch.h"
 #include "RunnerGameMode.h"
 #include "Character.h"
+#include "RunnerCharacter.h"
 #include "PlayerController.h"
-#include "Source/Runtime/LuaScripting/UScriptManager.h"
-#include"CameraActor.h"
+#include "CameraActor.h"
 
 IMPLEMENT_CLASS(ARunnerGameMode)
 
@@ -49,30 +49,7 @@ void ARunnerGameMode::BeginPlay()
 
 	UE_LOG("[RunnerGameMode] BeginPlay - Runner Game Starting!");
 
-	// Player가 스폰된 직후, Character::BeginPlay 이전에 스크립트 부착
-	if (PlayerController)
-	{
-		APawn* SpawnedPawn = PlayerController->GetPawn();
-		if (SpawnedPawn)
-		{
-			UE_LOG("[RunnerGameMode] Attaching PlayerAutoMove.lua to spawned player");
-
-			FLuaLocalValue LuaLocalValue;
-			LuaLocalValue.MyActor = SpawnedPawn;
-			LuaLocalValue.GameMode = this;  // GameMode 전달
-			UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "PlayerAutoMove.lua");
-
-			UE_LOG("[RunnerGameMode] PlayerAutoMove.lua attached successfully!");
-		}
-		else
-		{
-			UE_LOG("[RunnerGameMode] ERROR: SpawnedPawn is null!");
-		}
-	}
-	else
-	{
-		UE_LOG("[RunnerGameMode] ERROR: PlayerController is null!");
-	}
+	// RunnerCharacter가 자체적으로 스크립트를 연결하므로 여기서는 불필요
 }
 
 void ARunnerGameMode::Tick(float DeltaSeconds)
@@ -117,13 +94,6 @@ void ARunnerGameMode::RestartGame()
 {
 	UE_LOG("[RunnerGameMode] RestartGame called!");
 
-	// 기존 Pawn에서 스크립트 명시적으로 제거
-	if (PlayerController && PlayerController->GetPawn())
-	{
-		UE_LOG("[RunnerGameMode] Detaching script from old pawn...");
-		UScriptManager::GetInstance().DetachScriptFrom(PlayerController->GetPawn(), "PlayerAutoMove.lua");
-	}
-
 	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
 	Super::RestartGame();
 
@@ -133,21 +103,14 @@ void ARunnerGameMode::RestartGame()
 		UE_LOG("[RunnerGameMode] Restarting player...");
 		RestartPlayer(PlayerController);
 
-		// 새로 스폰된 Pawn에 다시 스크립트 부착
+		// RunnerCharacter::BeginPlay()에서 자동으로 스크립트 연결됨
 		APawn* SpawnedPawn = PlayerController->GetPawn();
 		if (SpawnedPawn)
 		{
-			UE_LOG("[RunnerGameMode] Re-attaching PlayerAutoMove.lua to restarted player");
 			UE_LOG("[RunnerGameMode] New Pawn location: (%.1f, %.1f, %.1f)",
 				SpawnedPawn->GetActorLocation().X,
 				SpawnedPawn->GetActorLocation().Y,
 				SpawnedPawn->GetActorLocation().Z);
-
-			FLuaLocalValue LuaLocalValue;
-			LuaLocalValue.MyActor = SpawnedPawn;
-			LuaLocalValue.GameMode = this;
-			UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "PlayerAutoMove.lua");
-
 			UE_LOG("[RunnerGameMode] Player restarted successfully!");
 		}
 		else
