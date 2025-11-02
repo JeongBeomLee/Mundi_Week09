@@ -285,6 +285,7 @@ APawn* AGameModeBase::SpawnDefaultPawnFor(APlayerController* NewPlayer, const FT
 
 	// Pawn 스폰
 	AActor* NewActor = World->SpawnActor(PawnClass, SpawnTransform);
+
 	APawn* NewPawn = Cast<APawn>(NewActor);
 
 	if (NewPawn)
