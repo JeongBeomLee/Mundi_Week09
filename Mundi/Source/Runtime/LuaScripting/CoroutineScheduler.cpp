@@ -24,7 +24,7 @@ void UCoroutineScheduler::Update(double Dt)
 
     for (auto It = Entries.begin(); It != Entries.end();)
     {
-        if (It->bFinished)
+        if (It->bFinished || GWorld->bPie == false)
         {
             It = Entries.erase(It);
             continue;

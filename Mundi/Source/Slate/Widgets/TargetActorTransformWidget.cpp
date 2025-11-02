@@ -548,6 +548,13 @@ void UTargetActorTransformWidget::RenderSelectedActorDetails(AActor* SelectedAct
 		ImGui::Text("%s", Script->ScriptName.c_str());
 		ImGui::SameLine();
 
+		// Edit 버튼 추가
+		if (ImGui::Button("Edit"))
+		{
+			ScriptMgr.OpenScriptInEditor(Script->ScriptName);
+		}
+
+		ImGui::SameLine();
 		if (ImGui::Button("Remove"))
 		{
 			ScriptMgr.DetachScriptFrom(SelectedActor, Script->ScriptName);
@@ -565,39 +572,80 @@ void UTargetActorTransformWidget::RenderSelectedActorDetails(AActor* SelectedAct
 	}
 
 	ImGui::Separator();
-	ImGui::InputText("New Script Name", NewScriptName, IM_ARRAYSIZE(NewScriptName));
+	ImGui::InputText("Script File", NewScriptName, IM_ARRAYSIZE(NewScriptName));
 
-	if (ImGui::Button("Add Script"))
+	// Create Script 버튼
+	if (ImGui::Button("Create Script"))
 	{
 		if (strlen(NewScriptName) > 0)
 		{
-			// 스크립트 이름 정규화
 			FString ScriptName = FString(NewScriptName);
-			
-			// LuaLocalValue 설정
-			FLuaLocalValue LocalVal;
-			LocalVal.MyActor = SelectedActor;
 
-			// 스크립트 추가 시도
-			ScriptMgr.AttachScriptTo(LocalVal, ScriptName);
-			ScriptMgr.PrintDebugLog();
-
-			memset(NewScriptName, 0, sizeof(NewScriptName));
+			if (ScriptMgr.CreateScriptFile(ScriptName))
+			{
+				LastErrorMessage = FString("Script created: ") + ScriptName;
+				memset(NewScriptName, 0, sizeof(NewScriptName));
+			}
+			else
+			{
+				LastErrorMessage = FString("Failed to create script: ") + ScriptName +
+				                   ". File may already exist.";
+			}
+		}
+		else
+		{
+			LastErrorMessage = FString("Please enter a script name.");
 		}
 	}
 
 	ImGui::SameLine();
-	if (ImGui::Button("Remove All Scripts"))
+	if (ImGui::Button("Add Script"))
 	{
-		ScriptMgr.DetachAllScriptFrom(SelectedActor);
-		LastErrorMessage = FString("");
+		if (strlen(NewScriptName) > 0)
+		{
+			FString ScriptName = FString(NewScriptName);
+
+			try
+			{
+				// LuaLocalValue 설정
+				FLuaLocalValue LocalVal;
+				LocalVal.MyActor = SelectedActor;
+
+				// 스크립트 추가 시도
+				ScriptMgr.AttachScriptTo(LocalVal, ScriptName);
+				ScriptMgr.PrintDebugLog();
+
+				LastErrorMessage = FString("Script attached: ") + ScriptName;
+				memset(NewScriptName, 0, sizeof(NewScriptName));
+			}
+			catch (const std::exception& e)
+			{
+				LastErrorMessage = FString("Error: ") + e.what();
+			}
+		}
+		else
+		{
+			LastErrorMessage = FString("Please enter a script name.");
+		}
 	}
 
-	// 에러 메시지 표시
+	ImGui::SameLine();
+	if (ImGui::Button("Remove All"))
+	{
+		ScriptMgr.DetachAllScriptFrom(SelectedActor);
+		LastErrorMessage = FString("All scripts removed.");
+	}
+
+	// 메시지 표시
 	if (!LastErrorMessage.empty())
 	{
 		ImGui::Separator();
-		ImGui::TextColored(ImVec4(1, 0.3f, 0.3f, 1), "%s", LastErrorMessage.c_str());
+		// 성공 메시지는 초록색, 에러 메시지는 빨간색
+		ImVec4 Color = (LastErrorMessage.find("Error:") != std::string::npos ||
+		                LastErrorMessage.find("Failed") != std::string::npos)
+		               ? ImVec4(1, 0.3f, 0.3f, 1)
+		               : ImVec4(0.3f, 1, 0.3f, 1);
+		ImGui::TextColored(Color, "%s", LastErrorMessage.c_str());
 	}
 }
 
