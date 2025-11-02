@@ -371,6 +371,7 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Slate\Widgets\SceneManagerWidget.cpp" />
     <ClCompile Include="Source\Slate\Widgets\TargetActorTransformWidget.cpp" />
     <ClCompile Include="Source\Slate\Widgets\Widget.cpp" />
+    <ClCompile Include="Source\Slate\Widgets\WorldDetailsWidget.cpp" />
     <ClCompile Include="Source\Slate\Windows\ConsoleWindow.cpp" />
     <ClCompile Include="Source\Slate\Windows\ControlPanelWindow.cpp" />
     <ClCompile Include="Source\Slate\Windows\ExperimentalFeatureWindow.cpp" />
@@ -658,6 +659,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Slate\Widgets\SceneManagerWidget.h" />
     <ClInclude Include="Source\Slate\Widgets\TargetActorTransformWidget.h" />
     <ClInclude Include="Source\Slate\Widgets\Widget.h" />
+    <ClInclude Include="Source\Slate\Widgets\WorldDetailsWidget.h" />
     <ClInclude Include="Source\Slate\Windows\ConsoleWindow.h" />
     <ClInclude Include="Source\Slate\Windows\ControlPanelWindow.h" />
     <ClInclude Include="Source\Slate\Windows\ExperimentalFeatureWindow.h" />

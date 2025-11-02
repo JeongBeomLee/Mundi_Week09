@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "PropertyWindow.h"
 #include "Widgets/TargetActorTransformWidget.h"
+#include "Widgets/WorldDetailsWidget.h"
 
 IMPLEMENT_CLASS(UPropertyWindow)
 
@@ -21,6 +22,11 @@ UPropertyWindow::UPropertyWindow()
 	TargetActorTransformWidget->Initialize();
 	AddWidget(TargetActorTransformWidget);
 
+	// WorldDetailsWidget 추가 (GameMode 설정용)
+	auto WorldDetailsWidget = NewObject<UWorldDetailsWidget>();
+	WorldDetailsWidget->Initialize();
+	AddWidget(WorldDetailsWidget);
+
 	Config.UpdateWindowFlags();
 	SetConfig(Config);
 }
@@ -28,4 +34,17 @@ UPropertyWindow::UPropertyWindow()
 void UPropertyWindow::Initialize()
 {
 	UE_LOG("UPropertyWindow: Initialized");
+}
+
+void UPropertyWindow::SetWorld(UWorld* InWorld)
+{
+	// WorldDetailsWidget에 World 참조 전달
+	for (UWidget* Widget : GetWidgets())
+	{
+		if (UWorldDetailsWidget* WorldWidget = Cast<UWorldDetailsWidget>(Widget))
+		{
+			WorldWidget->SetWorld(InWorld);
+			break;
+		}
+	}
 }

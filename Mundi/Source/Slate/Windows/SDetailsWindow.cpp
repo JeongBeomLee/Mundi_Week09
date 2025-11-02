@@ -1,23 +1,48 @@
 ﻿#include "pch.h"
 #include "SDetailsWindow.h"
-#include "Windows/PropertyWindow.h"
+#include "Widgets/TargetActorTransformWidget.h"
+#include "Widgets/WorldDetailsWidget.h"
 #include "UIManager.h"
+
 SDetailsWindow::SDetailsWindow()
     : SWindow()
-    , DetailsWidget(nullptr)
+    , ActorDetailsWidget(nullptr)
+    , WorldDetailsWidget(nullptr)
 {
     Initialize();
 }
 
 SDetailsWindow::~SDetailsWindow()
 {
-    delete DetailsWidget;
+    if (ActorDetailsWidget)
+    {
+        DeleteObject(ActorDetailsWidget);
+        ActorDetailsWidget = nullptr;
+    }
+
+    if (WorldDetailsWidget)
+    {
+        DeleteObject(WorldDetailsWidget);
+        WorldDetailsWidget = nullptr;
+    }
 }
 
 void SDetailsWindow::Initialize()
 {
-    DetailsWidget = new UPropertyWindow();
-    DetailsWidget->Initialize();
+    // Actor Transform Widget 생성
+    ActorDetailsWidget = NewObject<UTargetActorTransformWidget>();
+    ActorDetailsWidget->Initialize();
+
+    // World Details Widget 생성
+    WorldDetailsWidget = NewObject<UWorldDetailsWidget>();
+    WorldDetailsWidget->Initialize();
+
+    // UIManager의 World를 WorldDetailsWidget에 전달
+    UWorld* World = UUIManager::GetInstance().GetWorld();
+    if (GWorld)
+    {
+        WorldDetailsWidget->SetWorld(GWorld);
+    }
 }
 
 void SDetailsWindow::OnRender()
@@ -32,13 +57,33 @@ void SDetailsWindow::OnRender()
 
     if (ImGui::Begin("디테일", nullptr, flags))
     {
-        if (DetailsWidget)
-            DetailsWidget->RenderWidget();
+        // World Settings (상단)
+        if (WorldDetailsWidget)
+        {
+            WorldDetailsWidget->RenderWidget();
+        }
+
+        ImGui::Separator();
+        ImGui::Spacing();
+
+        // Actor Details (하단)
+        if (ActorDetailsWidget)
+        {
+            ActorDetailsWidget->RenderWidget();
+        }
     }
     ImGui::End();
 }
 
 void SDetailsWindow::OnUpdate(float deltaSecond)
 {
-    DetailsWidget->Update();
+    if (ActorDetailsWidget)
+    {
+        ActorDetailsWidget->Update();
+    }
+
+    if (WorldDetailsWidget)
+    {
+        WorldDetailsWidget->Update();
+    }
 }

@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "Actor.h"
 #include "Windows/UIWindow.h"
+#include "Windows/PropertyWindow.h"
 #include "ImGui/ImGuiHelper.h"
 #include "Widgets/Widget.h"
 #include "ImGui/imgui.h"
@@ -367,5 +368,17 @@ void UUIManager::ClearTransformWidgetSelection()
 	if (TargetTransformWidgetRef)
 	{
 		TargetTransformWidgetRef->OnSelectedActorCleared();
+	}
+}
+
+void UUIManager::SetWorld(UWorld* InWorld)
+{
+	WorldRef = InWorld;
+
+	// PropertyWindow에 World 전달
+	UPropertyWindow* PropertyWindow = Cast<UPropertyWindow>(FindUIWindow("Property Window"));
+	if (PropertyWindow)
+	{
+		PropertyWindow->SetWorld(InWorld);
 	}
 }

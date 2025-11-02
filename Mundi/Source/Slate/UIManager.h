@@ -62,7 +62,7 @@ public:
 
 	// 기존 UIManager 호환성 메서드
 	void Release() { Shutdown(); }
-	void SetWorld(UWorld* InWorld) { WorldRef = InWorld; }
+	void SetWorld(UWorld* InWorld);
 	UWorld* GetWorld() const { return WorldRef; }
 	
 	// Actor management methods

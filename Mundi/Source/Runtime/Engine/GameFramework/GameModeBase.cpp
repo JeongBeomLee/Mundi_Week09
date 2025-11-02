@@ -34,6 +34,27 @@ void AGameModeBase::BeginPlay()
 
 	UE_LOG("[GameMode] BeginPlay");
 
+	// World의 PIE 설정을 GameMode에 적용
+	if (World)
+	{
+		// World 설정이 있으면 우선 사용
+		if (World->GetDefaultPawnClass())
+		{
+			DefaultPawnClass = World->GetDefaultPawnClass();
+			UE_LOG("[GameMode] DefaultPawnClass set from World: %s", DefaultPawnClass->Name);
+		}
+
+		if (World->GetPlayerControllerClass())
+		{
+			PlayerControllerClass = World->GetPlayerControllerClass();
+			UE_LOG("[GameMode] PlayerControllerClass set from World: %s", PlayerControllerClass->Name);
+		}
+
+		PlayerSpawnLocation = World->GetPlayerSpawnLocation();
+		UE_LOG("[GameMode] PlayerSpawnLocation set from World: (%.1f, %.1f, %.1f)",
+			PlayerSpawnLocation.X, PlayerSpawnLocation.Y, PlayerSpawnLocation.Z);
+	}
+
 	// GameState 자동 생성 (없는 경우)
 	if (!GameState.IsValid())
 	{

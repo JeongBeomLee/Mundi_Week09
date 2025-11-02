@@ -364,12 +364,27 @@ void UEditorEngine::StartPIE()
 
     // PIE World에 GameMode/GameState 자동 생성
     PIEWorld->GameState = PIEWorld->SpawnActor<AGameStateBase>();
-    PIEWorld->GameMode = PIEWorld->SpawnActor<ARunnerGameMode>();
+
+    // World 설정에서 GameMode 클래스 가져오기 (없으면 기본값 사용)
+    UClass* GameModeClassToSpawn = PIEWorld->GetGameModeClass();
+    if (!GameModeClassToSpawn)
+    {
+        GameModeClassToSpawn = ARunnerGameMode::StaticClass(); // 기본값
+        UE_LOG("[PIE] No GameModeClass set in World, using default: ARunnerGameMode");
+    }
+
+    AActor* GameModeActor = PIEWorld->SpawnActor(GameModeClassToSpawn);
+    PIEWorld->GameMode = Cast<AGameModeBase>(GameModeActor);
+
     if (PIEWorld->GameMode)
     {
         PIEWorld->GameMode->SetGameState(PIEWorld->GameState);
+        UE_LOG("PIE: GameMode created: %s", PIEWorld->GameMode->GetClass()->Name);
     }
-    UE_LOG("PIE: GameMode/GameState 생성 완료");
+    else
+    {
+        UE_LOG("PIE: ERROR - Failed to create GameMode!");
+    }
 
     // PIE World의 MainCamera 설정 (복사된 CameraActor 찾기)
     for (AActor* Actor : PIEWorld->GetLevel()->GetActors())

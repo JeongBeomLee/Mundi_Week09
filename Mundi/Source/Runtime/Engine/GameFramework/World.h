@@ -113,9 +113,28 @@ public:
     // PIE용 World 생성
     static UWorld* DuplicateWorldForPIE(UWorld* InEditorWorld);
 
+    /** === PIE 설정 (에디터에서 설정, PIE 시작 시 사용) === */
+    UClass* GetGameModeClass() const { return GameModeClass; }
+    void SetGameModeClass(UClass* InClass) { GameModeClass = InClass; }
+
+    UClass* GetDefaultPawnClass() const { return DefaultPawnClass; }
+    void SetDefaultPawnClass(UClass* InClass) { DefaultPawnClass = InClass; }
+
+    UClass* GetPlayerControllerClass() const { return PlayerControllerClass; }
+    void SetPlayerControllerClass(UClass* InClass) { PlayerControllerClass = InClass; }
+
+    FVector GetPlayerSpawnLocation() const { return PlayerSpawnLocation; }
+    void SetPlayerSpawnLocation(const FVector& InLocation) { PlayerSpawnLocation = InLocation; }
+
     /** === 게임 프레임워크 (PIE 전용) === */
     AGameModeBase* GameMode = nullptr;
     AGameStateBase* GameState = nullptr;
+
+    /** === PIE 설정 (에디터에서 편집 가능) === */
+    UClass* GameModeClass = nullptr;
+    UClass* DefaultPawnClass = nullptr;
+    UClass* PlayerControllerClass = nullptr;
+    FVector PlayerSpawnLocation = FVector(0.0f, 0.0f, 100.0f);
 
 private:
     /** === 에디터 특수 액터 관리 === */

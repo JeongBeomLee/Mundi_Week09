@@ -71,14 +71,14 @@ void UWorld::Initialize()
 	InitializeGrid();
 	InitializeGizmo();
 
-	// Pawn 생성
-	APawn* MyPawn = SpawnActor<APawn>();
+	//// Pawn 생성
+	//APawn* MyPawn = SpawnActor<APawn>();
 
-	// PlayerController 생성
-	APlayerController* PC = NewObject<APlayerController>();
+	//// PlayerController 생성
+	//APlayerController* PC = NewObject<APlayerController>();
 
-	// Pawn 빙의
-	PC->Possess(MyPawn);
+	//// Pawn 빙의
+	//PC->Possess(MyPawn);
 }
 
 void UWorld::InitializeGrid()
@@ -138,10 +138,24 @@ UWorld* UWorld::DuplicateWorldForPIE(UWorld* InEditorWorld)
 	//ULevel* NewLevel = ULevelService::CreateNewLevel();
 	UWorld* PIEWorld = NewObject<UWorld>(); // 레벨도 새로 생성됨
 	PIEWorld->bPie = true;
-	
+
+	// EditorWorld의 PIE 설정 복사
+	PIEWorld->GameModeClass = InEditorWorld->GameModeClass;
+	PIEWorld->DefaultPawnClass = InEditorWorld->DefaultPawnClass;
+	PIEWorld->PlayerControllerClass = InEditorWorld->PlayerControllerClass;
+	PIEWorld->PlayerSpawnLocation = InEditorWorld->PlayerSpawnLocation;
+
+	UE_LOG("[PIE] Copied settings from EditorWorld:");
+	UE_LOG("  DefaultPawnClass: %s", PIEWorld->DefaultPawnClass ? PIEWorld->DefaultPawnClass->Name : "nullptr");
+	UE_LOG("  PlayerControllerClass: %s", PIEWorld->PlayerControllerClass ? PIEWorld->PlayerControllerClass->Name : "nullptr");
+	UE_LOG("  SpawnLocation: (%.1f, %.1f, %.1f)",
+		PIEWorld->PlayerSpawnLocation.X,
+		PIEWorld->PlayerSpawnLocation.Y,
+		PIEWorld->PlayerSpawnLocation.Z);
+
 	FWorldContext PIEWorldContext = FWorldContext(PIEWorld, EWorldType::Game);
 	GEngine.AddWorldContext(PIEWorldContext);
-	
+
 
 	const TArray<AActor*>& SourceActors = InEditorWorld->GetLevel()->GetActors();
 	for (AActor* SourceActor : SourceActors)
