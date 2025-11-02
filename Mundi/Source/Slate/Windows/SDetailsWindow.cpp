@@ -38,7 +38,7 @@ void SDetailsWindow::Initialize()
     WorldDetailsWidget->Initialize();
 
     // UIManager의 World를 WorldDetailsWidget에 전달
-    UWorld* World = UUIManager::GetInstance().GetWorld();
+    UWorld* World = GWorld;
     if (GWorld)
     {
         WorldDetailsWidget->SetWorld(GWorld);

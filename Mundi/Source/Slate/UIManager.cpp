@@ -371,14 +371,3 @@ void UUIManager::ClearTransformWidgetSelection()
 	}
 }
 
-void UUIManager::SetWorld(UWorld* InWorld)
-{
-	WorldRef = InWorld;
-
-	// PropertyWindow에 World 전달
-	UPropertyWindow* PropertyWindow = Cast<UPropertyWindow>(FindUIWindow("Property Window"));
-	if (PropertyWindow)
-	{
-		PropertyWindow->SetWorld(InWorld);
-	}
-}

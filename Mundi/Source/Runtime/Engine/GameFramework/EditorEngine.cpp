@@ -202,9 +202,6 @@ bool UEditorEngine::Startup(HINSTANCE hInstance)
     FRect ScreenRect(0, 0, ClientWidth, ClientHeight);
     SLATE.Initialize(RHIDevice.GetDevice(), GWorld, ScreenRect);
 
-    //스폰을 위한 월드셋
-    UI.SetWorld(WorldContexts[0].World);
-
     bRunning = true;
     return true;
 }

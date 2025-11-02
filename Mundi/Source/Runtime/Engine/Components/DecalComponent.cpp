@@ -57,7 +57,7 @@ void UDecalComponent::TickComponent(float DeltaTime)
 
 void UDecalComponent::OnRegister(UWorld* InWorld)
 {
-	if (!SpriteComponent)
+	if (!SpriteComponent && !InWorld->bPie)
 	{
 		CREATE_EDITOR_COMPONENT(SpriteComponent, UBillboardComponent);
 		SpriteComponent->SetTextureName(GDataDir + "/UI/Icons/S_DecalActorIcon.dds");
