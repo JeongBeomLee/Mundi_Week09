@@ -29,6 +29,12 @@ local function RotateToNewGravity(newGravityDir)
 
     IsRotating = true
 
+    -- CharacterMovementComponent에 회전 시작 알림 (중력 멈춤)
+    local movement = ActorReference:GetCharacterMovement()
+    if movement then
+        movement:SetIsRotating(true)
+    end
+
     StartCoroutine(function()
         local newGravityCopy = FVector(newGravityDir.X, newGravityDir.Y, newGravityDir.Z)
         local oldGravityDir = CurrentGravityDirection
@@ -39,12 +45,14 @@ local function RotateToNewGravity(newGravityDir)
         local world = GEngine:GetPIEWorld()
         if not world then
             IsRotating = false
+            if movement then movement:SetIsRotating(false) end
             return
         end
 
         local camera = world:GetCameraActor()
         if not camera then
             IsRotating = false
+            if movement then movement:SetIsRotating(false) end
             return
         end
 
@@ -87,7 +95,12 @@ local function RotateToNewGravity(newGravityDir)
         -- 중력 방향 업데이트 (복사본 사용)
         CurrentGravityDirection = newGravityCopy
 
-        ActorReference:GetCharacterMovement():SetGravityDirection(newGravityCopy)
+        local finalMovement = ActorReference:GetCharacterMovement()
+        if finalMovement then
+            finalMovement:SetGravityDirection(newGravityCopy)
+            -- 회전 종료 알림 (중력 재개)
+            finalMovement:SetIsRotating(false)
+        end
 
         IsRotating = false
         LastWallNormal = nil  -- 회전 완료 후 초기화

@@ -236,6 +236,22 @@ public:
 	 */
 	void SetOnWallCollisionCallback(sol::function Callback);
 
+	// ────────────────────────────────────────────────
+	// 회전 상태 제어
+	// ────────────────────────────────────────────────
+
+	/**
+	 * 회전 중 상태를 설정합니다.
+	 * 회전 중일 때는 모든 움직임과 중력이 멈춥니다.
+	 * @param bInIsRotating - true면 회전 중, false면 정상 이동
+	 */
+	void SetIsRotating(bool bInIsRotating) { bIsRotating = bInIsRotating; }
+
+	/**
+	 * 현재 회전 중인지 확인합니다.
+	 */
+	bool IsRotating() const { return bIsRotating; }
+
 protected:
 	// ────────────────────────────────────────────────
 	// 멤버 변수
@@ -258,6 +274,9 @@ protected:
 
 	/** 점프 중인지 여부 */
 	bool bIsJumping;
+
+	/** 회전 중인지 여부 (회전 중에는 모든 움직임과 중력 멈춤) */
+	bool bIsRotating;
 
 	/** 측면 충돌 시 호출될 Lua 콜백 함수 */
 	sol::function WallCollisionLuaCallback;

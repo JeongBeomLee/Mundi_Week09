@@ -500,7 +500,9 @@ void UScriptManager::RegisterUserTypeToLua()
         "AirControl", &UCharacterMovementComponent::AirControl,
         "SetGravityDirection", &UCharacterMovementComponent::SetGravityDirection,
         "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection,
-        "SetOnWallCollisionCallback", &UCharacterMovementComponent::SetOnWallCollisionCallback
+        "SetOnWallCollisionCallback", &UCharacterMovementComponent::SetOnWallCollisionCallback,
+        "SetIsRotating", &UCharacterMovementComponent::SetIsRotating,
+        "IsRotating", &UCharacterMovementComponent::IsRotating
     );
 
     // ARunnerCharacter 클래스 등록 (ACharacter 상속)

@@ -30,6 +30,7 @@ UCharacterMovementComponent::UCharacterMovementComponent()
 	, MovementMode(EMovementMode::Falling)
 	, TimeInAir(0.0f)
 	, bIsJumping(false)
+	, bIsRotating(false)
 	// 이동 설정
 	, MaxWalkSpeed(30.0f)           // 0.3 m/s
 	, MaxAcceleration(2048.0f)       // 20.48 m/s²
@@ -212,6 +213,12 @@ void UCharacterMovementComponent::SetMovementMode(EMovementMode NewMode)
 
 void UCharacterMovementComponent::UpdateVelocity(float DeltaTime)
 {
+	// 회전 중에는 입력 처리 안 함
+	if (bIsRotating)
+	{
+		return;
+	}
+
 	if (PendingInputVector.SizeSquared() > 0.0f)
 	{
 		// 입력이 있으면 가속
@@ -274,6 +281,12 @@ void UCharacterMovementComponent::UpdateVelocity(float DeltaTime)
 
 void UCharacterMovementComponent::ApplyGravity(float DeltaTime)
 {
+	// 회전 중에는 중력 적용 안 함
+	if (bIsRotating)
+	{
+		return;
+	}
+
 	// 지면에 있으면 중력 적용 안 함
 	if (IsGrounded())
 	{
