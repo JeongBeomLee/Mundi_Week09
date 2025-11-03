@@ -204,6 +204,16 @@ void USlateManager::Render()
     // 게임 HUD 오버레이 렌더링 (PIE 모드에서만)
     if (GameHUD)
     {
+        // MainViewport의 Rect를 GameHUD에 전달 (오버레이 영역 제한용)
+        if (MainViewport)
+        {
+            FRect viewportRect = MainViewport->GetRect();
+            float vpX = viewportRect.Left;
+            float vpY = viewportRect.Top;
+            float vpWidth = viewportRect.Right - viewportRect.Left;
+            float vpHeight = viewportRect.Bottom - viewportRect.Top;
+            GameHUD->SetViewportBounds(vpX, vpY, vpWidth, vpHeight);
+        }
         GameHUD->Update();
         GameHUD->RenderWidget();
     }

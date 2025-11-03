@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Widget.h"
 #include "GameStateBase.h"
 
@@ -19,6 +19,9 @@ public:
 
 	// GameState 설정
 	void SetGameState(AGameStateBase* InGameState);
+
+	// 뷰포트 영역 설정 (게임 오버 팝업 표시 영역 제한용)
+	void SetViewportBounds(float X, float Y, float Width, float Height);
 
 	// 델리게이트 바인딩 해제 (GameState 변경 시)
 	void UnbindDelegates();
@@ -41,6 +44,12 @@ private:
 	int32 CachedScore;
 	float CachedElapsedTime;
 	FString CachedGameStateText;
+
+	// 뷰포트 영역 (게임 오버 오버레이 제한용)
+	float ViewportX;
+	float ViewportY;
+	float ViewportWidth;
+	float ViewportHeight;
 
 	// UI 헬퍼 함수
 	FString FormatTime(float Seconds) const;
