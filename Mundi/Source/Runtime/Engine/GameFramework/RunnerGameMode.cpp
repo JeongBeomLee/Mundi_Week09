@@ -151,8 +151,15 @@ void ARunnerGameMode::OnCoinCollected(int32 CoinValue)
 	
 	// TODO: GameState 업데이트
 	CoinScore += CoinValue;
-	GameState->SetScore(CoinScore);
-	UE_LOG("[RunnerGameMode] Coin Collected! Value: %d, CoinScore: %d", CoinValue, CoinScore);
+	if (GameState)
+	{
+		GameState->SetScore(CoinScore);
+		UE_LOG("[RunnerGameMode] Coin Collected! Value: %d, CoinScore: %d", CoinValue, CoinScore);
+	}
+	else
+	{
+		UE_LOG("[RunnerGameMode] ERROR: GameState is null when collecting coin!");
+	}
 }
 
 void ARunnerGameMode::OnObstacleAvoided()

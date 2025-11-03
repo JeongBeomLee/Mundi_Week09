@@ -647,6 +647,10 @@ void UScriptManager::RegisterUserTypeToLua()
                 else if (ActorType == "ACoinActor")
                 {
                     ACoinActor* coin = World->SpawnActor<ACoinActor>(Transform);
+                    if(coin && World->bPie)
+                    {
+						coin->BeginPlay();
+					}
                     return sol::make_object(lua, coin);
                 }
                 else if(ActorType == "AProjectileActor")
