@@ -1,11 +1,11 @@
 {
   "Level" : {
     "Actors" : {
-      "896" : {
+      "881" : {
         "Name" : "Directional Light Actor",
         "OwnedComponents" : [{
             "CSMLambda" : 0.500000,
-            "Id" : 898,
+            "Id" : 883,
             "Intensity" : 1.000000,
             "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
             "NumCascades" : 3,
@@ -26,13 +26,13 @@
             "bIsVisible" : true,
             "bTickEnabled" : true
           }],
-        "RootComponentId" : 898,
+        "RootComponentId" : 883,
         "Type" : "ADirectionalLightActor"
       },
-      "899" : {
+      "884" : {
         "Name" : "Ambient Light Actor",
         "OwnedComponents" : [{
-            "Id" : 901,
+            "Id" : 886,
             "Intensity" : 0.100000,
             "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
             "ParentId" : 0,
@@ -50,37 +50,15 @@
             "bIsVisible" : true,
             "bTickEnabled" : true
           }],
-        "RootComponentId" : 901,
+        "RootComponentId" : 886,
         "Type" : "AAmbientLightActor"
-      },
-      "902" : {
-        "Name" : "스태틱 메시_0",
-        "OwnedComponents" : [{
-            "Id" : 904,
-            "MaterialSlots" : [{
-                "AssetPath" : "texture",
-                "Type" : "UMaterial"
-              }],
-            "ParentId" : 0,
-            "RelativeLocation" : [0.000000, 0.000000, -0.457850],
-            "RelativeRotationEuler" : [0.000000, -0.000000, 0.000000],
-            "RelativeScale" : [10000.000000, 10.000000, 1.000000],
-            "StaticMesh" : "Data/cube-tex.obj",
-            "Type" : "UStaticMeshComponent",
-            "bHiddenInGame" : false,
-            "bIsActive" : true,
-            "bIsVisible" : true,
-            "bTickEnabled" : true
-          }],
-        "RootComponentId" : 904,
-        "Type" : "AStaticMeshActor"
       }
     },
-    "NextUUID" : 978,
+    "NextUUID" : 3315,
     "PerspectiveCamera" : {
       "FOV" : [60.000000],
       "FarClip" : [1000.000000],
-      "Location" : [82.548141, -2.183443, 18.285452],
+      "Location" : [18.257950, 0.000000, 53.607185],
       "NearClip" : [0.100000],
       "Rotation" : [0.000000, 33.900005, 10.199938]
     },
@@ -89,6 +67,6 @@
   "WorldSettings" : {
     "DefaultPawnClass" : "ARunnerCharacter",
     "GameModeClass" : "ARunnerGameMode",
-    "PlayerSpawnLocation" : [0.000000, 0.000000, 100.000000]
+    "PlayerSpawnLocation" : [0.000000, 0.000000, 0.000000]
   }
 }

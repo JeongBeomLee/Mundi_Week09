@@ -11,7 +11,7 @@ local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
 local DEFAULT_MAP_SIZE = 30;
 local DEFAULT_SCALE = 2.0;
-local DEFAULT_FILLRATE = 0.5;
+local DEFAULT_FILLRATE = 1.0;
 
 local Width = DEFAULT_WIDTH;
 local Height = DEFAULT_HEIGHT;

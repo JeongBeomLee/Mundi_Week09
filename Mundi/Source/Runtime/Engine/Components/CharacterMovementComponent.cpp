@@ -302,7 +302,7 @@ bool UCharacterMovementComponent::CheckGround()
 
 	FVector Location = CharacterOwner->GetActorLocation();
 
-	// 간단한 지면 체크: Y = 0을 지면으로 가정
+	// 간단한 지면 체크: Z = 0을 지면으로 가정
 	// 나중에 충돌 시스템과 연결하여 제대로 구현
 	constexpr float GroundLevel = 0.0f;
 	constexpr float GroundTolerance = 0.01f; // 1cm 오차 허용

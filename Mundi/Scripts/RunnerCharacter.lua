@@ -15,7 +15,7 @@ local Config = {
     bAutoForward = true,        -- 자동 전진 활성화
 
     -- 점프 및 중력 설정
-    JumpZVelocity = 50.0,      -- 점프 초기 속도 (cm/s, 위로)
+    JumpZVelocity = 35.0,      -- 점프 초기 속도 (cm/s, 위로)
     GravityScale = 0.1,         -- 중력 스케일 (1.0 = 기본 중력)
     AirControl = 0.3,           -- 공중 제어력 (0.0 ~ 1.0)
 

@@ -56,5 +56,5 @@ private:
 	int SelectedControllerClassIndex = 0;
 
 	/** SpawnLocation 편집용 */
-	FVector EditSpawnLocation = FVector(0.0f, 0.0f, 100.0f);
+	FVector EditSpawnLocation = FVector(0.0f, 0.0f, 0.0f);
 };
