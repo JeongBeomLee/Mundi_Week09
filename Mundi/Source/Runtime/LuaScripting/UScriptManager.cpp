@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
@@ -507,16 +507,6 @@ void UScriptManager::RegisterUserTypeToLua()
             }
 
 			return Billboard;
-
-            //if (!self) return nullptr;
-            //FName componentName = name.value_or("BillboardComponent");
-            //UBillboardComponent* Billboard = self->CreateDefaultSubobject<UBillboardComponent>(componentName);
-            //if (Billboard && self->GetRootComponent()) {
-            //    // RootComponent에 부착하여 Transform 동기화
-            //    Billboard->SetupAttachment(self->GetRootComponent(), EAttachmentRule::KeepRelative);
-            //}
-            //return Billboard;
-
 		},
         "AttachScript", [](AActor* self, const FString& scriptName) -> void {
             if (!self) return;
@@ -524,10 +514,6 @@ void UScriptManager::RegisterUserTypeToLua()
             LuaLocalValue.MyActor = self;
             LuaLocalValue.GameMode = self->World ? self->World->GetGameMode() : nullptr;
             UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, scriptName);
-   //         if(self->World->bPie)
-   //         {
-   //             self->BeginPlay(); // BeginPlay 호출
-			//}
 		}
     );
 
