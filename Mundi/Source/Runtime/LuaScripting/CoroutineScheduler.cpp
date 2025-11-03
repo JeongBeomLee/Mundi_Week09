@@ -10,7 +10,7 @@ void UCoroutineScheduler::Start(sol::function F)
     CoroutineEntry E{ NewThread, Co, CurrentTime, nullptr, false, false };
     Entries.Add(std::move(E));
 
-    UE_LOG("[Coroutine] Started new coroutine. Total entries: %zu", Entries.Num());
+    // UE_LOG("[Coroutine] Started new coroutine. Total entries: %zu", Entries.Num());
 }
 
 void UCoroutineScheduler::Update(double Dt)

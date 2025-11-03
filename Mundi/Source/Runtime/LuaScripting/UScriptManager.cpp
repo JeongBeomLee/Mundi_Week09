@@ -2,6 +2,7 @@
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
+#include "CollisionComponent/CapsuleComponent.h"
 #include "CameraActor.h"
 #include "CameraComponent.h"
 #include "SceneComponent.h"
@@ -278,12 +279,19 @@ void UScriptManager::RegisterUserTypeToLua()
     // USceneComponent 등록
     sol::usertype<USceneComponent> SceneComponentType = Lua.new_usertype<USceneComponent>(
         "USceneComponent",
-        sol::constructors<USceneComponent()>());
+        sol::constructors<USceneComponent()>(),
+        "SetRelativeLocation", &USceneComponent::SetRelativeLocation,
+        "GetRelativeLocation", &USceneComponent::GetRelativeLocation);
     SceneComponentType["GetSceneId"] = &USceneComponent::GetSceneId;
 
     // UShapeComponent 등록 (충돌 컴포넌트)
     Lua.new_usertype<UShapeComponent>("UShapeComponent",
-        sol::base_classes, sol::bases<USceneComponent, UActorComponent>()
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>()//,
+        // OnOverlap 델리게이트 바인딩
+        // "BindOnOverlap", [](UShapeComponent* self, sol::function callback) {
+        //     if (!self) return;
+        //     self->OnComponentBeginOverlap.Add(callback);
+        // }
     );
 
     // UBoxComponent 등록 (박스 충돌 컴포넌트)
@@ -303,6 +311,19 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetForward", &UCameraComponent::GetForward,
         "GetRight", &UCameraComponent::GetRight,
         "GetUp", &UCameraComponent::GetUp
+    );
+    
+    // UCapsuleComponent 등록 (캡슐 충돌 컴포넌트)
+    Lua.new_usertype<UCapsuleComponent>("UCapsuleComponent",
+        sol::base_classes, sol::bases<UShapeComponent, USceneComponent, UActorComponent>(),
+        "SetCapsuleSize", &UCapsuleComponent::SetCapsuleSize,
+        "GetCapsuleRadius", &UCapsuleComponent::GetCapsuleRadius,
+        "GetCapsuleHalfHeight", &UCapsuleComponent::GetCapsuleHalfHeight,
+        "GetScaledCapsuleRadius", &UCapsuleComponent::GetScaledCapsuleRadius,
+        "GetScaledCapsuleHalfHeight", &UCapsuleComponent::GetScaledCapsuleHalfHeight,
+        "GetCapsuleCenter", &UCapsuleComponent::GetCapsuleCenter,
+        "CapsuleRadius", &UCapsuleComponent::CapsuleRadius,
+        "CapsuleHalfHeight", &UCapsuleComponent::CapsuleHalfHeight
     );
 
     // FVector 타입을 Lua에 등록
@@ -391,7 +412,18 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetName", &AActor::GetName,
 		"SetActorHiddenInGame", &AActor::SetActorHiddenInGame,
 		"DestroyAllComponents", &AActor::DestroyAllComponents,
-		"Destroy", &AActor::Destroy
+		"Destroy", &AActor::Destroy,
+        // CapsuleComponent 생성 및 부착 헬퍼
+        "CreateCapsuleComponent", [](AActor* self, sol::optional<FString> name) -> UCapsuleComponent* {
+            if (!self) return nullptr;
+            FName componentName = name.value_or("CapsuleComponent");
+            UCapsuleComponent* Capsule = self->CreateDefaultSubobject<UCapsuleComponent>(componentName);
+            if (Capsule && self->GetRootComponent()) {
+                // RootComponent에 부착하여 Transform 동기화
+                Capsule->SetupAttachment(self->GetRootComponent(), EAttachmentRule::KeepRelative);
+            }
+            return Capsule;
+        }
     );
 
     // APawn 클래스 등록 (AActor 상속)
@@ -492,6 +524,12 @@ void UScriptManager::RegisterUserTypeToLua()
         "Translation", &FTransform::Translation,
         "Rotation", &FTransform::Rotation,
         "Scale3D", &FTransform::Scale3D
+    );
+
+    // UStaticMesh 클래스 등록
+    Lua.new_usertype<UStaticMesh>("UStaticMesh",
+        sol::base_classes, sol::bases<UResourceBase>(),
+        "GetCacheFilePath", &UStaticMesh::GetCacheFilePath
     );
 
     // UStaticMeshComponent 클래스 등록
@@ -676,6 +714,17 @@ void UScriptManager::RegisterGlobalFuncToLua()
 
     // 마우스에서 Ray 생성 함수 (마우스 방향 계산용)
     Lua["MakeRayFromMouse"] = &MakeRayFromMouse;
+    
+    Lua["GetRunnerGameMode"] = GetRunnerGameMode;
+
+    // Cast 헬퍼 함수: AActor를 AStaticMeshActor로 캐스팅
+    // 캐스팅 실패 시 nullptr 반환 (Lua에서는 nil)
+    Lua["CastToStaticMeshActor"] = [](AActor* Actor) -> AStaticMeshActor* {
+        if (!Actor) return nullptr;
+        return Cast<AStaticMeshActor>(Actor);
+    };
+
+    CoroutineScheduler.RegisterCoroutineTo(Lua);
 }
 
 void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)

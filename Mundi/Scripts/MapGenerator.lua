@@ -12,7 +12,7 @@ local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
 local DEFAULT_MAP_SIZE = 20;
 local DEFAULT_SCALE = 2.0;
-local DEFAULT_FILLRATE = 1.00;
+local DEFAULT_FILLRATE = 1.0;
 local DEFAULT_MAPSTART_INDEX = -5.0;
 
 local Width = DEFAULT_WIDTH;
@@ -35,15 +35,8 @@ STORAGE_POSITION.Rotation = FQuat.MakeFromEuler(0, 0, 0);
 
 local ChunkPool = Queue.new();
 
---local function SetNewRandomSeed()
---    local Seed = math.floor(os.clock() * 1000);  -- 정수로 변환
---    math.randomseed(Seed);
---end
-
 local function CreateCellChunk()
     local CellChunk = {};
-
-    -- 랜덤 시드는 Initialize에서 한 번만 설정하므로 여기서는 제거
 
     for i = 1, 4 do
         local Plane = {};
