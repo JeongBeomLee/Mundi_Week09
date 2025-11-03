@@ -218,7 +218,7 @@ local function InitializePool()
     PrintToConsole("[MapGenerator] Creating pool with " .. PoolSize .. " actors");
 
     for i = 1, PoolSize do
-        Queue.push(ChunkPool, world:SpawnActor(PlaceOfExile, "AGravityWall"));
+        Queue.push(ChunkPool, world:SpawnActor(STORAGE_POSITION, "AGravityWall"));
     end
 
     PrintToConsole("[MapGenerator] Pool initialized. Queue size: " .. (ChunkPool.last - ChunkPool.first + 1));
