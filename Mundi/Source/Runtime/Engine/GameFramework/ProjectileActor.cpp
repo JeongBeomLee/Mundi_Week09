@@ -36,18 +36,11 @@ AProjectileActor::AProjectileActor()
 	if (CollisionComponent)
 	{
 		CollisionComponent->SetOwner(this);
-		CollisionComponent->SetSphereRadius(25.0f); // 반지름 25cm
+		CollisionComponent->SetSphereRadius(5.0f); // 반지름 25cm
 		RootComponent = CollisionComponent;
 
-		// 충돌 이벤트 바인딩
-		CollisionComponent->OnComponentBeginOverlap.Add([this](UPrimitiveComponent* OverlappedComponent,
-		                                                   AActor* OtherActor,
-		                                                   UPrimitiveComponent* OtherComp,
-		                                                   const FVector& ContactPoint,
-		                                                   float PenetrationDepth)
-		{
-			OnProjectileHit(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth);
-		});
+		// 충돌 이벤트는 Lua에서 처리하도록 바인딩 제거
+		// Lua의 OnOverlap이 자동으로 연결됩니다
 	}
 
 	// MeshComponent 생성

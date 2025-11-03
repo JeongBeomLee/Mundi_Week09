@@ -60,20 +60,32 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         return
     end
 
+    -- 액터 이름 가져오기
+    local actorName = OtherActor:GetName():ToString()
+
     if Config.bDebugLog then
-        PrintToConsole("[Projectile] Hit: " .. OtherActor:GetName():ToString())
+        PrintToConsole("[Projectile] Hit: " .. actorName)
     end
 
-    -- TODO: 충돌 시 로직
-    -- 예: 파티클 효과, 사운드, 데미지 처리 등
+    -- 장애물인지 확인 (이름에 "Obstacle" 포함)
+    if string.find(actorName, "Obstacle") then
+        if Config.bDebugLog then
+            PrintToConsole("[Projectile] Hit Obstacle! Destroying projectile...")
+        end
 
-    -- 충돌 시 발사체 파괴
-    if MyActor.SetActorHiddenInGame then
-        MyActor:SetActorHiddenInGame(true)
-    end
+        -- 장애물과 충돌 시 발사체 파괴
+        if MyActor.SetActorHiddenInGame then
+            MyActor:SetActorHiddenInGame(true)
+        end
 
-    if MyActor.Destroy then
-        MyActor:Destroy()
+        if MyActor.Destroy then
+            MyActor:Destroy()
+        end
+    else
+        -- 장애물이 아닌 경우 통과
+        if Config.bDebugLog then
+            PrintToConsole("[Projectile] Hit non-obstacle actor, passing through...")
+        end
     end
 end
 

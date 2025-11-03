@@ -6,12 +6,14 @@ local RandomManager = require("RandomManager");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
-local DEFAULT_SCALE = 2.0;
+local DEFAULT_SCALE = 0.4;
 
 local DEFAULT_SPAWN_DELAY_MIN = 3.0;
 local DEFAULT_SPAWN_DELAY_MAX = 5.0;
 
 local DEFAULT_POOL_SIZE = 50;
+
+local OBSTACLE_OBJ_FILE_PATH = "Data/Model/smokegrenade.obj";
 
 local HorizontalSpawnRange = DEFAULT_HORIZONTAL_SPAWN_RANGE;
 local VerticalSpawnRange = DEFAULT_VERTICAL_SPAWN_RANGE;
@@ -36,7 +38,14 @@ local function InitializePool()
     local PieWorld = GlobalObjectManager.GetPIEWorld();
 
     for i = 1, PoolSize do
-        Queue.push(ObstaclePool, PieWorld:SpawnActor(STORAGE_POSITION));
+        local Obstacle = PieWorld:SpawnActor(STORAGE_POSITION);
+        local StaticMeshComponent = Obstacle:GetStaticMeshComponent();
+        StaticMeshComponent:SetStaticMesh(OBSTACLE_OBJ_FILE_PATH);
+        local CapsuleComponent = Obstacle:CreateCapsuleComponent("CollisionComponent");
+        CapsuleComponent:SetCapsuleSize(4.0, 5.5, true);
+        CapsuleComponent:SetRelativeLocation(FVector(0.0, 3.0, 0.5));
+
+        Queue.push(ObstaclePool, Obstacle);
     end
 end
 
@@ -98,7 +107,33 @@ function EndPlay()
 end
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
-    -- No-op
+    -- OtherActor를 StaticMeshActor로 캐스팅
+    local StaticMeshActor = CastToStaticMeshActor(OtherActor);
+    if (StaticMeshActor == nil) then
+        return;
+    end
+
+    -- StaticMeshComponent 가져오기
+    local StaticMeshComponent = StaticMeshActor:GetStaticMeshComponent();
+    if (StaticMeshComponent == nil) then
+        return;
+    end
+
+    -- StaticMesh 가져오기
+    local StaticMesh = StaticMeshComponent:GetStaticMesh();
+    if (StaticMesh == nil) then
+        return;
+    end
+
+    -- 경로 비교
+    local FilePath = StaticMesh:GetCacheFilePath();
+
+    if (
+            FilePath == OBSTACLE_OBJ_FILE_PATH or 
+            FilePath == "DerivedDataCache/Model/smokegrenade.obj.bin"
+    ) then
+        GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
+    end
 end
 
 function Tick(dt)
