@@ -114,13 +114,12 @@ void AActor::Destroy()
 void AActor::DestroyImmediate()
 {
 	// 실제 파괴 로직
-	EndPlay(EEndPlayReason::Destroyed);
 	UnregisterAllComponents(true);
 	DestroyAllComponents();
 	ClearSceneComponentCaches();
 	
 	// Lua 스크립트 정리
-	UScriptManager::GetInstance().DetachAllScriptFrom(this);
+	//UScriptManager::GetInstance().DetachAllScriptFrom(this);
 }
 
 
