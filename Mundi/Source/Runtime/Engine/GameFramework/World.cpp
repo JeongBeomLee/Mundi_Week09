@@ -130,14 +130,14 @@ void UWorld::Tick(float DeltaSeconds)
 		}
 	}
 
+	// ⭐ 프레임 끝에 지연 삭제된 Actor들 처리: UpdateCollisions 이전에 호출되야 함!(Unregister를 이 함수 내에서 하므로)
+	ProcessPendingActorDestruction();
+
 	// 충돌 감지 업데이트
 	if (CollisionManager)
 	{
 		CollisionManager->UpdateCollisions(DeltaSeconds);
 	}
-
-	// ⭐ 프레임 끝에 지연 삭제된 Actor들 처리
-	ProcessPendingActorDestruction();
 }
 
 UWorld* UWorld::DuplicateWorldForPIE(UWorld* InEditorWorld)
