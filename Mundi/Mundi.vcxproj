@@ -691,8 +691,12 @@ if "$(Configuration)"=="Debug" (
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\GlobalObjectManager.lua" />
+    <Content Include="Scripts\GlobalVariable.lua" />
     <Content Include="Scripts\MapGenerator.lua" />
+    <Content Include="Scripts\ObstacleGenerator.lua" />
     <Content Include="Scripts\Queue.lua" />
+    <Content Include="Scripts\RandomManager.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

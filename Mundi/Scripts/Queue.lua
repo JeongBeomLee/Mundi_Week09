@@ -21,6 +21,13 @@ function Queue.pop(queue)
     return value
 end
 
+function Queue.head(queue)
+    if queue.first > queue.last then
+        return nil  -- 비어있음
+    end
+    return queue.items[queue.first];
+end
+
 function Queue.isEmpty(queue)
     return queue.first > queue.last
 end
