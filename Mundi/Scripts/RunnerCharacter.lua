@@ -4,6 +4,12 @@ local _ENV = ...
 -- 키 바인딩: A/D (좌우 이동), Space (점프)
 
 -- ════════════════════════════════════════════════════════════════════════════
+-- 외부 모듈
+-- ════════════════════════════════════════════════════════════════════════════
+
+local GravitySystem = require("GravitySystem")
+
+-- ════════════════════════════════════════════════════════════════════════════
 -- 설정 (에디터에서 조정 가능)
 -- ════════════════════════════════════════════════════════════════════════════
 
@@ -57,6 +63,12 @@ function BeginPlay()
         if InputComponent then
             SetupInputBindings()
         end
+    end
+
+    -- GravitySystem 초기화 (측면 충돌 시 중력 전환)
+    if GravitySystem and GravitySystem.Initialize then
+        GravitySystem.Initialize(MyActor)
+        PrintToConsole("[RunnerCharacter] GravitySystem initialized")
     end
 end
 
@@ -222,10 +234,10 @@ end
 -- ════════════════════════════════════════════════════════════════════════════
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
-    PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
-    if Config.bDebugLog then
-        PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
-    end
+    --PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
+    --if Config.bDebugLog then
+    --    PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
+    --end
 
     -- TODO: 벽면 감지 및 중력 방향 전환 로직
     -- 예: OtherActor의 태그를 확인해서 "WallTrigger"면 중력 방향 변경

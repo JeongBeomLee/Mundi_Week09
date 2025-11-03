@@ -1,5 +1,3 @@
-local _ENV = ...
-
 -- ────────────────────────────────────────────────────────────────────────────
 -- GravitySystem.lua
 -- 측면 충돌 시 중력 방향 전환 및 카메라/캐릭터 회전 시스템
@@ -12,6 +10,7 @@ local GRAVITY_MAGNITUDE = 980.0  -- 중력 크기 (cm/s²)
 -- 상태 변수
 local CurrentGravityDirection = FVector(0, 0, -1)  -- 현재 중력 방향 (기본: 아래)
 local IsRotating = false  -- 회전 중인지 여부
+local ActorReference = nil  -- RunnerCharacter 액터 참조
 
 -- ────────────────────────────────────────────────────────────────────────────
 -- 회전 애니메이션 Coroutine
@@ -20,6 +19,11 @@ local function RotateToNewGravity(newGravityDir)
     if IsRotating then
         PrintToConsole("[GravitySystem] Already rotating, ignoring new gravity change")
         return  -- 이미 회전 중이면 무시
+    end
+
+    if not ActorReference then
+        PrintToConsole("[GravitySystem] ERROR: ActorReference is nil!")
+        return
     end
 
     IsRotating = true
@@ -47,7 +51,7 @@ local function RotateToNewGravity(newGravityDir)
         end
 
         -- 시작 회전
-        local charStartRot = MyActor:GetRotation()
+        local charStartRot = ActorReference:GetRotation()
         local camStartRot = camera:GetRotation()
 
         -- 목표 회전 계산: oldUp에서 newUp으로 회전하는 Quaternion
@@ -67,17 +71,17 @@ local function RotateToNewGravity(newGravityDir)
             local currentCharRot = FQuat.Slerp(charStartRot, charTargetRot, alpha)
             local currentCamRot = FQuat.Slerp(camStartRot, camTargetRot, alpha)
 
-            MyActor:SetRotation(currentCharRot)
+            ActorReference:SetRotation(currentCharRot)
             camera:SetRotation(currentCamRot)
         end
 
         -- 최종 위치 보정
-        MyActor:SetRotation(charTargetRot)
+        ActorReference:SetRotation(charTargetRot)
         camera:SetRotation(camTargetRot)
 
         -- 중력 방향 업데이트
         CurrentGravityDirection = newGravityDir
-        MyActor:GetCharacterMovement():SetGravityDirection(newGravityDir)
+        ActorReference:GetCharacterMovement():SetGravityDirection(newGravityDir)
 
         PrintToConsole("[GravitySystem] Rotation complete. New gravity direction set.")
         IsRotating = false
@@ -112,11 +116,20 @@ end
 -- ────────────────────────────────────────────────────────────────────────────
 -- 초기화
 -- ────────────────────────────────────────────────────────────────────────────
-function Initialize()
+function Initialize(actor)
     PrintToConsole("[GravitySystem] Initializing...")
 
+    -- Actor 참조 저장
+    if not actor then
+        PrintToConsole("[GravitySystem] ERROR: Actor is nil!")
+        return
+    end
+
+    ActorReference = actor
+    PrintToConsole("[GravitySystem] Actor reference set")
+
     -- CharacterMovementComponent에 콜백 등록
-    local movement = MyActor:GetCharacterMovement()
+    local movement = ActorReference:GetCharacterMovement()
     if movement then
         movement:SetOnWallCollisionCallback(OnWallCollision)
         PrintToConsole("[GravitySystem] Callback registered successfully")
@@ -126,6 +139,7 @@ function Initialize()
 
     -- 초기 중력 방향 설정
     CurrentGravityDirection = FVector(0, 0, -1)
+    PrintToConsole("[GravitySystem] Initialization complete")
 end
 
 -- ────────────────────────────────────────────────────────────────────────────

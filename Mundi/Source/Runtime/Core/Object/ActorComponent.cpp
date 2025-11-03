@@ -42,7 +42,6 @@ void UActorComponent::RegisterComponent(UWorld* InWorld)
         UE_LOG("ActorComponent::RegisterComponent - Already registered, skipping: %s", GetClass()->Name);
         return;
     }
-    UE_LOG("ActorComponent::RegisterComponent - Registering: %s", GetClass()->Name);
     bRegistered = true;
     OnRegister(InWorld);
 
