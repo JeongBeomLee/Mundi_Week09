@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
@@ -597,6 +597,15 @@ void UScriptManager::RegisterUserTypeToLua()
                     ACoinActor* coin = World->SpawnActor<ACoinActor>(Transform);
                     return sol::make_object(lua, coin);
                 }
+                else if(ActorType == "AProjectileActor")
+                {
+                    AProjectileActor* projectile = World->SpawnActor<AProjectileActor>(Transform);
+                    if (projectile && World->bPie)
+                    {
+                        projectile->BeginPlay();
+                    }
+                    return sol::make_object(lua, projectile);
+				}
                 else
                 {
                     return sol::nil;
