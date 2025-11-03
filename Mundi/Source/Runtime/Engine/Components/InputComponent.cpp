@@ -60,22 +60,35 @@ void UInputComponent::ProcessInput()
 	// 액션 바인딩 처리
 	for (FInputActionBinding& Binding : ActionBindings)
 	{
-		// 키가 눌렸을 때
-		if (InputManager.IsKeyPressed(Binding.KeyCode))
+		bool bPressed = false;
+		bool bReleased = false;
+
+		// KeyCode가 음수면 마우스 버튼 (0 = Left, 1 = Right, 2 = Middle)
+		// 양수면 키보드 키
+		if (Binding.KeyCode < 0)
 		{
-			if (Binding.PressedCallback)
-			{
-				Binding.PressedCallback();
-			}
+			// 마우스 버튼 처리 (음수를 EMouseButton으로 변환)
+			EMouseButton MouseButton = static_cast<EMouseButton>(-(Binding.KeyCode + 1));
+			bPressed = InputManager.IsMouseButtonPressed(MouseButton);
+			bReleased = InputManager.IsMouseButtonReleased(MouseButton);
+		}
+		else
+		{
+			// 키보드 키 처리
+			bPressed = InputManager.IsKeyPressed(Binding.KeyCode);
+			bReleased = InputManager.IsKeyReleased(Binding.KeyCode);
 		}
 
-		// 키가 떼어졌을 때
-		if (InputManager.IsKeyReleased(Binding.KeyCode))
+		// 눌렸을 때
+		if (bPressed && Binding.PressedCallback)
 		{
-			if (Binding.ReleasedCallback)
-			{
-				Binding.ReleasedCallback();
-			}
+			Binding.PressedCallback();
+		}
+
+		// 떼어졌을 때
+		if (bReleased && Binding.ReleasedCallback)
+		{
+			Binding.ReleasedCallback();
 		}
 	}
 
