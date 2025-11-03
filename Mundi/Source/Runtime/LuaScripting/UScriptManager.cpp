@@ -561,6 +561,8 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetInitialSpeed", &UProjectileMovementComponent::GetInitialSpeed,
         "SetGravity", &UProjectileMovementComponent::SetGravity,
         "GetGravity", &UProjectileMovementComponent::GetGravity,
+        "SetGravityDirection", &UProjectileMovementComponent::SetGravityDirection,
+        "GetGravityDirection", &UProjectileMovementComponent::GetGravityDirection,
         "SetMaxSpeed", &UProjectileMovementComponent::SetMaxSpeed,
         "GetMaxSpeed", &UProjectileMovementComponent::GetMaxSpeed,
         "SetRotationFollowsVelocity", &UProjectileMovementComponent::SetRotationFollowsVelocity,

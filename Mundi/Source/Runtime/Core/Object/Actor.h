@@ -154,6 +154,28 @@ public:
     // Serialize
     void Serialize(const bool bInIsLoading, JSON& InOutHandle) override;
 
+    // ────────────────────────────────────────────────
+    // 게임 모드 델리게이트 핸들러
+    // ────────────────────────────────────────────────
+
+    /** 게임 시작 이벤트 핸들러 */
+    virtual void OnGameStartedHandler();
+
+    /** 게임 종료 이벤트 핸들러 */
+    virtual void OnGameEndedHandler(bool bVictory);
+
+    /** 게임 재시작 이벤트 핸들러 */
+    virtual void OnGameRestartedHandler();
+
+    /** 게임 일시정지 이벤트 핸들러 */
+    virtual void OnGamePausedHandler();
+
+    /** 게임 재개 이벤트 핸들러 */
+    virtual void OnGameResumedHandler();
+
+    /** 게임 시작 여부 확인 */
+    bool IsGameStarted() const { return bGameStarted; }
+
 public:
     FName Name;
     UWorld* World = nullptr;
@@ -165,7 +187,7 @@ protected:
     // OwnedComponents와 SceneComponents에 포함되어 관리됨.
     TSet<UActorComponent*> OwnedComponents;   // 모든 컴포넌트 (씬/비씬)
     TArray<USceneComponent*> SceneComponents; // 씬 컴포넌트들만 별도 캐시(트리/렌더/ImGui용)
-    
+
     bool bTickInEditor = false; // 에디터에서도 틱 허용
     bool bHiddenInGame = false;
     // Actor의 Visibility는 루트 컴포넌트로 설정
@@ -176,6 +198,9 @@ protected:
     bool bIsPicked = false;
     bool bCanEverTick = true;
     bool bIsCulled = false;
+
+    /** 게임 시작 여부 (델리게이트로 관리) */
+    bool bGameStarted = false;
 
 private:
    

@@ -28,7 +28,7 @@ ACharacter::ACharacter()
 	, StaticMeshComponent(nullptr)
 	, bIsCrouched(false)
 	, CrouchedHeightRatio(0.5f)
-	, bGameStarted(false)
+
 {
 	// CharacterMovementComponent 생성
 	CharacterMovement = CreateDefaultSubobject<UCharacterMovementComponent>("CharacterMovement");
@@ -66,22 +66,6 @@ ACharacter::~ACharacter()
 void ACharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// GameMode 델리게이트 구독
-	if (World)
-	{
-		AGameModeBase* GameMode = World->GetGameMode();
-		if (GameMode)
-		{
-			GameMode->OnGameStarted.AddDynamic(this, &ACharacter::OnGameStartedHandler);
-			GameMode->OnGameEnded.AddDynamic(this, &ACharacter::OnGameEndedHandler);
-			GameMode->OnGameRestarted.AddDynamic(this, &ACharacter::OnGameRestartedHandler);
-			GameMode->OnGamePaused.AddDynamic(this, &ACharacter::OnGamePausedHandler);
-			GameMode->OnGameResumed.AddDynamic(this, &ACharacter::OnGameResumedHandler);
-
-			UE_LOG("[Character] Subscribed to GameMode delegates");
-		}
-	}
 }
 
 void ACharacter::Tick(float DeltaSeconds)
@@ -244,36 +228,3 @@ bool ACharacter::IsFalling() const
 	return CharacterMovement && CharacterMovement->IsFalling();
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// 델리게이트 핸들러
-// ────────────────────────────────────────────────────────────────────────────
-
-void ACharacter::OnGameStartedHandler()
-{
-	bGameStarted = true;
-	UE_LOG("[Character] Game Started - Input enabled");
-}
-
-void ACharacter::OnGameEndedHandler(bool bVictory)
-{
-	bGameStarted = false;
-	UE_LOG("[Character] Game Ended - Input disabled");
-}
-
-void ACharacter::OnGameRestartedHandler()
-{
-	bGameStarted = true;
-	UE_LOG("[Character] Game Restarted - Waiting for StartGame");
-}
-
-void ACharacter::OnGamePausedHandler()
-{
-	bGameStarted = false;
-	UE_LOG("[Character] Game Paused - Input disabled");
-}
-
-void ACharacter::OnGameResumedHandler()
-{
-	bGameStarted = true;
-	UE_LOG("[Character] Game Resumed - Input enabled");
-}

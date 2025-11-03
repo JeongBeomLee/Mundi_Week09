@@ -27,6 +27,7 @@ END_PROPERTIES()
 
 UProjectileMovementComponent::UProjectileMovementComponent()
     : Gravity(-9.8f)
+    , GravityDirection(FVector(0.0f, 0.0f, 1.0f))  // 기본 중력 방향: 아래쪽
     , InitialSpeed(3.0f)  // 초기 속도
     , MaxSpeed(0.0f)  // 0 = 제한 없음
     , HomingTargetActor(nullptr)
@@ -85,8 +86,10 @@ void UProjectileMovementComponent::TickComponent(float DeltaSeconds)
         ComputeHomingAcceleration(DeltaSeconds);
     }
 
-    // 3. 중력 적용
-    Velocity.Z += Gravity * DeltaSeconds;
+    // 3. 중력 적용 (방향 벡터 사용)
+    // Gravity는 음수일 수 있으므로 절댓값 사용
+    FVector GravityAcceleration = GravityDirection * abs(Gravity);
+    Velocity += GravityAcceleration * DeltaSeconds;
 
     // 4. 가속도 적용
     Velocity += Acceleration * DeltaSeconds;

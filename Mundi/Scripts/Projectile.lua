@@ -109,6 +109,16 @@ function SetGravity(gravity)
     end
 end
 
+function SetGravityDirection(gravityDirection)
+    if ProjectileMovement then
+        ProjectileMovement:SetGravityDirection(gravityDirection)
+        if Config.bDebugLog then
+            PrintToConsole(string.format("[Projectile] Gravity direction set: (%.2f, %.2f, %.2f)",
+                gravityDirection.X, gravityDirection.Y, gravityDirection.Z))
+        end
+    end
+end
+
 function SetLifespan(lifespan)
     if ProjectileMovement then
         ProjectileMovement:SetProjectileLifespan(lifespan)

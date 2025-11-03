@@ -32,6 +32,9 @@ public:
     void SetGravity(float NewGravity) { Gravity = NewGravity; }
     float GetGravity() const { return Gravity; }
 
+    void SetGravityDirection(const FVector& NewGravityDirection) { GravityDirection = NewGravityDirection.GetNormalized(); }
+    FVector GetGravityDirection() const { return GravityDirection; }
+
     void SetInitialSpeed(float NewInitialSpeed) { InitialSpeed = NewInitialSpeed; }
     float GetInitialSpeed() const { return InitialSpeed; }
 
@@ -84,6 +87,9 @@ protected:
 
     // === 물리 속성 ===
     float Gravity;
+
+    // 중력 방향 (정규화된 벡터)
+    FVector GravityDirection;
 
     // 발사 시 초기 속도 (cm/s)
     float InitialSpeed;

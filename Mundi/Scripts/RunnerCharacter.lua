@@ -211,7 +211,20 @@ function ThrowProjectile()
         return
     end
 
-    -- 마우스 방향으로 발사
+    -- 발사체에 캐릭터의 중력 방향 적용
+    if MyActor.GetGravityDirection then
+        local gravityDirection = MyActor:GetGravityDirection()
+        local projectileMovement = projectile:GetProjectileMovement()
+        if projectileMovement then
+            projectileMovement:SetGravityDirection(gravityDirection)
+            if Config.bDebugLog then
+                PrintToConsole(string.format("[RunnerCharacter] Set projectile gravity direction: (%.2f, %.2f, %.2f)",
+                    gravityDirection.X, gravityDirection.Y, gravityDirection.Z))
+            end
+        end
+    end
+
+    -- 카메라 방향으로 발사
     projectile:FireInDirection(fireDirection, Config.ProjectileSpeed)
 
     if Config.bDebugLog then

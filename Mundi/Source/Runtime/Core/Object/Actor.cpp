@@ -10,6 +10,7 @@
 #include "JsonSerializer.h"
 #include "World.h"
 #include "CollisionComponent/ShapeComponent.h"
+#include "GameModeBase.h"
 
 IMPLEMENT_CLASS(AActor)
 
@@ -43,12 +44,31 @@ void AActor::BeginPlay()
 	{
 		Script->LuaTemplateFunctions.BeginPlay();
 	}
+
+	// GameMode 델리게이트 구독
+	if (World)
+	{
+		AGameModeBase* GameMode = World->GetGameMode();
+		if (GameMode)
+		{
+			GameMode->OnGameStarted.AddDynamic(this, &AActor::OnGameStartedHandler);
+			GameMode->OnGameEnded.AddDynamic(this, &AActor::OnGameEndedHandler);
+			GameMode->OnGameRestarted.AddDynamic(this, &AActor::OnGameRestartedHandler);
+			GameMode->OnGamePaused.AddDynamic(this, &AActor::OnGamePausedHandler);
+			GameMode->OnGameResumed.AddDynamic(this, &AActor::OnGameResumedHandler);
+
+			UE_LOG("[Actor] Subscribed to GameMode delegates");
+		}
+	}
 }
 
 void AActor::Tick(float DeltaSeconds)
 {
 	// 에디터에서 틱 Off면 스킵
 	if (!bTickInEditor && World->bPie == false) return;
+
+	// 게임이 시작되지 않았으면 Tick 실행하지 않음 (PIE 모드에서만)
+	
 
 	// Lua 스크립트 먼저 실행 (입력 처리를 위해)
 	for (FScript* Script : UScriptManager::GetInstance().GetScriptsOfActor(this))
@@ -737,4 +757,38 @@ void AActor::UnregisterComponentTree(USceneComponent* SceneComp)
 		UnregisterComponentTree(Child);
 	}
 	SceneComp->UnregisterComponent();
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 게임 모드 델리게이트 핸들러
+// ────────────────────────────────────────────────────────────────────────────
+
+void AActor::OnGameStartedHandler()
+{
+	bGameStarted = true;
+	UE_LOG("[Actor] Game Started - %s", GetName().ToString());
+}
+
+void AActor::OnGameEndedHandler(bool bVictory)
+{
+	bGameStarted = false;
+	UE_LOG("[Actor] Game Ended - %s (Victory: %d)", GetName().ToString(), bVictory);
+}
+
+void AActor::OnGameRestartedHandler()
+{
+	bGameStarted = true;
+	UE_LOG("[Actor] Game Restarted - %s", GetName().ToString());
+}
+
+void AActor::OnGamePausedHandler()
+{
+	bGameStarted = false;
+	UE_LOG("[Actor] Game Paused - %s", GetName().ToString());
+}
+
+void AActor::OnGameResumedHandler()
+{
+	bGameStarted = true;
+	UE_LOG("[Actor] Game Resumed - %s", GetName().ToString());
 }
