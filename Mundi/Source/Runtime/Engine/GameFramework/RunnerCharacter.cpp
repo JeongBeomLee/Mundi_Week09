@@ -102,16 +102,11 @@ void ARunnerCharacter::SetupPlayerInputComponent(UInputComponent* InInputCompone
 
 FVector ARunnerCharacter::GetUpDirection() const
 {
-	if (CharacterMovement)
-	{
-		// 중력 반대 방향 = 위쪽
-		FVector GravityDir = CharacterMovement->GetGravityDirection();
-		FVector UpDir = GravityDir * -1.0f;
-
-		return UpDir;
-	}
-
-	return FVector(0.0f, 0.0f, 1.0f); // 기본값: Z 위쪽
+	// Actor의 회전 상태에서 로컬 Z축(위쪽)을 월드 좌표로 변환
+	FQuat Rotation = GetActorRotation();
+	FVector LocalUp(0.0f, 0.0f, 1.0f);  // 로컬 좌표계의 Z축
+	FVector WorldUp = Rotation.RotateVector(LocalUp);
+	return WorldUp;
 }
 
 FVector ARunnerCharacter::GetRightDirection() const
@@ -135,8 +130,11 @@ FVector ARunnerCharacter::GetRightDirection() const
 
 FVector ARunnerCharacter::GetForwardDirection() const
 {
-	// Runner 게임에서는 항상 X축 양의 방향으로 전진
-	return FVector(1.0f, 0.0f, 0.0f);
+	// Actor의 회전 상태에서 로컬 X축(전진)을 월드 좌표로 변환
+	FQuat Rotation = GetActorRotation();
+	FVector LocalForward(1.0f, 0.0f, 0.0f);  // 로컬 좌표계의 X축
+	FVector WorldForward = Rotation.RotateVector(LocalForward);
+	return WorldForward;
 }
 
 // ────────────────────────────────────────────────────────────────────────────
