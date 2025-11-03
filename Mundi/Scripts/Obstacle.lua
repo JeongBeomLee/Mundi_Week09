@@ -27,6 +27,7 @@ function OnOverlap(
         Health = Health - 1
         if Health <= 0 then
             -- PrintToConsole("[coin_collision] Coin collected!")
+            GameMode:OnCoinCollected(1)
             MyActor:Destroy()
         else
             -- PrintToConsole("[coin_collision] Health remaining: " .. Health)
