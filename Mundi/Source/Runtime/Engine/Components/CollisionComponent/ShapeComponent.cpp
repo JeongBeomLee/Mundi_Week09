@@ -7,6 +7,7 @@
 #include "Actor.h"
 #include "World.h"
 #include "CollisionManager.h"
+#include "GravityWall.h"
 
 // UShapeComponent는 추상 클래스이므로 IMPLEMENT_ABSTRACT_CLASS 사용
 IMPLEMENT_CLASS(UShapeComponent)
@@ -106,6 +107,19 @@ void UShapeComponent::UpdateOverlaps(const TArray<UShapeComponent*>& OtherCompon
 		if (OtherComp == this)
 		{
 			continue; // 자기 자신은 제외
+		}
+
+		// AGravityWall끼리는 충돌 무시 (For GameJam 나중에 충돌 필터링으로 대체해야함.)
+		AActor* MyOwner = GetOwner();
+		AActor* OtherOwner = OtherComp->GetOwner();
+		if (MyOwner && OtherOwner)
+		{
+			AGravityWall* MyWall = Cast<AGravityWall>(MyOwner);
+			AGravityWall* OtherWall = Cast<AGravityWall>(OtherOwner);
+			if (MyWall && OtherWall)
+			{
+				continue; // 둘 다 GravityWall이면 충돌 무시
+			}
 		}
 
 		if (IsOverlappingComponent(OtherComp))
