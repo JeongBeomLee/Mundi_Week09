@@ -8,6 +8,8 @@
 #include "RunnerCharacter.h"
 #include "CollisionComponent/BoxComponent.h"
 #include "GravityWall.h"
+#include "RunnerGameMode.h"
+#include "World.h"
 
 IMPLEMENT_CLASS(UCharacterMovementComponent)
 
@@ -103,13 +105,19 @@ void UCharacterMovementComponent::TickComponent(float DeltaTime)
 	{
 		TimeInAir += DeltaTime;
 
-		// 너무 오래 공중에 있으면 강제로 착지 (안전장치)
+		// 너무 오래 공중에 있으면 GameOver 처리
 		if (TimeInAir > MaxAirTime)
 		{
-			FVector Location = CharacterOwner->GetActorLocation();
-			Location.Z = 0.0f; // 지면으로 이동
-			CharacterOwner->SetActorLocation(Location);
-			SetMovementMode(EMovementMode::Walking);
+			// GameMode를 통해 플레이어 사망 처리
+			UWorld* World = CharacterOwner->GetWorld();
+			if (World)
+			{
+				ARunnerGameMode* GameMode = Cast<ARunnerGameMode>(World->GetGameMode());
+				if (GameMode)
+				{
+					GameMode->OnPlayerDeath(CharacterOwner);
+				}
+			}
 			TimeInAir = 0.0f;
 		}
 	}

@@ -8,6 +8,7 @@
 #include "RunnerCharacter.h"
 #include "PlayerController.h"
 #include "CameraActor.h"
+#include "GameStateBase.h"
 
 IMPLEMENT_CLASS(ARunnerGameMode)
 
@@ -127,7 +128,12 @@ void ARunnerGameMode::RestartGame()
 void ARunnerGameMode::OnPlayerDeath(ACharacter* Player)
 {
 	UE_LOG("[RunnerGameMode] Player Died!");
-	// TODO: GameState 업데이트
+
+	// GameState를 GameOver로 변경
+	if (GameState)
+	{
+		GameState->SetGameState(EGameState::GameOver);
+	}
 }
 
 void ARunnerGameMode::OnCoinCollected(int32 CoinValue)
