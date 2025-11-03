@@ -36,7 +36,7 @@ AProjectileActor::AProjectileActor()
 	if (CollisionComponent)
 	{
 		CollisionComponent->SetOwner(this);
-		CollisionComponent->SetSphereRadius(5.0f); // 반지름 25cm
+		CollisionComponent->SetSphereRadius(2.5f); // 반지름 25cm
 		RootComponent = CollisionComponent;
 
 		// 충돌 이벤트는 Lua에서 처리하도록 바인딩 제거
