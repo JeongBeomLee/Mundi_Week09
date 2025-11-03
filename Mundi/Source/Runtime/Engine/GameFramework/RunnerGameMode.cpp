@@ -76,7 +76,7 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 
 			// 로컬 좌표계 기준 오프셋 계산
 			// 뒤쪽(-Forward) 3.0, 위쪽(+Up) 3.0
-			FVector CameraOffset = ForwardDirection * -3.0f + UpDirection * 3.0f;
+			FVector CameraOffset = ForwardDirection * -5.0f + UpDirection * 5.0f;
 			FVector CameraLocation = PlayerLocation + CameraOffset;
 
 			// 카메라 위치 설정
