@@ -19,6 +19,7 @@
 #include "StaticMeshActor.h"
 #include "StaticMeshComponent.h"
 #include "GravityWall.h"
+#include "CoinActor.h"
 #include "ProjectileActor.h"
 #include "ProjectileMovementComponent.h"
 
@@ -415,8 +416,17 @@ void UScriptManager::RegisterUserTypeToLua()
             // Pressed와 Released를 모두 받는 버전
             [](UInputComponent* self, const FString& ActionName, int32 KeyCode,
                sol::function pressedCallback, sol::function releasedCallback) {
-                auto pressed = pressedCallback.valid() ? [pressedCallback]() { pressedCallback(); } : std::function<void()>();
-                auto released = releasedCallback.valid() ? [releasedCallback]() { releasedCallback(); } : std::function<void()>();
+                std::function<void()> pressed;
+                std::function<void()> released;
+                
+                if (pressedCallback.valid()) {
+                    pressed = [pressedCallback]() { pressedCallback(); };
+                }
+                
+                if (releasedCallback.valid()) {
+                    released = [releasedCallback]() { releasedCallback(); };
+                }
+                
                 self->BindAction(ActionName, KeyCode, pressed, released);
             },
             // Pressed만 받는 버전 (간단한 경우)
@@ -558,6 +568,13 @@ void UScriptManager::RegisterUserTypeToLua()
         "Direction", &FRay::Direction
     );
 
+	Lua.new_usertype<ACoinActor>("ACoinActor",
+		sol::base_classes, sol::bases<AActor>(),
+		"GetStaticMeshComponent", &ACoinActor::GetStaticMeshComponent,
+		"GetBoxComponent", &ACoinActor::GetBoxComponent,
+		"SetMeshPath", &ACoinActor::SetMeshPath
+	);
+
     // UWorld 클래스 등록
     Lua.new_usertype<UWorld>("UWorld",
         sol::no_constructor,
@@ -566,28 +583,41 @@ void UScriptManager::RegisterUserTypeToLua()
             [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
                 return World->SpawnActor<AStaticMeshActor>(Transform);
             },
-            // ProjectileActor 생성 (타입 문자열 받기)
-            [](UWorld* World, const std::string& ActorType, const FTransform& Transform) -> AActor* {
-                if (ActorType == "ProjectileActor") {
-                    return World->SpawnActor<AProjectileActor>(Transform);
-                }
-                else if (ActorType == "StaticMeshActor") {
-                    return World->SpawnActor<AStaticMeshActor>(Transform);
-                }
-                return nullptr;
-            },
-            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> AGravityWall* {
+            // 타입 문자열로 Actor 생성 (Lua에게 정확한 타입 반환)
+            [](UWorld* World, const FTransform& Transform, const FString& ActorType, sol::this_state s) -> sol::object {
+                sol::state_view lua(s);
+                
                 if (ActorType == "AGravityWall")
                 {
-                    return World->SpawnActor<AGravityWall>(Transform);
+                    AGravityWall* wall = World->SpawnActor<AGravityWall>(Transform);
+                    return sol::make_object(lua, wall);
                 }
+                else if (ActorType == "ACoinActor")
+                {
+                    ACoinActor* coin = World->SpawnActor<ACoinActor>(Transform);
+                    return sol::make_object(lua, coin);
+                }
+                else if(ActorType == "AProjectileActor")
+                {
+                    AProjectileActor* projectile = World->SpawnActor<AProjectileActor>(Transform);
+                    if (projectile && World->bPie)
+                    {
+                        projectile->BeginPlay();
+                    }
+                    return sol::make_object(lua, projectile);
+				}
                 else
                 {
-                    // 기본값은 nullptr 반환
-                    return nullptr;
+                    return sol::nil;
                 }
             }
         ),
+        "SpawnGravityWall", [](UWorld* World, const FTransform& Transform) -> AGravityWall* {
+            return World->SpawnActor<AGravityWall>(Transform);
+        },
+        "SpawnCoinActor", [](UWorld* World, const FTransform& Transform) -> ACoinActor* {
+            return World->SpawnActor<ACoinActor>(Transform);
+        },
         "SpawnProjectileActor", [](UWorld* World, const FTransform& Transform) -> AProjectileActor* {
             AProjectileActor* NewProjectile = World->SpawnActor<AProjectileActor>(Transform);
             if (NewProjectile && World->bPie)

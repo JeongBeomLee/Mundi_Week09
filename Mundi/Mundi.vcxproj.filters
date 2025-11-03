@@ -67,11 +67,14 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\Components\CharacterMovementComponent.cpp">
-      <Filter>Source\Runtime\Engine\Components</Filter>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\CoinActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\Components\InputComponent.cpp">
-      <Filter>Source\Runtime\Engine\Components</Filter>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GravityWall.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
@@ -80,6 +83,18 @@
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Controller.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\EmptyActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\HeightFogActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\GameStateBase.cpp">
@@ -95,114 +110,6 @@
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PlayerController.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionBVH.cpp">
-      <Filter>Source\Runtime\Engine\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionManager.cpp">
-      <Filter>Source\Runtime\Engine\Collision</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Slate\Widgets\GameHUDWidget.cpp">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Slate\Widgets\GameControlWindow.cpp">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Slate\Widgets\WorldDetailsWidget.cpp">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\LuaScripting\CoroutineScheduler.cpp">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Misc\Color.cpp">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Misc\FName.cpp">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Object\Actor.cpp">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Object\ActorComponent.cpp">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Object\Object.cpp">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Object\ObjectFactory.cpp">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Containers\UEContainer.cpp">
-      <Filter>Source\Runtime\Core\Containers</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Memory\MemoryManager.cpp">
-      <Filter>Source\Runtime\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Core\Memory\PlatformTime.cpp">
-      <Filter>Source\Runtime\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\SceneView.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\ShadowConfiguration.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\ShadowManager.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\ShadowMap.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\TileLightCuller.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\SceneRenderer.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\FViewport.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\FViewportClient.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\Material.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\QuadManager.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\Renderer.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\RenderManager.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Renderer\Shader.cpp">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\EmptyActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\HeightFogActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp">
@@ -238,7 +145,13 @@
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\CharacterMovementComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\DirectionalLightComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\InputComponent.cpp">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\LightComponent.cpp">
@@ -319,6 +232,12 @@
     <ClCompile Include="Source\Runtime\Engine\Collision\Collision.cpp">
       <Filter>Source\Runtime\Engine\Collision</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionBVH.cpp">
+      <Filter>Source\Runtime\Engine\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Collision\CollisionManager.cpp">
+      <Filter>Source\Runtime\Engine\Collision</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Collision\Frustum.cpp">
       <Filter>Source\Runtime\Engine\Collision</Filter>
     </ClCompile>
@@ -339,6 +258,84 @@
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Spatial\Octree.cpp">
       <Filter>Source\Runtime\Engine\Spatial</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Misc\Color.cpp">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Misc\FName.cpp">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Object\Actor.cpp">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Object\ActorComponent.cpp">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Object\Object.cpp">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Object\ObjectFactory.cpp">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Containers\UEContainer.cpp">
+      <Filter>Source\Runtime\Core\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Memory\MemoryManager.cpp">
+      <Filter>Source\Runtime\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Core\Memory\PlatformTime.cpp">
+      <Filter>Source\Runtime\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\LuaScripting\CoroutineScheduler.cpp">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\SceneView.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\ShadowConfiguration.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\ShadowManager.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\ShadowMap.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\TileLightCuller.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\SceneRenderer.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\FViewport.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\FViewportClient.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\Material.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\QuadManager.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\Renderer.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\RenderManager.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Renderer\Shader.cpp">
+      <Filter>Source\Runtime\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\RHI\D3D11RHI.cpp">
       <Filter>Source\Runtime\RHI</Filter>
@@ -385,30 +382,6 @@
     <ClCompile Include="Source\Runtime\InputCore\InputManager.cpp">
       <Filter>Source\Runtime\InputCore</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Editor\ObjManager.cpp">
-      <Filter>Source\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\SelectionManager.cpp">
-      <Filter>Source\Editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp">
-      <Filter>Source\Editor\Clipboard</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Gizmo\GizmoActor.cpp">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Gizmo\GizmoArrowComponent.cpp">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Gizmo\GizmoRotateComponent.cpp">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Gizmo\GizmoScaleComponent.cpp">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Editor\Grid\GridActor.cpp">
-      <Filter>Source\Editor\Grid</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Slate\GlobalConsole.cpp">
       <Filter>Source\Slate</Filter>
     </ClCompile>
@@ -433,6 +406,12 @@
     <ClCompile Include="Source\Slate\Widgets\MainToolbarWidget.cpp">
       <Filter>Source\Slate\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Slate\Widgets\GameHUDWidget.cpp">
+      <Filter>Source\Slate\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Slate\Widgets\GameControlWindow.cpp">
+      <Filter>Source\Slate\Widgets</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Slate\Widgets\SceneManagerWidget.cpp">
       <Filter>Source\Slate\Widgets</Filter>
     </ClCompile>
@@ -440,6 +419,9 @@
       <Filter>Source\Slate\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Source\Slate\Widgets\Widget.cpp">
+      <Filter>Source\Slate\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Slate\Widgets\WorldDetailsWidget.cpp">
       <Filter>Source\Slate\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Source\Slate\Windows\ConsoleWindow.cpp">
@@ -486,6 +468,30 @@
     </ClCompile>
     <ClCompile Include="Source\Slate\ImGui\ImGuiHelper.cpp">
       <Filter>Source\Slate\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\ObjManager.cpp">
+      <Filter>Source\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\SelectionManager.cpp">
+      <Filter>Source\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp">
+      <Filter>Source\Editor\Clipboard</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Gizmo\GizmoActor.cpp">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Gizmo\GizmoArrowComponent.cpp">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Gizmo\GizmoRotateComponent.cpp">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Gizmo\GizmoScaleComponent.cpp">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Editor\Grid\GridActor.cpp">
+      <Filter>Source\Editor\Grid</Filter>
     </ClCompile>
     <ClCompile Include="ThirdParty\ImGui\imgui.cpp">
       <Filter>ThirdParty\ImGui</Filter>
@@ -537,14 +543,20 @@
     <!-- Source\Slate -->
     <!-- Source\Slate\Widgets -->
     <!-- Source\Slate\Windows -->
-    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
+    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
     <ClInclude Include="BoxSphereBounds.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Source\Runtime\Engine\Components\CharacterMovementComponent.h">
-      <Filter>Source\Runtime\Engine\Components</Filter>
+    <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\CoinActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\Components\InputComponent.h">
-      <Filter>Source\Runtime\Engine\Components</Filter>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GravityWall.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
@@ -553,6 +565,18 @@
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Controller.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\EmptyActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\HeightFogActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Pawn.h">
@@ -568,169 +592,6 @@
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Slate\Widgets\GameControlWindow.h">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="Sphere.h" />
-    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionBVH.h">
-      <Filter>Source\Runtime\Engine\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionManager.h">
-      <Filter>Source\Runtime\Engine\Collision</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Slate\Widgets\GameHUDWidget.h">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Slate\Widgets\WorldDetailsWidget.h">
-      <Filter>Source\Slate\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\LuaScripting\CoroutineScheduler.h">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\WeakPtr.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\Archive.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\Color.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\Enums.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\JsonSerializer.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\Name.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\ObjectIterator.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\VertexData.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\WindowsBinReader.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Misc\WindowsBinWriter.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Object\Property.h">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Object\Actor.h">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Object\ActorComponent.h">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Object\Object.h">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Object\ObjectFactory.h">
-      <Filter>Source\Runtime\Core\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Math\Vector.h">
-      <Filter>Source\Runtime\Core\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Containers\UEContainer.h">
-      <Filter>Source\Runtime\Core\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Memory\MemoryManager.h">
-      <Filter>Source\Runtime\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Core\Memory\PlatformTime.h">
-      <Filter>Source\Runtime\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\LightManager.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\MeshBatchElement.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\SceneView.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowConfiguration.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowManager.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowMap.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowStats.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\ShadowViewProjection.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\TileCullingStats.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\TileLightCuller.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\DecalStatManager.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\SceneRenderer.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\FViewport.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\FViewportClient.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\Material.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\QuadManager.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\Renderer.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\RenderManager.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\RenderSettings.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Renderer\Shader.h">
-      <Filter>Source\Runtime\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\EmptyActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\HeightFogActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h">
@@ -759,6 +620,12 @@
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\World.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\CharacterMovementComponent.h">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\InputComponent.h">
+      <Filter>Source\Runtime\Engine\Components</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Components\MovementComponent.h">
       <Filter>Source\Runtime\Engine\Components</Filter>
@@ -844,6 +711,12 @@
     <ClInclude Include="Source\Runtime\Engine\Collision\Collision.h">
       <Filter>Source\Runtime\Engine\Collision</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionBVH.h">
+      <Filter>Source\Runtime\Engine\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Collision\CollisionManager.h">
+      <Filter>Source\Runtime\Engine\Collision</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Collision\Frustum.h">
       <Filter>Source\Runtime\Engine\Collision</Filter>
     </ClInclude>
@@ -867,6 +740,138 @@
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Spatial\WorldPartitionManager.h">
       <Filter>Source\Runtime\Engine\Spatial</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\WeakPtr.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\Archive.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\Color.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\Enums.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\JsonSerializer.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\Name.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\ObjectIterator.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\VertexData.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\WindowsBinReader.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Misc\WindowsBinWriter.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Object\Property.h">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Object\Actor.h">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Object\ActorComponent.h">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Object\Object.h">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Object\ObjectFactory.h">
+      <Filter>Source\Runtime\Core\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Math\Vector.h">
+      <Filter>Source\Runtime\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Containers\UEContainer.h">
+      <Filter>Source\Runtime\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Memory\MemoryManager.h">
+      <Filter>Source\Runtime\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Core\Memory\PlatformTime.h">
+      <Filter>Source\Runtime\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\LuaScripting\CoroutineScheduler.h">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\LightManager.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\MeshBatchElement.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\SceneView.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowConfiguration.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowManager.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowMap.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowStats.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\ShadowViewProjection.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\TileCullingStats.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\TileLightCuller.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\DecalStatManager.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\SceneRenderer.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\FViewport.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\FViewportClient.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\Material.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\QuadManager.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\Renderer.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\RenderManager.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\RenderSettings.h">
+      <Filter>Source\Runtime\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Renderer\Shader.h">
+      <Filter>Source\Runtime\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\RHI\SwapGuard.h">
       <Filter>Source\Runtime\RHI</Filter>
@@ -925,36 +930,6 @@
     <ClInclude Include="Source\Runtime\InputCore\InputManager.h">
       <Filter>Source\Runtime\InputCore</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Editor\ImGuiConsole.h">
-      <Filter>Source\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\ObjManager.h">
-      <Filter>Source\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\SelectionManager.h">
-      <Filter>Source\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h">
-      <Filter>Source\Editor\Clipboard</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Gizmo\GizmoActor.h">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Gizmo\GizmoArrowComponent.h">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Gizmo\GizmoRotateComponent.h">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Gizmo\GizmoScaleComponent.h">
-      <Filter>Source\Editor\Gizmo</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Grid\Grid.h">
-      <Filter>Source\Editor\Grid</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Editor\Grid\GridActor.h">
-      <Filter>Source\Editor\Grid</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Slate\GlobalConsole.h">
       <Filter>Source\Slate</Filter>
     </ClInclude>
@@ -966,6 +941,9 @@
     </ClInclude>
     <ClInclude Include="Source\Slate\USlateManager.h">
       <Filter>Source\Slate</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Slate\Widgets\GameControlWindow.h">
+      <Filter>Source\Slate\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Source\Slate\Widgets\PropertyRenderer.h">
       <Filter>Source\Slate\Widgets</Filter>
@@ -979,6 +957,9 @@
     <ClInclude Include="Source\Slate\Widgets\MainToolbarWidget.h">
       <Filter>Source\Slate\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Slate\Widgets\GameHUDWidget.h">
+      <Filter>Source\Slate\Widgets</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Slate\Widgets\SceneManagerWidget.h">
       <Filter>Source\Slate\Widgets</Filter>
     </ClInclude>
@@ -986,6 +967,9 @@
       <Filter>Source\Slate\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Source\Slate\Widgets\Widget.h">
+      <Filter>Source\Slate\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Slate\Widgets\WorldDetailsWidget.h">
       <Filter>Source\Slate\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Source\Slate\Windows\ConsoleWindow.h">
@@ -1033,6 +1017,36 @@
     <ClInclude Include="Source\Slate\ImGui\ImGuiHelper.h">
       <Filter>Source\Slate\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Editor\ImGuiConsole.h">
+      <Filter>Source\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\ObjManager.h">
+      <Filter>Source\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\SelectionManager.h">
+      <Filter>Source\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h">
+      <Filter>Source\Editor\Clipboard</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Gizmo\GizmoActor.h">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Gizmo\GizmoArrowComponent.h">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Gizmo\GizmoRotateComponent.h">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Gizmo\GizmoScaleComponent.h">
+      <Filter>Source\Editor\Gizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Grid\Grid.h">
+      <Filter>Source\Editor\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Editor\Grid\GridActor.h">
+      <Filter>Source\Editor\Grid</Filter>
+    </ClInclude>
     <ClInclude Include="ThirdParty\ImGui\imconfig.h">
       <Filter>ThirdParty\ImGui</Filter>
     </ClInclude>
@@ -1065,16 +1079,22 @@
     <None Include="Scripts\actor_transform.lua">
       <Filter>Scripts</Filter>
     </None>
+    <None Include="Scripts\coin_collision.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\PlayerAutoMove.lua">
+      <Filter>Scripts</Filter>
+    </None>
     <None Include="Scripts\print_debug_log.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\RunnerCharacter.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\test_coroutine.lua">
+    <None Include="Scripts\template.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\template.lua">
+    <None Include="Scripts\test_coroutine.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\MapGenerator.lua" />
@@ -1090,118 +1110,118 @@
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
-      <UniqueIdentifier>{34c89172-2b77-4518-9398-1f4c14d10e8d}</UniqueIdentifier>
+      <UniqueIdentifier>{c8743452-2c9d-42d1-a335-2047f05051ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime">
-      <UniqueIdentifier>{bd9d27f7-1571-4565-b78d-e4a32fae9fcc}</UniqueIdentifier>
+      <UniqueIdentifier>{f9bddbb9-593d-42a5-b49c-57be37f4ad22}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine">
-      <UniqueIdentifier>{3f624337-2508-4325-bf14-5d266d00726e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components">
-      <UniqueIdentifier>{e3ec041b-6f6c-4899-b6ad-3fb509f7a38e}</UniqueIdentifier>
+      <UniqueIdentifier>{4414fff0-ea49-40d3-a167-292002625ea9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine\GameFramework">
-      <UniqueIdentifier>{09fa5293-19c2-4e15-bf7f-3a3e64c4f76e}</UniqueIdentifier>
+      <UniqueIdentifier>{ca75e848-9b02-493c-b2e8-6d2841eab8c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Runtime\Engine\Collision">
-      <UniqueIdentifier>{1ff4dcb8-52bc-4e68-90b5-b99a5ad40527}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate">
-      <UniqueIdentifier>{e043dcb5-c38a-4afd-aa74-10e3a6846afe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Widgets">
-      <UniqueIdentifier>{e21616fd-45dd-4454-85be-6eb5e89747c2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts">
-      <UniqueIdentifier>{da41b26b-1997-4162-97ae-f1e4d858ed11}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\LuaScripting">
-      <UniqueIdentifier>{8e0b5079-8f95-4a23-affe-60be409a3cfa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core">
-      <UniqueIdentifier>{d66457de-7c77-4e76-9b6f-5d40fe227f9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Misc">
-      <UniqueIdentifier>{84f73e8e-c036-4378-96e1-21d47cafdc70}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Object">
-      <UniqueIdentifier>{4c9a9376-6b75-4335-915b-536118ddd39a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Math">
-      <UniqueIdentifier>{282a38e4-9ad8-43e1-9410-1893128168c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Containers">
-      <UniqueIdentifier>{21098ae6-1b33-4844-952f-8570db79db17}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Memory">
-      <UniqueIdentifier>{9d78e1ba-fefe-472d-83d2-10ac030ba2e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Renderer">
-      <UniqueIdentifier>{21dde508-6e6d-4350-b1d2-a7821c1e46eb}</UniqueIdentifier>
+    <Filter Include="Source\Runtime\Engine\Components">
+      <UniqueIdentifier>{dc02c852-faa9-4abe-9e68-ebbf0bd10acf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
-      <UniqueIdentifier>{0afcabb1-4b2c-4ad8-949c-b16b7f610879}</UniqueIdentifier>
+      <UniqueIdentifier>{4a187b5e-5b0c-4b01-a3f0-c379747e4b65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Collision">
+      <UniqueIdentifier>{f1494585-915f-4e62-862c-876915395bcd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine\Spatial">
-      <UniqueIdentifier>{4a5a9925-7a1c-45d3-b690-1b9161899f14}</UniqueIdentifier>
+      <UniqueIdentifier>{7649a7cb-57b4-4593-9e1c-0bcfea972e90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core">
+      <UniqueIdentifier>{8192afdc-b7a5-4641-bf64-ba9cdab6cef1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Misc">
+      <UniqueIdentifier>{0d8e9f8e-fbec-4cde-89d4-c0438e8a2b0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Object">
+      <UniqueIdentifier>{ed20c87b-0c5d-47ac-8bac-cf94abbe58e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Math">
+      <UniqueIdentifier>{9e555a3d-81fb-4b96-8b87-fea3648e3576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Containers">
+      <UniqueIdentifier>{8652bf00-1ade-4431-af35-b73989a61051}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Memory">
+      <UniqueIdentifier>{c5fdefa4-b4a7-4813-be2d-a938c5fe3811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\LuaScripting">
+      <UniqueIdentifier>{0687bbbe-e4a0-4d3f-b559-ef74c0d21d75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Renderer">
+      <UniqueIdentifier>{77a4ab86-cb57-46be-91bf-4847afa977ca}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\RHI">
-      <UniqueIdentifier>{145796f6-ac9e-4ba2-a6f1-4102c76cf062}</UniqueIdentifier>
+      <UniqueIdentifier>{8547d445-76cc-44df-a5ad-40c0793e141c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\AssetManagement">
-      <UniqueIdentifier>{240a4fa4-c6ea-41db-9f29-f50588386468}</UniqueIdentifier>
+      <UniqueIdentifier>{00b930c0-4709-4ffb-aef4-a90fa5ba4afe}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\InputCore">
-      <UniqueIdentifier>{e3a1adc6-3f34-444f-8df1-ca1c96f03d3d}</UniqueIdentifier>
+      <UniqueIdentifier>{f9083926-32c7-4d8d-8632-aa1bd207a005}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Editor">
-      <UniqueIdentifier>{44144571-4e38-43c6-baa1-47c2e5f001f7}</UniqueIdentifier>
+    <Filter Include="Source\Slate">
+      <UniqueIdentifier>{25738df0-19d6-4b98-86ab-6e49a8dc41f3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Editor\Clipboard">
-      <UniqueIdentifier>{9d1b6b6a-bca7-4960-946c-f4caac39d189}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Gizmo">
-      <UniqueIdentifier>{86fd0cf6-d367-49f9-b932-3c59874502ea}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Grid">
-      <UniqueIdentifier>{99707780-4bad-4398-ac1a-5d50618d113e}</UniqueIdentifier>
+    <Filter Include="Source\Slate\Widgets">
+      <UniqueIdentifier>{561bb83a-e1d0-422f-b58c-c6ec07da5a11}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\Windows">
-      <UniqueIdentifier>{5cd55cb8-5b11-42a6-b396-2e912ef368f4}</UniqueIdentifier>
+      <UniqueIdentifier>{4b0bba45-d81f-4abf-8cdf-10cc35d95a9a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\Factory">
-      <UniqueIdentifier>{f0cfcdda-b2a1-46fe-b4b4-12b4364de02a}</UniqueIdentifier>
+      <UniqueIdentifier>{3ea0799b-c83e-447d-8530-ac523314b2f0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\ImGui">
-      <UniqueIdentifier>{17305921-2a42-47fc-a4bc-9c0a20c32f20}</UniqueIdentifier>
+      <UniqueIdentifier>{602a309f-d884-44c1-bd87-598ed60f7e2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor">
+      <UniqueIdentifier>{f3d4840d-8494-4d1e-a13b-78c335fb3488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Clipboard">
+      <UniqueIdentifier>{8b99960a-2dd6-475e-a242-45bfda5346b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Gizmo">
+      <UniqueIdentifier>{5478831d-7910-4569-9e39-2bc228d896cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Grid">
+      <UniqueIdentifier>{03363d24-e190-48df-acdb-026ca6020cf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{a283e9c5-9e39-4509-ade8-d8c66da5bbad}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders">
-      <UniqueIdentifier>{77366ea0-cfcd-4777-af44-2e38569a3acb}</UniqueIdentifier>
+      <UniqueIdentifier>{69b9a2ef-6144-4c86-b64b-0d6d0747e8c0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Effects">
-      <UniqueIdentifier>{9b8ef3c0-eca9-48e2-b35a-9a95902eb33e}</UniqueIdentifier>
+      <UniqueIdentifier>{af8daec3-9b1b-49fe-9ced-429140723d5c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\PostProcess">
-      <UniqueIdentifier>{6ccb3868-7193-4c57-a7b6-8cc29aa332e7}</UniqueIdentifier>
+      <UniqueIdentifier>{5cf28487-175b-46a3-b8e2-bdae7db059ea}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Utility">
-      <UniqueIdentifier>{06f6b441-1e6f-4e99-a50c-cd4b3ee1dbcb}</UniqueIdentifier>
+      <UniqueIdentifier>{b322a22e-12ee-4588-88c4-2f822a9a37e4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\UI">
-      <UniqueIdentifier>{80cbf298-c02a-4f32-b39d-698422a64e4a}</UniqueIdentifier>
+      <UniqueIdentifier>{8f3edc29-d329-47fa-a5b9-eff769f2f85e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Materials">
-      <UniqueIdentifier>{5e4e8761-f125-4ad8-9bad-a279865a49bf}</UniqueIdentifier>
+      <UniqueIdentifier>{d3183a8b-d415-4476-915e-c1ca2176299b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Common">
-      <UniqueIdentifier>{8d90a0f2-55a3-4d3b-818d-d032e88c4cf8}</UniqueIdentifier>
+      <UniqueIdentifier>{19037b4f-cb8f-4ff0-a95e-297bb3c379e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{33aaa82f-be53-45ef-9184-d05750769596}</UniqueIdentifier>
+      <UniqueIdentifier>{7ae64641-f18c-4841-b4ff-68fe8ec8b281}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\ImGui">
-      <UniqueIdentifier>{4c9a1538-31de-4242-9bdb-22f100398feb}</UniqueIdentifier>
+      <UniqueIdentifier>{da45b460-2b77-4841-86d0-17ed5a7c089c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

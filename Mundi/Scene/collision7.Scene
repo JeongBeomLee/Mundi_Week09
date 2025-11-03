@@ -1,0 +1,250 @@
+{
+  "Level" : {
+    "Actors" : {
+      "10625" : {
+        "Name" : "Directional Light Actor",
+        "OwnedComponents" : [{
+            "CSMLambda" : 0.500000,
+            "Id" : 10627,
+            "Intensity" : 1.000000,
+            "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+            "NumCascades" : 3,
+            "ParentId" : 0,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [-62.900280, 16.769619, -62.900280],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShadowBias" : 0.005000,
+            "ShadowMapType" : 1,
+            "ShadowProjectionType" : 0,
+            "ShadowSharpen" : 1.000000,
+            "ShadowSlopeBias" : 2.000000,
+            "Temperature" : 6500.000000,
+            "Type" : "UDirectionalLightComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsCastShadows" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 10627,
+        "Type" : "ADirectionalLightActor"
+      },
+      "10628" : {
+        "Name" : "Ambient Light Actor",
+        "OwnedComponents" : [{
+            "Id" : 10630,
+            "Intensity" : 0.100000,
+            "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+            "ParentId" : 0,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShadowBias" : 0.001000,
+            "ShadowSharpen" : 1.000000,
+            "ShadowSlopeBias" : 0.000000,
+            "Temperature" : 6500.000000,
+            "Type" : "UAmbientLightComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsCastShadows" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 10630,
+        "Type" : "AAmbientLightActor"
+      },
+      "10631" : {
+        "Name" : "스태틱 메시_2",
+        "OwnedComponents" : [{
+            "Id" : 10633,
+            "MaterialSlots" : [{
+                "AssetPath" : "texture",
+                "Type" : "UMaterial"
+              }],
+            "ParentId" : 0,
+            "RelativeLocation" : [0.000000, 0.000000, -0.648000],
+            "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+            "RelativeScale" : [500.000000, 500.000000, 0.050000],
+            "StaticMesh" : "Data/cube-tex.obj",
+            "Type" : "UStaticMeshComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 10633,
+        "Type" : "AStaticMeshActor"
+      },
+      "10634" : {
+        "Name" : "스태틱 메시_0",
+        "OwnedComponents" : [{
+            "BoxExtent" : [17.000000, 15.700000, 15.300000],
+            "Id" : 10636,
+            "ParentId" : 10637,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShapeColor" : [0.000000, 1.000000, 0.000000],
+            "Type" : "UBoxComponent",
+            "bBlockComponent" : false,
+            "bDrawOnlyIfSelected" : false,
+            "bGenerateOverlapEvents" : true,
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "Id" : 10637,
+            "MaterialSlots" : [{
+                "AssetPath" : "material_0",
+                "Type" : "UMaterial"
+              }, {
+                "AssetPath" : "material_1",
+                "Type" : "UMaterial"
+              }],
+            "ParentId" : 0,
+            "RelativeLocation" : [112.190002, 0.381394, 0.609551],
+            "RelativeRotationEuler" : [0.000000, 90.000000, -0.000000],
+            "RelativeScale" : [0.050000, 0.050000, 0.050000],
+            "StaticMesh" : "Data/Chinese coin OBJ/chinese_coin.obj",
+            "Type" : "UStaticMeshComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "Acceleration" : [0.000000, 0.000000, 0.000000],
+            "PivotTranslation" : [0.000000, 0.000000, 0.000000],
+            "RotationRate" : [80.000000, 0.000000, 0.000000],
+            "Type" : "URotatingMovementComponent",
+            "Velocity" : [0.000000, 0.000000, 0.000000],
+            "bIsActive" : true,
+            "bRotationInLocalSpace" : true,
+            "bTickEnabled" : true,
+            "bUpdateOnlyIfRendered" : false
+          }],
+        "RootComponentId" : 10637,
+        "Scripts" : ["coin_collision.lua"],
+        "Type" : "AStaticMeshActor"
+      },
+      "10642" : {
+        "Name" : "AStaticMeshActor_2",
+        "OwnedComponents" : [{
+            "BoxExtent" : [17.000000, 15.700000, 15.300000],
+            "Id" : 10643,
+            "ParentId" : 10644,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShapeColor" : [0.000000, 1.000000, 0.000000],
+            "Type" : "UBoxComponent",
+            "bBlockComponent" : false,
+            "bDrawOnlyIfSelected" : false,
+            "bGenerateOverlapEvents" : true,
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "Id" : 10644,
+            "MaterialSlots" : [{
+                "AssetPath" : "material_0",
+                "Type" : "UMaterial"
+              }, {
+                "AssetPath" : "material_1",
+                "Type" : "UMaterial"
+              }],
+            "ParentId" : 0,
+            "RelativeLocation" : [113.190002, 0.507882, 1.609551],
+            "RelativeRotationEuler" : [0.000000, 90.000000, -0.000000],
+            "RelativeScale" : [0.050000, 0.050000, 0.050000],
+            "StaticMesh" : "Data/Chinese coin OBJ/chinese_coin.obj",
+            "Type" : "UStaticMeshComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "Acceleration" : [0.000000, 0.000000, 0.000000],
+            "PivotTranslation" : [0.000000, 0.000000, 0.000000],
+            "RotationRate" : [80.000000, 0.000000, 0.000000],
+            "Type" : "URotatingMovementComponent",
+            "Velocity" : [0.000000, 0.000000, 0.000000],
+            "bIsActive" : true,
+            "bRotationInLocalSpace" : true,
+            "bTickEnabled" : true,
+            "bUpdateOnlyIfRendered" : false
+          }],
+        "RootComponentId" : 10644,
+        "Scripts" : ["coin_collision.lua"],
+        "Type" : "AStaticMeshActor"
+      },
+      "10646" : {
+        "Name" : "AStaticMeshActor_3",
+        "OwnedComponents" : [{
+            "BoxExtent" : [17.000000, 15.700000, 15.300000],
+            "Id" : 10647,
+            "ParentId" : 10648,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShapeColor" : [0.000000, 1.000000, 0.000000],
+            "Type" : "UBoxComponent",
+            "bBlockComponent" : false,
+            "bDrawOnlyIfSelected" : false,
+            "bGenerateOverlapEvents" : true,
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "Id" : 10648,
+            "MaterialSlots" : [{
+                "AssetPath" : "material_0",
+                "Type" : "UMaterial"
+              }, {
+                "AssetPath" : "material_1",
+                "Type" : "UMaterial"
+              }],
+            "ParentId" : 0,
+            "RelativeLocation" : [113.687073, 1.507882, 2.609551],
+            "RelativeRotationEuler" : [0.000000, 90.000000, -0.000000],
+            "RelativeScale" : [0.050000, 0.050000, 0.050000],
+            "StaticMesh" : "Data/Chinese coin OBJ/chinese_coin.obj",
+            "Type" : "UStaticMeshComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "Acceleration" : [0.000000, 0.000000, 0.000000],
+            "PivotTranslation" : [0.000000, 0.000000, 0.000000],
+            "RotationRate" : [80.000000, 0.000000, 0.000000],
+            "Type" : "URotatingMovementComponent",
+            "Velocity" : [0.000000, 0.000000, 0.000000],
+            "bIsActive" : true,
+            "bRotationInLocalSpace" : true,
+            "bTickEnabled" : true,
+            "bUpdateOnlyIfRendered" : false
+          }],
+        "RootComponentId" : 10648,
+        "Scripts" : ["coin_collision.lua"],
+        "Type" : "AStaticMeshActor"
+      }
+    },
+    "NextUUID" : 13085,
+    "PerspectiveCamera" : {
+      "FOV" : [60.000000],
+      "FarClip" : [1000.000000],
+      "Location" : [106.045662, 2.422186, 4.658134],
+      "NearClip" : [0.100000],
+      "Rotation" : [0.000000, 22.400156, -14.999880]
+    },
+    "Version" : 1
+  },
+  "WorldSettings" : {
+    "DefaultPawnClass" : "ARunnerCharacter",
+    "GameModeClass" : "ARunnerGameMode",
+    "PlayerSpawnLocation" : [0.000000, 0.000000, 100.000000]
+  }
+}
