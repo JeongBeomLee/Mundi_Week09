@@ -11,6 +11,7 @@ struct FLuaTemplateFunctions
     sol::function EndPlay;
     sol::function OnOverlap;
     sol::function Tick;
+    sol::function Restart;
 
     TMulticastDelegate<>::DelegateHandle OnOverlapDelegateHandle;
 };

@@ -313,3 +313,6 @@ function Tick(dt)
     Update();
 end
 
+-- 부활 작업
+function Restart() end
+

@@ -77,6 +77,9 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     end
 end
 
+-- 부활 작업
+function Restart() end
+
 -- ════════════════════════════════════════════════════════════════════════════
 -- 유틸리티 함수
 -- ════════════════════════════════════════════════════════════════════════════

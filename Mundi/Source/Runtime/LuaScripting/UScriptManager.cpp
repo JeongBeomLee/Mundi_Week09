@@ -812,6 +812,7 @@ FLuaTemplateFunctions UScriptManager::GetTemplateFunctionFromScript(
     AssignFunction(LuaTemplateFunctions.EndPlay, "EndPlay");
     AssignFunction(LuaTemplateFunctions.OnOverlap, "OnOverlap");
     AssignFunction(LuaTemplateFunctions.Tick, "Tick");
+    AssignFunction(LuaTemplateFunctions.Restart, "Restart");
 
     return LuaTemplateFunctions;
 }
