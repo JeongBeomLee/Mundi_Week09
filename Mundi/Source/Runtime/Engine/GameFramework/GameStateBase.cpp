@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "GameStateBase.h"
 
 // AGameStateBase를 ObjectFactory에 등록
@@ -68,7 +68,7 @@ void AGameStateBase::SetGameState(EGameState NewState)
 
 void AGameStateBase::SetScore(int32 NewScore)
 {
-	if (Score != NewScore)
+	if (this && Score != NewScore)
 	{
 		int32 OldScore = Score;
 		Score = NewScore;
