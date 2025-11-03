@@ -180,18 +180,11 @@ function ThrowProjectile()
         return
     end
 
-    -- 카메라 가져오기
-    local camera = World:GetCameraActor()
-    if not camera then
-        PrintToConsole("[RunnerCharacter] ERROR: Camera is nil!")
-        return
-    end
-
     -- 캐릭터 위치 가져오기
     local actorLocation = MyActor:GetLocation()
 
-    -- 카메라가 바라보는 방향으로 발사
-    local fireDirection = camera:GetForward()
+    -- 캐릭터가 바라보는 방향으로 발사 (전진 방향)
+    local fireDirection = MyActor:GetForwardDirection()
 
     -- 발사 위치 계산 (캐릭터 위치 + 오프셋)
     local offset = Config.ProjectileSpawnOffset
