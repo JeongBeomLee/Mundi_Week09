@@ -21,15 +21,15 @@ function OnOverlap(
     PenetrationDepth
 )
     local actorName = OtherActor:GetName():ToString()
-    PrintToConsole("[coin_collision] Collided with: " .. actorName)
+    -- PrintToConsole("[coin_collision] Collided with: " .. actorName)
 
     if actorName == "Projectile Actor" then
         Health = Health - 1
         if Health <= 0 then
-            PrintToConsole("[coin_collision] Coin collected!")
+            -- PrintToConsole("[coin_collision] Coin collected!")
             MyActor:Destroy()
         else
-            PrintToConsole("[coin_collision] Health remaining: " .. Health)
+            -- PrintToConsole("[coin_collision] Health remaining: " .. Health)
         end
     end
 end

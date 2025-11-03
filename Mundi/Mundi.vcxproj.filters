@@ -1082,9 +1082,6 @@
     <None Include="Scripts\coin_collision.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\PlayerAutoMove.lua">
-      <Filter>Scripts</Filter>
-    </None>
     <None Include="Scripts\print_debug_log.lua">
       <Filter>Scripts</Filter>
     </None>
@@ -1105,6 +1102,15 @@
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\Queue.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\CollisionUtility.lua" />
+    <None Include="Scripts\GlobalObjectManager.lua" />
+    <None Include="Scripts\GlobalVariable.lua" />
+    <None Include="Scripts\GravitySystem.lua" />
+    <None Include="Scripts\ObstacleGenerator.lua" />
+    <None Include="Scripts\RandomManager.lua" />
+    <None Include="Scripts\CoinGenerator.lua">
       <Filter>Scripts</Filter>
     </None>
   </ItemGroup>

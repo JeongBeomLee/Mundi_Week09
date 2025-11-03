@@ -126,7 +126,7 @@ void USceneComponent::AddRelativeScale3D(const FVector& DeltaScale)
     OnTransformUpdated();
 }
 
-// ──────────────────────────────
+// ────────────────────────────── 
 // World API
 // ──────────────────────────────
 FTransform USceneComponent::GetWorldTransform() const
