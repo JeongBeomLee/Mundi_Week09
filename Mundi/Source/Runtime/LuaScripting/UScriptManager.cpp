@@ -431,7 +431,19 @@ void UScriptManager::RegisterUserTypeToLua()
                 Capsule->SetupAttachment(self->GetRootComponent(), EAttachmentRule::KeepRelative);
             }
             return Capsule;
-        }
+        },
+		// 스크립트 부착 헬퍼 함수
+		"AttachScript", [](AActor* self, const FString& scriptName) -> void {
+            if (!self) return;
+            FLuaLocalValue LuaLocalValue;
+            LuaLocalValue.MyActor = self;
+            LuaLocalValue.GameMode = self->World ? self->World->GetGameMode() : nullptr;
+            UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, scriptName);
+            if(self->World->bPie)
+            {
+                self->BeginPlay(); // BeginPlay 호출
+			}
+		}
     );
 
     // APawn 클래스 등록 (AActor 상속)

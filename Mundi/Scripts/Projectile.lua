@@ -31,7 +31,7 @@ local CurrentLifetime = 0.0
 
 function BeginPlay()
     if Config.bDebugLog then
-        PrintToConsole("[Projectile] BeginPlay - Projectile spawned")
+        PrintToConsole("[Projectile] BeginPlay - Projectile spawned. Name: " .. MyActor:GetName():ToString())
     end
 
     -- ProjectileMovement 컴포넌트 가져오기
@@ -91,13 +91,13 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
             end
         end
 
-        -- 장애물 파괴
-        if OtherActor.SetActorHiddenInGame then
-            OtherActor:SetActorHiddenInGame(true)
-        end
-        if OtherActor.Destroy then
-            OtherActor:Destroy()
-        end
+        -- -- 장애물 파괴
+        -- if OtherActor.SetActorHiddenInGame then
+        --     OtherActor:SetActorHiddenInGame(true)
+        -- end
+        -- if OtherActor.Destroy then
+        --     OtherActor:Destroy()
+        -- end
 
         -- 발사체도 파괴
         if MyActor.SetActorHiddenInGame then

@@ -57,7 +57,7 @@ function BeginPlay()
         local StaticMeshComponent = MyActor:GetStaticMesh()
         if StaticMeshComponent then
             -- 원하는 메시 파일 경로로 변경
-            StaticMeshComponent:SetStaticMesh("Data/Model/Cube.obj")
+            StaticMeshComponent:SetStaticMesh("Data/runner_cube.obj")
           --  PrintToConsole("[RunnerCharacter] Character mesh changed to smokegrenade.obj")
         end
     end
@@ -123,10 +123,11 @@ function SetupInputBindings()
         return
     end
 
-    -- Axis 바인딩: A/D 키 (좌우 이동)
+    -- Axis 바인딩: 좌우 방향키 (좌우 이동)
+    -- VK_LEFT = 0x25 (37), VK_RIGHT = 0x27 (39)
     if InputComponent.BindAxis then
-        InputComponent:BindAxis("MoveRight", string.byte('D'), 1.0, OnMoveRight)
-        InputComponent:BindAxis("MoveLeft", string.byte('A'), 1.0, OnMoveLeft)
+        InputComponent:BindAxis("MoveRight", 0x27, 1.0, OnMoveRight)
+        InputComponent:BindAxis("MoveLeft", 0x25, 1.0, OnMoveLeft)
     end
 
     -- Action 바인딩: Space 키 (점프)
@@ -134,10 +135,9 @@ function SetupInputBindings()
         InputComponent:BindAction("Jump", 0x20, OnJumpPressed, OnJumpReleased)
     end
 
-    -- Action 바인딩: 마우스 좌클릭 (프로젝타일 던지기)
-    -- 마우스 버튼: -1 = Left, -2 = Right, -3 = Middle
+    -- Action 바인딩: C 키 (프로젝타일 던지기)
     if InputComponent.BindAction then
-        InputComponent:BindAction("ThrowProjectile", -1, OnThrowProjectile, nil)
+        InputComponent:BindAction("ThrowProjectile", string.byte('C'), OnThrowProjectile, nil)
     end
 end
 

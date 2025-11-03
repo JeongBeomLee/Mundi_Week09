@@ -34,5 +34,4 @@ private:
 	bool IsPauseButtonEnabled() const;
 	bool IsResumeButtonEnabled() const;
 	bool IsRestartButtonEnabled() const;
-	bool IsEndGameButtonEnabled() const;
 };

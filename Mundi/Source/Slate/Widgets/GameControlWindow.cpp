@@ -33,7 +33,7 @@ void UGameControlWindow::RenderWidget()
 	// 화면 우측 하단에 배치
 	ImGuiIO& io = ImGui::GetIO();
 	const float windowWidth = 240.0f;
-	const float windowHeight = 280.0f;  // 스코어 테스트 버튼 추가로 높이 증가
+	const float windowHeight = 200.0f;  // EndGame 버튼 제거로 높이 감소
 	const float padding = 20.0f;
 
 	ImGui::SetNextWindowPos(ImVec2((io.DisplaySize.x - windowWidth) * 0.01f, io.DisplaySize.y - windowHeight - padding), ImGuiCond_Always);
@@ -57,7 +57,6 @@ void UGameControlWindow::RenderWidget()
 		bool bPauseEnabled = IsPauseButtonEnabled();
 		bool bResumeEnabled = IsResumeButtonEnabled();
 		bool bRestartEnabled = IsRestartButtonEnabled();
-		bool bEndGameEnabled = IsEndGameButtonEnabled();
 
 		// 버튼 스타일 설정
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 8));
@@ -112,42 +111,6 @@ void UGameControlWindow::RenderWidget()
 		}
 
 		if (!bRestartEnabled)
-			ImGui::EndDisabled();
-
-		// End Game (Victory) 버튼
-		if (!bEndGameEnabled)
-			ImGui::BeginDisabled();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.6f, 0.8f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.0f, 0.7f, 0.9f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.5f, 0.7f, 1.0f));
-
-		if (ImGui::Button("End Game (Victory)", buttonSize))
-		{
-			Mode->EndGame(true);
-		}
-
-		ImGui::PopStyleColor(3);
-
-		if (!bEndGameEnabled)
-			ImGui::EndDisabled();
-
-		// End Game (Game Over) 버튼
-		if (!bEndGameEnabled)
-			ImGui::BeginDisabled();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.0f, 0.0f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.9f, 0.0f, 0.0f, 1.0f));
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.7f, 0.0f, 0.0f, 1.0f));
-
-		if (ImGui::Button("End Game (Game Over)", buttonSize))
-		{
-			Mode->EndGame(false);
-		}
-
-		ImGui::PopStyleColor(3);
-
-		if (!bEndGameEnabled)
 			ImGui::EndDisabled();
 
 		ImGui::PopStyleVar(2);
@@ -224,20 +187,4 @@ bool UGameControlWindow::IsRestartButtonEnabled() const
 	return CurrentState == EGameState::Paused ||
 		   CurrentState == EGameState::GameOver ||
 		   CurrentState == EGameState::Victory;
-}
-
-bool UGameControlWindow::IsEndGameButtonEnabled() const
-{
-	if (!GameMode.IsValid())
-		return false;
-
-	AGameModeBase* Mode = GameMode.Get();
-	AGameStateBase* State = Mode->GetGameState();
-	if (!State)
-		return false;
-
-	// Playing, Paused 상태일 때만 End Game 가능
-	EGameState CurrentState = State->GetGameState();
-	return CurrentState == EGameState::Playing ||
-		   CurrentState == EGameState::Paused;
 }
