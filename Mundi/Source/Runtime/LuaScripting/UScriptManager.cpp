@@ -442,7 +442,8 @@ void UScriptManager::RegisterUserTypeToLua()
         "GravityScale", &UCharacterMovementComponent::GravityScale,
         "AirControl", &UCharacterMovementComponent::AirControl,
         "SetGravityDirection", &UCharacterMovementComponent::SetGravityDirection,
-        "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection
+        "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection,
+        "SetOnWallCollisionCallback", &UCharacterMovementComponent::SetOnWallCollisionCallback
     );
 
     // ARunnerCharacter 클래스 등록 (ACharacter 상속)

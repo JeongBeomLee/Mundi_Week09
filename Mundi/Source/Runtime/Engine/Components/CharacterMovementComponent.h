@@ -6,6 +6,7 @@
 
 #include "ActorComponent.h"
 #include "Vector.h"
+#include <sol/sol.hpp>
 
 // 전방 선언
 class ACharacter;
@@ -224,6 +225,18 @@ protected:
 	 */
 	bool CheckWallCollision();
 
+public:
+	// ────────────────────────────────────────────────
+	// Lua 콜백 (측면 충돌 이벤트)
+	// ────────────────────────────────────────────────
+
+	/**
+	 * 측면 충돌 시 호출될 Lua 콜백을 설정합니다.
+	 * @param Callback - Lua 함수 (매개변수: WallNormal FVector)
+	 */
+	void SetOnWallCollisionCallback(sol::function Callback);
+
+protected:
 	// ────────────────────────────────────────────────
 	// 멤버 변수
 	// ────────────────────────────────────────────────
@@ -245,4 +258,7 @@ protected:
 
 	/** 점프 중인지 여부 */
 	bool bIsJumping;
+
+	/** 측면 충돌 시 호출될 Lua 콜백 함수 */
+	sol::function WallCollisionLuaCallback;
 };
