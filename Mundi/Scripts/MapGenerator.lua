@@ -240,7 +240,7 @@ end
 local function InitializeMap()
     for i = 1, MapSize do
         CellChunks[i] = CreateCellChunk();
-        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStartOffset - 1));
+        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStartOffset));
     end
 end
 
