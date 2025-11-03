@@ -30,6 +30,12 @@ local Config = {
     LeftInput = 0.0,            -- A 키 입력
     RightInput = 0.0,           -- D 키 입력
 
+    -- 프로젝타일 설정
+    ProjectileSpeed = 2000.0,    -- 발사체 속도 (cm/s)
+    ProjectileSpawnOffset = FVector(0, 0, 0), -- 발사 위치 오프셋 (캐릭터 위치에서 시작)
+    ProjectileGravityScale = 1.0, -- 발사체 중력 스케일
+    ProjectileLifespan = 5.0,   -- 발사체 생명 시간 (초)
+
     -- 디버그
     bDebugLog = true,
 }
@@ -110,6 +116,12 @@ function SetupInputBindings()
     if InputComponent.BindAction then
         InputComponent:BindAction("Jump", 0x20, OnJumpPressed, OnJumpReleased)
     end
+
+    -- Action 바인딩: 마우스 좌클릭 (프로젝타일 던지기)
+    -- 마우스 버튼: -1 = Left, -2 = Right, -3 = Middle
+    if InputComponent.BindAction then
+        InputComponent:BindAction("ThrowProjectile", -1, OnThrowProjectile, nil)
+    end
 end
 
 -- ════════════════════════════════════════════════════════════════════════════
@@ -117,6 +129,7 @@ end
 -- ════════════════════════════════════════════════════════════════════════════
 
 function OnMoveLeft(value)
+    
     Config.LeftInput = value
     Config.HorizontalInput = Config.RightInput - Config.LeftInput
 end
@@ -135,6 +148,62 @@ end
 function OnJumpReleased()
     if MyActor.StopJumping then
         MyActor:StopJumping()
+    end
+end
+
+function OnThrowProjectile()
+  PrintToConsole("[RunnerCharacter] function OnThrowProjectile()!")
+    ThrowProjectile()
+end
+
+-- ════════════════════════════════════════════════════════════════════════════
+-- 프로젝타일 발사
+-- ════════════════════════════════════════════════════════════════════════════
+
+function ThrowProjectile()
+    -- World가 없으면 리턴
+    if not World then
+        PrintToConsole("[RunnerCharacter] ERROR: World is nil!")
+        return
+    end
+
+    -- 카메라 가져오기
+    local camera = World:GetCameraActor()
+    if not camera then
+        PrintToConsole("[RunnerCharacter] ERROR: Camera is nil!")
+        return
+    end
+
+    -- 캐릭터 위치 가져오기
+    local actorLocation = MyActor:GetLocation()
+
+    -- 카메라가 바라보는 방향으로 발사
+    local fireDirection = camera:GetForward()
+
+    -- 발사 위치 계산 (캐릭터 위치 + 오프셋)
+    local offset = Config.ProjectileSpawnOffset
+    local spawnLocation = FVector(
+        actorLocation.X + offset.X,
+        actorLocation.Y + offset.Y,
+        actorLocation.Z + offset.Z
+    )
+
+    -- Transform 생성
+    local spawnTransform = FTransform(spawnLocation, FQuat(), FVector(1, 1, 1))
+
+    -- ProjectileActor 생성
+    local projectile = World:SpawnProjectileActor(spawnTransform)
+    if not projectile then
+        PrintToConsole("[RunnerCharacter] ERROR: Failed to spawn projectile!")
+        return
+    end
+
+    -- 마우스 방향으로 발사
+    projectile:FireInDirection(fireDirection, Config.ProjectileSpeed)
+
+    if Config.bDebugLog then
+        PrintToConsole(string.format("[RunnerCharacter] Projectile thrown! Dir: (%.2f, %.2f, %.2f)",
+            fireDirection.X, fireDirection.Y, fireDirection.Z))
     end
 end
 

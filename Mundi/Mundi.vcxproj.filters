@@ -508,6 +508,9 @@
     <ClCompile Include="ThirdParty\ImGui\imgui_widgets.cpp">
       <Filter>ThirdParty\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\ProjectileActor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -1054,15 +1057,12 @@
     <ClInclude Include="ThirdParty\ImGui\imstb_truetype.h">
       <Filter>ThirdParty\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\ProjectileActor.h">
+      <Filter>Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\actor_transform.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\coin_collision.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\PlayerAutoMove.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\print_debug_log.lua">
@@ -1075,6 +1075,16 @@
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\template.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\MapGenerator.lua" />
+    <None Include="Scripts\coin_collision.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\Projectile.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\Queue.lua">
       <Filter>Scripts</Filter>
     </None>
   </ItemGroup>
