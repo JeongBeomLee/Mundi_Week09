@@ -53,7 +53,7 @@ local function GetObstacleSpawnLocation()
     local ObstacleSpawnLocation = FVector(
             MyActor:GetLocation().X + (40.0 - 5.0) * 2, -- (MapSize + MapStart) * Scale
             math.random(-HorizontalSpawnRange / 2 + 2, HorizontalSpawnRange / 2 - 2.0), -- -MapWidth / 2.0 + Scale ...
-            -3.0 -- math.random(-VerticalSpawnRange / 2 + 2, VerticalSpawnRange / 2 - 2.0)
+            math.random(-VerticalSpawnRange / 2 + 2, VerticalSpawnRange / 2 - 2.0)
     );
     return ObstacleSpawnLocation;
 end
