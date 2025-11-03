@@ -12,12 +12,14 @@ IMPLEMENT_CLASS(AGravityWall)
 BEGIN_PROPERTIES(AGravityWall)
 	MARK_AS_SPAWNABLE("중력 벽", "4방향 중력을 지원하는 벽 액터입니다.")
 	ADD_PROPERTY(bool, bIsFloor, "Wall", true, "지면 여부 (true: 바닥, false: 벽)")
+	ADD_PROPERTY(FVector, WallNormal, "Wall", true, "벽 법선 벡터 (벽이 향하는 방향)")
 END_PROPERTIES()
 
 AGravityWall::AGravityWall()
 	: StaticMeshComponent(nullptr)
 	, BoxComponent(nullptr)
 	, bIsFloor(false)
+	, WallNormal(0.0f, 0.0f, 1.0f) // 기본값: 위를 향함
 {
 	Name = "Gravity Wall";
 

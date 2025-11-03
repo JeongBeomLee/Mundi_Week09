@@ -327,15 +327,32 @@ bool UCharacterMovementComponent::CheckWallCollision()
 		return false;
 	}
 
+	// 수평 이동 방향 계산 (Z축 제외)
+	FVector HorizontalVelocity(Velocity.X, Velocity.Y, 0.0f);
+	if (HorizontalVelocity.SizeSquared() < 0.01f)
+	{
+		// 이동하지 않으면 충돌 검사 안 함
+		return false;
+	}
+
+	FVector MovementDirection = HorizontalVelocity.GetNormalized();
+
 	// CollisionBox의 오버랩 정보 확인
 	for (const FOverlapInfo& Info : CollisionBox->OverlapInfos)
 	{
 		// GravityWall과 충돌했는지 확인
 		AGravityWall* Wall = Cast<AGravityWall>(Info.OtherActor);
-		if (Wall && !Wall->IsFloor())
+		if (Wall)
 		{
-			// 벽과 충돌 중 (bIsFloor = false)
-			return true;
+			FVector WallNormal = Wall->GetWallNormal();
+
+			// 벽 Normal과 이동 방향의 내적 계산
+			// Normal이 이동 방향과 반대면 내적이 음수 (벽이 앞을 가로막음)
+			float DotProduct = FVector::Dot(WallNormal, MovementDirection);
+			if (DotProduct < -0.3f)
+			{
+				return true;
+			}
 		}
 	}
 
@@ -369,18 +386,26 @@ bool UCharacterMovementComponent::CheckGround()
 		AGravityWall* Wall = Cast<AGravityWall>(Info.OtherActor);
 		if (Wall)
 		{
-			if (Wall->IsFloor())
+			FVector WallNormal = Wall->GetWallNormal();
+
+			// WallNormal과 중력 방향의 내적 계산
+			// Normal이 중력 방향과 반대면 바닥 (내적이 충분히 음수)
+			float DotProduct = FVector::Dot(WallNormal, GravityDirection);
+			if (DotProduct <= -0.9f)
 			{
-				// 상승 중이면 지면으로 인식하지 않음 (점프 허용)
-				if (Velocity.Z > 0.0f)
+				// 중력 방향으로의 속도 성분 계산
+				float VelocityInGravityDir = FVector::Dot(Velocity, GravityDirection);
+
+				// 중력 반대 방향으로 이동 중이면 지면으로 인식하지 않음 (점프 허용)
+				if (VelocityInGravityDir < 0.0f)
 				{
 					return false;
 				}
 
-				// 하강 중이거나 정지 상태일 때만 바닥에 스냅
-				if (Velocity.Z <= 0.0f)
+				// 중력 방향으로 이동 중이거나 정지 상태일 때만 바닥에 스냅
+				if (VelocityInGravityDir >= 0.0f)
 				{
-					// 바닥의 상단 위치 계산 (Wall의 Z 위치 + BoxComponent의 높이 절반)
+					// 바닥의 표면 위치 계산
 					UBoxComponent* WallBox = Wall->GetBoxComponent();
 					if (WallBox)
 					{
@@ -388,24 +413,48 @@ bool UCharacterMovementComponent::CheckGround()
 						FVector WallScale = Wall->GetActorScale();
 						FVector WallBoxExtent = WallBox->GetBoxExtent();
 
-						float FloorSurface = WallLocation.Z + (WallBoxExtent.Z * WallScale.Z);
+						// WallNormal 방향으로의 Wall 크기 계산
+						float WallExtentInNormalDir =
+							FMath::Abs(WallBoxExtent.X * WallScale.X * WallNormal.X) +
+							FMath::Abs(WallBoxExtent.Y * WallScale.Y * WallNormal.Y) +
+							FMath::Abs(WallBoxExtent.Z * WallScale.Z * WallNormal.Z);
 
+						// 바닥 표면 위치 = Wall 중심 + (Normal 방향 크기)
+						FVector FloorSurface = WallLocation + WallNormal * WallExtentInNormalDir;
+
+						// 캐릭터의 BoxComponent 크기 계산
 						FVector CharBoxExtent = CollisionBox->GetBoxExtent();
 						FVector CharScale = CharacterOwner->GetActorScale();
-						float CharHalfHeight = CharBoxExtent.Z * CharScale.Z;
 
-						FVector CharLocation = CharacterOwner->GetActorLocation();
-						CharLocation.Z = FloorSurface + CharHalfHeight;
-						CharacterOwner->SetActorLocation(CharLocation);
+						// 중력 반대 방향으로의 캐릭터 크기
+						float CharExtentInGravityDir =
+							FMath::Abs(CharBoxExtent.X * CharScale.X * GravityDirection.X) +
+							FMath::Abs(CharBoxExtent.Y * CharScale.Y * GravityDirection.Y) +
+							FMath::Abs(CharBoxExtent.Z * CharScale.Z * GravityDirection.Z);
 
-						Velocity.Z = 0.0f;
+						// 현재 캐릭터 위치를 가져옴
+						FVector CurrentCharLocation = CharacterOwner->GetActorLocation();
+
+						// 목표 바닥 위치 = 바닥 표면 - (중력 방향 × 캐릭터 크기)
+						FVector TargetFloorPos = FloorSurface - GravityDirection * CharExtentInGravityDir;
+
+						// 중력 방향으로 투영한 현재 위치
+						float CurrentPosInGravityDir = FVector::Dot(CurrentCharLocation, GravityDirection);
+						float TargetPosInGravityDir = FVector::Dot(TargetFloorPos, GravityDirection);
+
+						// 중력 방향으로만 위치 조정 (수평 위치는 유지)
+						FVector PositionAdjustment = GravityDirection * (TargetPosInGravityDir - CurrentPosInGravityDir);
+						FVector NewCharLocation = CurrentCharLocation + PositionAdjustment;
+						CharacterOwner->SetActorLocation(NewCharLocation);
+
+						// 중력 방향 속도 성분 초기화
+						FVector GravityComponent = GravityDirection * VelocityInGravityDir;
+						Velocity -= GravityComponent;
 					}
 				}
-
 				return true;
 			}
 		}
 	}
-
 	return false;
 }

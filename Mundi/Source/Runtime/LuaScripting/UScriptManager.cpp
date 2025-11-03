@@ -454,8 +454,8 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetStaticMeshComponent", &AGravityWall::GetStaticMeshComponent,
         "GetBoxComponent", &AGravityWall::GetBoxComponent,
         "SetMeshPath", &AGravityWall::SetMeshPath,
-        "IsFloor", &AGravityWall::IsFloor,
-        "SetIsFloor", &AGravityWall::SetIsFloor
+        "GetWallNormal", &AGravityWall::GetWallNormal,
+        "SetWallNormal", &AGravityWall::SetWallNormal
     );
 
     // UWorld 클래스 등록

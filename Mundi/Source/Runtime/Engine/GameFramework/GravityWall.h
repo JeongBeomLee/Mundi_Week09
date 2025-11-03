@@ -30,6 +30,10 @@ public:
 	bool IsFloor() const { return bIsFloor; }
 	void SetIsFloor(bool bInIsFloor) { bIsFloor = bInIsFloor; }
 
+	// 벽 법선 벡터 (벽이 향하는 방향)
+	FVector GetWallNormal() const { return WallNormal; }
+	void SetWallNormal(const FVector& InNormal) { WallNormal = InNormal.GetNormalized(); }
+
 	// 복제 및 직렬화
 	void DuplicateSubObjects() override;
 	DECLARE_ACTOR_DUPLICATE(AGravityWall)
@@ -42,4 +46,7 @@ protected:
 
 	// 지면 여부 (true: 바닥, false: 벽)
 	bool bIsFloor;
+
+	// 벽 법선 벡터 (벽이 향하는 방향, 정규화됨)
+	FVector WallNormal;
 };

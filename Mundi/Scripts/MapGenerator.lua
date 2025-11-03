@@ -11,7 +11,7 @@ local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
 local DEFAULT_MAP_SIZE = 40;
 local DEFAULT_SCALE = 2.0;
-local DEFAULT_FILLRATE = 1.0;
+local DEFAULT_FILLRATE = 1.00;
 local DEFAULT_MAPSTART_INDEX = -5.0;
 
 local Width = DEFAULT_WIDTH;
@@ -82,7 +82,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
-                    Row[j]:SetIsFloor(false);  -- 상단은 벽
+                    Row[j]:SetWallNormal(FVector(0, 0, -1));  -- 상단: 아래를 향함
                 end
             else
                 Row[j] = nil;
@@ -106,7 +106,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
-                    Row[j]:SetIsFloor(true);  -- 하단은 바닥
+                    Row[j]:SetWallNormal(FVector(0, 0, 1));  -- 하단: 위를 향함 (바닥)
                 end
             else
                 Row[j] = nil;
@@ -130,7 +130,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
-                    Row[j]:SetIsFloor(false);  -- 왼쪽은 벽
+                    Row[j]:SetWallNormal(FVector(0, 1, 0));  -- 왼쪽: 오른쪽(+Y)을 향함
                 end
             else
                 Row[j] = nil;
@@ -154,7 +154,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
-                    Row[j]:SetIsFloor(false);  -- 오른쪽은 벽
+                    Row[j]:SetWallNormal(FVector(0, -1, 0));  -- 오른쪽: 왼쪽(-Y)을 향함
                 end
             else
                 Row[j] = nil;
