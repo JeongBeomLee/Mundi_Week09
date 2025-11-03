@@ -4,6 +4,7 @@
 
 class UStaticMeshComponent;
 class UBoxComponent;
+class URotatingMovementComponent;
 
 
 class ACoinActor : public AActor

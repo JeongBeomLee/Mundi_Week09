@@ -367,8 +367,17 @@ void UScriptManager::RegisterUserTypeToLua()
             // Pressed와 Released를 모두 받는 버전
             [](UInputComponent* self, const FString& ActionName, int32 KeyCode,
                sol::function pressedCallback, sol::function releasedCallback) {
-                auto pressed = pressedCallback.valid() ? [pressedCallback]() { pressedCallback(); } : std::function<void()>();
-                auto released = releasedCallback.valid() ? [releasedCallback]() { releasedCallback(); } : std::function<void()>();
+                std::function<void()> pressed;
+                std::function<void()> released;
+                
+                if (pressedCallback.valid()) {
+                    pressed = [pressedCallback]() { pressedCallback(); };
+                }
+                
+                if (releasedCallback.valid()) {
+                    released = [releasedCallback]() { releasedCallback(); };
+                }
+                
                 self->BindAction(ActionName, KeyCode, pressed, released);
             },
             // Pressed만 받는 버전 (간단한 경우)
@@ -474,36 +483,32 @@ void UScriptManager::RegisterUserTypeToLua()
             [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
                 return World->SpawnActor<AStaticMeshActor>(Transform);
             },
-            // 타입 문자열로 Actor 생성
-            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> AGravityWall* {
+            // 타입 문자열로 Actor 생성 (Lua에게 정확한 타입 반환)
+            [](UWorld* World, const FTransform& Transform, const FString& ActorType, sol::this_state s) -> sol::object {
+                sol::state_view lua(s);
+                
                 if (ActorType == "AGravityWall")
                 {
-                    return World->SpawnActor<AGravityWall>(Transform);
+                    AGravityWall* wall = World->SpawnActor<AGravityWall>(Transform);
+                    return sol::make_object(lua, wall);
+                }
+                else if (ActorType == "ACoinActor")
+                {
+                    ACoinActor* coin = World->SpawnActor<ACoinActor>(Transform);
+                    return sol::make_object(lua, coin);
                 }
                 else
                 {
-                    // 기본값은 nullptr 반환
-                    return nullptr;
+                    return sol::nil;
                 }
             }
         ),
-		"SpawnCoinActor", sol::overload(
-            [](UWorld* World, const FTransform& Transform) -> ACoinActor* {
-                return World->SpawnActor<ACoinActor>(Transform);
-            },
-            // 타입 문자열로 Actor 생성
-            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> ACoinActor* {
-                if (ActorType == "ACoinActor")
-                {
-                    return World->SpawnActor<ACoinActor>(Transform);
-                }
-                else
-                {
-                    // 기본값은 nullptr 반환
-                    return nullptr;
-                }
-            }
-        ),
+        "SpawnGravityWall", [](UWorld* World, const FTransform& Transform) -> AGravityWall* {
+            return World->SpawnActor<AGravityWall>(Transform);
+        },
+        "SpawnCoinActor", [](UWorld* World, const FTransform& Transform) -> ACoinActor* {
+            return World->SpawnActor<ACoinActor>(Transform);
+        },
         "DestroyActor", &UWorld::DestroyActor,
         "GetActors", &UWorld::GetActors
     );
