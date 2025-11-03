@@ -32,7 +32,7 @@ local CurrentMapId = DEFAULT_CURRENT_MAP_ID;
 local ChunkRemovalId = DEFAULT_CHUNK_REMOVAL_ID;
 
 local STORAGE_POSITION = FTransform();
-STORAGE_POSITION.Translation = FVector(-1000.0, 0.0, 0.0);
+STORAGE_POSITION.Translation = FVector(-5000.0, 0.0, 0.0);
 STORAGE_POSITION.Scale3D = FVector(Scale, Scale, Scale);
 STORAGE_POSITION.Rotation = FQuat.MakeFromEuler(0, 0, 0);
 
@@ -237,7 +237,7 @@ end
 local function InitializeMap()
     for i = 1, MapSize do
         CellChunks[i] = CreateCellChunk();
-        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStartOffset - 1));
+        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStartOffset));
     end
 end
 

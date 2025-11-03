@@ -735,8 +735,9 @@ void UScriptManager::RegisterGlobalFuncToLua()
 
     // 마우스에서 Ray 생성 함수 (마우스 방향 계산용)
     Lua["MakeRayFromMouse"] = &MakeRayFromMouse;
-    
+
     Lua["GetRunnerGameMode"] = GetRunnerGameMode;
+    Lua["IsGamePlaying"] = IsGamePlaying;
 
     // Cast 헬퍼 함수: AActor를 AStaticMeshActor로 캐스팅
     // 캐스팅 실패 시 nullptr 반환 (Lua에서는 nil)

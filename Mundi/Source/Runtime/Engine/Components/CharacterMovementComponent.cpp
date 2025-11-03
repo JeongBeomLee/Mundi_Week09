@@ -68,6 +68,19 @@ void UCharacterMovementComponent::TickComponent(float DeltaTime)
 {
 	Super::TickComponent(DeltaTime);
 
+	// 사망한 상태면 조기 리턴
+	UWorld* World = CharacterOwner->GetWorld();
+	ARunnerGameMode* GameMode = nullptr;
+	if (World)
+	{
+		GameMode = Cast<ARunnerGameMode>(World->GetGameMode());
+		if (GameMode &&
+			GameMode->GetGameState()->GetGameState() == EGameState::GameOver)
+		{
+			return;
+		}
+	}
+	
 	if (!CharacterOwner)
 	{
 		return;
@@ -110,15 +123,9 @@ void UCharacterMovementComponent::TickComponent(float DeltaTime)
 		// 너무 오래 공중에 있으면 GameOver 처리
 		if (TimeInAir > MaxAirTime)
 		{
-			// GameMode를 통해 플레이어 사망 처리
-			UWorld* World = CharacterOwner->GetWorld();
-			if (World)
+			if (GameMode)
 			{
-				ARunnerGameMode* GameMode = Cast<ARunnerGameMode>(World->GetGameMode());
-				if (GameMode)
-				{
-					GameMode->OnPlayerDeath(CharacterOwner);
-				}
+				GameMode->OnPlayerDeath(CharacterOwner);
 			}
 			TimeInAir = 0.0f;
 		}
