@@ -1,118 +1,234 @@
-# Mundi 엔진 - Week08 Shadow Mapping System
+# Mundi 엔진 - Week09 GameJam#3
 
 ## 프로젝트 정보
-- **Week:** 08
-- **저자:** 박영빈, 서명교, 이정범
-- **주제:** 고급 Shadow Mapping 시스템 구현
+- **Week:** 09 (GameJam #3)
+- **저자:** 이정범, 홍신화, 조창근, 김상천
+- **주제:** Lua 스크립팅 시스템 + Delegate 기반 Actor 제어
 
 ---
 
-## 📋 Week08 주요 구현 내용
+## 📋 Week09 주요 구현 내용
 
-### 1. Shadow Mapping 시스템 아키텍처
-- **ShadowManager** (`ShadowManager.h/cpp`): 전체 섀도우 시스템 관리
-- **ShadowMap** (`ShadowMap.h/cpp`): 개별 섀도우맵 리소스 관리
-- **ShadowConfiguration** (`ShadowConfiguration.h/cpp`): 섀도우 설정 구조체
-- **ShadowStats** (`ShadowStats.h`): 섀도우 메모리 사용량 통계
-- **ShadowViewProjection** (`ShadowViewProjection.h`): View-Projection 행렬 계산
+### 1. Lua 스크립팅 시스템 (Sol2 기반)
 
-### 2. Shadow Mapping 기법 구현
+#### 1.1 UScriptManager - Lua 중앙 관리자
+- **경로:** `Source/Runtime/LuaScripting/UScriptManager.h/cpp`
+- **싱글톤 패턴:** 전역 단일 Lua 상태 관리
+- **주요 기능:**
+  - C++ 타입을 Lua에 등록 (new_usertype)
+  - 스크립트 파일 로드 및 실행
+  - Actor별 독립적 Lua 환경(environment) 제공
+  - 핫 리로드 지원 (파일 변경 감지 시 자동 리로드)
 
-#### 2.1 Cascaded Shadow Mapping (CSM)
-- Directional Light용 CSM 구현
-- 캐스케이드별 프러스텀 분할 및 최적화
-- UI를 통한 CSM 설정 조정 기능
+#### 1.2 C++ ↔ Lua 타입 바인딩
+- **등록된 C++ 타입:**
+  - `FVector`: X, Y, Z 접근, Add/Sub/Mul 메서드, 연산자 오버로딩 (+, -, *, /)
+  - `FQuat`: MakeFromEuler() 생성자
+  - `AActor`: GetLocation, SetLocation, GetRotation, SetRotation, GetScale, SetScale, AddWorldLocation 등
+  - `USceneComponent`: GetSceneId() 메서드
+  - `FName`: ToString() 메서드
 
-#### 2.2 Light-Space Perspective Shadow Mapping (LiSPSM)
-- OpenGL LiSPSM 알고리즘 구현
-- Weighted AABB orthogonal 투영
-- Perspective aliasing 감소
+#### 1.3 데이터 구조
+- **FScript:** 스크립트 메타데이터 저장 구조체
+  - `sol::environment Env`: 각 스크립트의 독립적 실행 환경
+  - `sol::table Table`: 스크립트 데이터 테이블
+  - `FLuaTemplateFunctions`: BeginPlay, Tick, OnOverlap, EndPlay 함수 포인터
+  - `LastModifiedTime`: 핫 리로드용 파일 수정 시간
+- **FLuaLocalValue:** 스크립트에 전달되는 로컬 데이터
+  - `MyActor`: 스크립트가 제어할 대상 Actor 포인터
 
-#### 2.3 Soft Shadow 기법
-- **PCF (Percentage Closer Filtering)**: 하드 섀도우 경계 완화
-- **VSM (Variance Shadow Mapping)**: 분산 기반 소프트 섀도우 (`ShadowVSM_PS.hlsl`)
-- **ESM (Exponential Shadow Mapping)**: 지수 함수 기반 필터링 (`ShadowESM_PS.hlsl`)
-- **EVSM (Exponential Variance Shadow Mapping)**: VSM + ESM 결합 (`ShadowEVSM_PS.hlsl`)
-- Gaussian 가중치 샘플링 적용
+### 2. Delegate 시스템
 
-### 3. 라이트별 Shadow 구현
+#### 2.1 단일 Delegate (TDelegate)
+- **기능:**
+  - 단일 함수 바인딩 및 실행
+  - 람다 함수 지원
+  - 멤버 함수 바인딩 (BindDynamic)
+  - Bind/Unbind/IsBound/Execute 메서드
 
-#### Point Light Shadow
-- 큐브맵 기반 6면 섀도우 렌더링
-- `ShadowDepthCube.hlsl` 셰이더 구현
-- 6개의 View-Projection 행렬 상수 버퍼 전달
-- Paraboloid 방식 제거 후 큐브맵으로 통일
+#### 2.2 멀티캐스트 Delegate (TMulticastDelegate)
+- **기능:**
+  - 여러 함수 동시 바인딩
+  - Add/AddDynamic로 핸들 반환
+  - RemoveDynamic(Handle)로 선택적 제거
+  - RemoveAll()로 전체 제거
+  - Broadcast로 동시 실행
 
-#### Directional Light Shadow
-- `ShadowDepth.hlsl` 셰이더 구현
-- CSM/LiSPSM 적용
-- Normal과 빛 방향 기반 동적 bias 적용
+#### 2.3 Delegate 매크로
+- `DECLARE_DELEGATE_OneParam`: 1개 파라미터 delegate 선언
+- `DECLARE_MULTICAST_DELEGATE_TwoParams`: 2개 파라미터 multicast delegate 선언
+- 다양한 파라미터 개수 지원
 
-#### Spot Light Shadow
-- 기본 섀도우맵 구현
-- 프러스텀 기반 투영 최적화
+### 3. Actor Transform 제어 (Lua)
 
-### 4. 에디터 기능 추가
+#### 3.1 Lua 스크립트에서 Actor 조작
+```lua
+-- 위치 제어
+local newPos = FVector.new(100, 200, 300)
+MyActor:SetLocation(newPos)
 
-#### 4.1 Shadow Map Viewer
-- SRV Editor를 통한 섀도우맵 시각화
-- Viewport에 Shadow Map 표시 (`Viewport_ShadowMap.png` 아이콘)
-- 0~1 Depth View 수정
+-- 회전 제어
+local rotation = FQuat.MakeFromEuler(10, 80, 20)
+MyActor:SetRotation(rotation)
 
-#### 4.2 런타임 설정 조정
-- 섀도우맵 해상도 런타임 변경
-- 라이트별 Shadow 활성화/비활성화
-- Shadow Sharpen 값으로 VSM 파라미터 동적 계산
-- DragFloat UI 위젯 추가
+-- 스케일 제어
+local scale = FVector.new(2, 2, 2)
+MyActor:SetScale(scale)
 
-#### 4.3 통계 및 디버깅
-- `stat shadow` 명령어: 섀도우맵 메모리 사용량 시각화
-- StatsOverlayD2D에 섀도우 통계 표시
-- 디버그 출력을 콘솔 대신 화면에 표시
+-- 월드 상대 이동
+local deltaPos = FVector.new(10, 0, 0)
+MyActor:AddWorldLocation(deltaPos)
+```
 
-### 5. 기타 개선사항
+#### 3.2 Lua 기본 함수 (템플릿)
+```lua
+function BeginPlay()
+    -- Actor 시작 시 호출
+end
 
-#### 5.1 클립보드 시스템
-- `ClipboardManager` 구현
-- Actor/Component 복사/붙여넣기 기능
-- Gizmo 컴포넌트도 복제 가능
+function Tick(deltaTime)
+    -- 매 프레임 호출
+    -- deltaTime: 이전 프레임부터의 경과 시간(초)
+end
 
-#### 5.2 카메라 시스템
-- 카메라 오버라이딩 기능 추가
-- 프러스텀 z depth 계산 수정
+function OnOverlap()
+    -- 충돌 발생 시 호출
+end
 
-#### 5.3 버그 수정
-- 메모리 누수 해결
-- 리소스 언바인딩 문제 해결 (Point Light SRV 슬롯 최적화)
-- Decal z-fighting 문제 해결
-- VSM/ESM/EVSM depth bias 제거
+function EndPlay()
+    -- Actor 종료 시 호출
+end
+```
 
-#### 5.4 리팩토링
-- SceneRenderer 대규모 리팩토링
-- UWorld 통합
-- FLightManager에서 Shadow 책임 분리
-- FShadowMap 캡슐화 개선
-- 중복 코드 제거
+#### 3.3 Delegate를 통한 Transform 변경 알림
+- Lua에서 Actor 변경 시 Delegate 호출
+- C++ 람다가 Broadcast로 변경 사항 수신
+- 이벤트 기반 아키텍처 구현
+
+### 4. 핫 리로드 기능
+
+#### 4.1 파일 변경 감지
+- `CheckAndHotReloadLuaScript()`: 매 프레임 호출
+- 파일 수정 시간(LastModifiedTime) 비교
+- 변경 감지 시 자동 리로드
+
+#### 4.2 안전한 리로드
+- 기존 상태 백업 (Env, Table, Functions)
+- 새로운 스크립트 로드 시도
+- 실패 시 백업으로 즉시 롤백
+- 게임 실행 중 로직 수정 가능
+
+### 5. 테스트 및 검증
+
+#### 5.1 main.cpp의 테스트 함수들
+- **TestDelegate()**: Delegate 시스템 9가지 테스트
+  - 람다 바인딩, 멤버 함수 바인딩, Unbind
+  - 멀티캐스트, 핸들 제거, Clear
+  - 매크로 테스트, 여러 멤버 함수, Operator() 오버로드
+
+- **TestLua()**: Lua 스크립트 로드 테스트
+  - template.lua 파일 로드 검증
+  - 함수 정의 확인
+
+- **TestLuaWithDelegateTransform()**: 통합 테스트 (3가지)
+  1. Lua로 Actor Transform 직접 변경
+  2. Delegate로 Transform 변경 알림 수신
+  3. Lua 스크립트로 애니메이션 구현 (원형 운동)
+
+#### 5.2 테스트 결과
+- 모든 기능 동작 확인
+- 메시지 박스로 성공/실패 보고
+
+### 6. 기타 개선사항
+
+#### 6.1 스크립트 구조화
+- 경로: `Scripts/` 폴더
+- 기본 템플릿: `Scripts/template.lua`
+- Actor별 스크립트 자동 생성
+
+#### 6.2 빌드 설정
+- **CLAUDE.md 참고:** PowerShell로만 빌드 실행
+- MSBuild 명령어 정확히 준수
+
+#### 6.3 코드 스타일
+- 모든 주석은 `//` 사용 (NOT `/* */`)
+- 한글 주석 강제
+- OOP 원칙 준수
 
 ---
 
 ## 🎮 사용 방법
 
-### Shadow 설정
-1. Light Component 선택 (Directional/Point/Spot)
-2. Properties에서 `bIsCastShadows` 활성화
-3. Shadow 파라미터 조정:
-   - Resolution: 섀도우맵 해상도
-   - Bias: 섀도우 아크네 방지
-   - Sharpen: VSM 선명도 (VSM 사용 시)
+### Lua 스크립팅 시작
+1. Actor 클래스에서 BeginPlay() 시 스크립트 부착:
+```cpp
+FLuaLocalValue LocalValue;
+LocalValue.MyActor = this;
+UScriptManager::GetInstance().AttachScriptTo(LocalValue, "my_actor.lua");
+```
 
-### Shadow Map 확인
-- Viewport 상단의 Shadow Map 아이콘 클릭
-- SRV Editor에서 각 라이트의 섀도우맵 확인
+2. Tick()에서 스크립트의 Lua Tick 호출:
+```cpp
+auto& ScriptsByOwner = UScriptManager::GetInstance().GetScriptsByOwner();
+if (ScriptsByOwner.find(this) != ScriptsByOwner.end()) {
+    for (FScript* Script : ScriptsByOwner[this]) {
+        if (Script->LuaTemplateFunctions.Tick.valid()) {
+            Script->LuaTemplateFunctions.Tick(DeltaTime);
+        }
+    }
+}
+```
 
-### 통계 확인
-- 콘솔에서 `stat shadow` 입력
-- 메모리 사용량 및 섀도우맵 정보 확인
+### Lua 스크립트 작성 (Scripts/my_actor.lua)
+```lua
+function BeginPlay()
+    PrintToConsole("Actor started!")
+end
+
+function Tick(deltaTime)
+    -- Actor 위치 업데이트
+    local pos = MyActor:GetLocation()
+    local newPos = FVector.new(pos.X + 10, pos.Y, pos.Z)
+    MyActor:SetLocation(newPos)
+end
+
+function OnOverlap()
+    PrintToConsole("Collision detected!")
+end
+
+function EndPlay()
+    PrintToConsole("Actor ended!")
+end
+```
+
+### 핫 리로드 활용
+- Engine Tick에서 주기적으로 호출:
+```cpp
+UScriptManager::GetInstance().CheckAndHotReloadLuaScript();
+```
+- Lua 파일 저장 시 자동으로 리로드되어 변경사항 즉시 반영
+
+### Delegate 사용
+```cpp
+// 단일 Delegate
+TDelegate<float> OnDamage;
+OnDamage.Bind([](float damage) {
+    PrintToConsole("Damage: " + std::to_string(damage));
+});
+OnDamage.Execute(50.0f);
+
+// 멀티캐스트 Delegate
+TMulticastDelegate<FVector> OnLocationChanged;
+auto handle = OnLocationChanged.Add([](FVector newPos) {
+    PrintToConsole(newPos.ToString());
+});
+OnLocationChanged.Broadcast(FVector(100, 200, 300));
+OnLocationChanged.RemoveDynamic(handle);
+```
+
+### 테스트 실행
+- Visual Studio에서 `TestLuaWithDelegateTransform()` 함수 실행
+- 메시지 박스로 결과 확인
 
 ---
 
