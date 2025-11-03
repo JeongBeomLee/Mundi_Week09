@@ -1,23 +1,23 @@
 ﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
+#include "CollisionComponent/BoxComponent.h"
 #include "CameraActor.h"
-#include "CollisionComponent/ShapeComponent.h"
-#include "Source/Runtime/Core/Object/Actor.h"
-#include "Source/Runtime/Engine/Components/SceneComponent.h"
+#include "SceneComponent.h"
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
-#include "Source/Runtime/Engine/GameFramework/Pawn.h"
-#include "Source/Runtime/Engine/GameFramework/Character.h"
-#include "Source/Runtime/Engine/GameFramework/RunnerCharacter.h"
-#include "Source/Runtime/Engine/GameFramework/GameModeBase.h"
-#include "Source/Runtime/Engine/GameFramework/GameStateBase.h"
-#include "Source/Runtime/Engine/GameFramework/RunnerGameMode.h"
-#include "Source/Runtime/Engine/Components/CharacterMovementComponent.h"
-#include "Source/Runtime/Engine/Components/InputComponent.h"
-#include "Source/Runtime/Engine/GameFramework/World.h"
-#include "Source/Runtime/Engine/GameFramework/EditorEngine.h"
-#include "Source/Runtime/Engine/GameFramework/StaticMeshActor.h"
-#include "Source/Runtime/Engine/Components/StaticMeshComponent.h"
+#include "Pawn.h"
+#include "Character.h"
+#include "RunnerCharacter.h"
+#include "GameModeBase.h"
+#include "GameStateBase.h"
+#include "RunnerGameMode.h"
+#include "CharacterMovementComponent.h"
+#include "InputComponent.h"
+#include "World.h"
+#include "EditorEngine.h"
+#include "StaticMeshActor.h"
+#include "StaticMeshComponent.h"
+#include "GravityWall.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -282,6 +282,13 @@ void UScriptManager::RegisterUserTypeToLua()
         sol::base_classes, sol::bases<USceneComponent, UActorComponent>()
     );
 
+    // UBoxComponent 등록 (박스 충돌 컴포넌트)
+    Lua.new_usertype<UBoxComponent>("UBoxComponent",
+        sol::base_classes, sol::bases<UShapeComponent, USceneComponent, UActorComponent>(),
+        "SetBoxExtent", &UBoxComponent::SetBoxExtent,
+        "GetBoxExtent", &UBoxComponent::GetBoxExtent
+    );
+
     // FVector 타입을 Lua에 등록
     Lua.new_usertype<FVector>("FVector",
         sol::call_constructor, sol::factories(
@@ -441,12 +448,36 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetStaticMeshComponent", &AStaticMeshActor::SetStaticMeshComponent
     );
 
+    // AGravityWall 클래스 등록 (AActor 상속)
+    Lua.new_usertype<AGravityWall>("AGravityWall",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetStaticMeshComponent", &AGravityWall::GetStaticMeshComponent,
+        "GetBoxComponent", &AGravityWall::GetBoxComponent,
+        "SetMeshPath", &AGravityWall::SetMeshPath,
+        "IsFloor", &AGravityWall::IsFloor,
+        "SetIsFloor", &AGravityWall::SetIsFloor
+    );
+
     // UWorld 클래스 등록
     Lua.new_usertype<UWorld>("UWorld",
         sol::no_constructor,
-        "SpawnActor", [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
-            return World->SpawnActor<AStaticMeshActor>(Transform);
-        },
+        "SpawnActor", sol::overload(
+            // AStaticMeshActor 생성
+            [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
+                return World->SpawnActor<AStaticMeshActor>(Transform);
+            },
+            // AGravityWall 생성 (타입 문자열로 구분)
+            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> AActor* {
+                if (ActorType == "AGravityWall")
+                {
+                    return World->SpawnActor<AGravityWall>(Transform);
+                }
+                else
+                {
+                    return World->SpawnActor<AStaticMeshActor>(Transform);
+                }
+            }
+        ),
         "DestroyActor", &UWorld::DestroyActor,
         "GetActors", &UWorld::GetActors
     );

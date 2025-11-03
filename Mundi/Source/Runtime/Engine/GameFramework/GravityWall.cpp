@@ -25,6 +25,7 @@ AGravityWall::AGravityWall()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	if (StaticMeshComponent)
 	{
+		SetMeshPath("Data/basic-cube.obj");
 		StaticMeshComponent->SetOwner(this);
 		RootComponent = StaticMeshComponent;
 	}
