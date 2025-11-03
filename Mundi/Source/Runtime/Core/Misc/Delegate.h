@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include "UEContainer.h"
+#include "WeakPtr.h"
 
 // 단일 함수 바인딩을 위한 Delegate
 template<typename... Args>
@@ -19,13 +20,28 @@ public:
 		Function = InFunction;
 	}
 
-	// 멤버 함수 바인딩
+	// 멤버 함수 바인딩 (TWeakPtr 기반, UObject 전용)
 	template<typename TObject>
 	void BindDynamic(TObject* InObject, void (TObject::*InMethod)(Args...))
 	{
-		Function = [InObject, InMethod](Args... InArgs)
+		if (!InObject)
 		{
-			(InObject->*InMethod)(InArgs...);
+			Function = nullptr;
+			return;
+		}
+
+		TWeakPtr<TObject> WeakPtr(InObject);
+		Function = [WeakPtr, InMethod](Args... InArgs)
+		{
+			// 객체가 여전히 유효한지 확인
+			if (WeakPtr.IsValid())
+			{
+				TObject* Obj = WeakPtr.Get();
+				if (Obj)
+				{
+					(Obj->*InMethod)(InArgs...);
+				}
+			}
 		};
 	}
 
@@ -78,13 +94,27 @@ public:
 		return Handle;
 	}
 
-	// 멤버 함수 추가
+	// 멤버 함수 추가 (TWeakPtr 기반, UObject 전용)
 	template<typename TObject>
 	DelegateHandle AddDynamic(TObject* InObject, void (TObject::*InMethod)(Args...))
 	{
-		auto Function = [InObject, InMethod](Args... InArgs)
+		if (!InObject)
 		{
-			(InObject->*InMethod)(InArgs...);
+			return static_cast<DelegateHandle>(-1);
+		}
+
+		TWeakPtr<TObject> WeakPtr(InObject);
+		auto Function = [WeakPtr, InMethod](Args... InArgs)
+		{
+			// 객체가 여전히 유효한지 확인
+			if (WeakPtr.IsValid())
+			{
+				TObject* Obj = WeakPtr.Get();
+				if (Obj)
+				{
+					(Obj->*InMethod)(InArgs...);
+				}
+			}
 		};
 		return Add(Function);
 	}
@@ -120,7 +150,6 @@ public:
 		// 재진입 방지
 		if (bIsBroadcasting)
 		{
-			//UE_LOG("[Delegate] Warning: Recursive broadcast detected!");
 			return;
 		}
 

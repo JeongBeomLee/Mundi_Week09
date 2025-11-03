@@ -1,11 +1,11 @@
 {
   "Level" : {
     "Actors" : {
-      "749" : {
+      "756" : {
         "Name" : "Directional Light Actor",
         "OwnedComponents" : [{
             "CSMLambda" : 0.500000,
-            "Id" : 751,
+            "Id" : 758,
             "Intensity" : 1.000000,
             "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
             "NumCascades" : 3,
@@ -26,13 +26,13 @@
             "bIsVisible" : true,
             "bTickEnabled" : true
           }],
-        "RootComponentId" : 751,
+        "RootComponentId" : 758,
         "Type" : "ADirectionalLightActor"
       },
-      "752" : {
+      "759" : {
         "Name" : "Ambient Light Actor",
         "OwnedComponents" : [{
-            "Id" : 754,
+            "Id" : 761,
             "Intensity" : 0.100000,
             "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
             "ParentId" : 0,
@@ -50,15 +50,15 @@
             "bIsVisible" : true,
             "bTickEnabled" : true
           }],
-        "RootComponentId" : 754,
+        "RootComponentId" : 761,
         "Type" : "AAmbientLightActor"
       }
     },
-    "NextUUID" : 10400,
+    "NextUUID" : 770,
     "PerspectiveCamera" : {
       "FOV" : [60.000000],
       "FarClip" : [1000.000000],
-      "Location" : [131.399963, -0.876906, -6.500000],
+      "Location" : [-5.000000, 0.000000, 5.000000],
       "NearClip" : [0.100000],
       "Rotation" : [0.000000, 23.299957, -0.200044]
     },
