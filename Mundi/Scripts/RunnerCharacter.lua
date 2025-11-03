@@ -57,7 +57,7 @@ function BeginPlay()
         local StaticMeshComponent = MyActor:GetStaticMesh()
         if StaticMeshComponent then
             -- 원하는 메시 파일 경로로 변경
-            StaticMeshComponent:SetStaticMesh("Data/Model/Cube.obj")
+            StaticMeshComponent:SetStaticMesh("Data/runner_cube.obj")
           --  PrintToConsole("[RunnerCharacter] Character mesh changed to smokegrenade.obj")
         end
     end

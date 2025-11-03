@@ -41,9 +41,10 @@
 #include "TileLightCuller.h"
 #include "LineComponent.h"
 #include "ShadowManager.h"
-#include"CollisionManager.h"
+#include "CollisionManager.h"
 #include "ShadowViewProjection.h"
-#include"CollisionComponent/ShapeComponent.h"
+#include "CollisionComponent/ShapeComponent.h"
+#include "GravityWall.h"
 
 FSceneRenderer::FSceneRenderer(UWorld* InWorld, FSceneView* InView, URenderer* InOwnerRenderer)
 	: World(InWorld)
@@ -1271,7 +1272,8 @@ void FSceneRenderer::RenderDebugPass()
 	}
 
 	// Collision Components Debug draw
-	if (World->GetRenderSettings().IsShowFlagEnabled(EEngineShowFlags::SF_Collision))
+	// SF_Collision 플래그가 켜져있거나, PIE 모드(GravityWall 전용)일 때 렌더링
+	if (World->GetRenderSettings().IsShowFlagEnabled(EEngineShowFlags::SF_Collision) || World->bPie)
 	{
 		if (UCollisionManager* CollisionMgr = World->GetCollisionManager())
 		{
@@ -1280,7 +1282,20 @@ void FSceneRenderer::RenderDebugPass()
 			{
 				if (Component)
 				{
-					Component->RenderDebugVolume(OwnerRenderer);
+					// SF_Collision 플래그가 켜져있으면 모든 컴포넌트 렌더링
+					bool bShouldRender = World->GetRenderSettings().IsShowFlagEnabled(EEngineShowFlags::SF_Collision);
+
+					// PIE 모드에서는 GravityWall의 BoxComponent만 렌더링
+					if (!bShouldRender && World->bPie)
+					{
+						AActor* Owner = Component->GetOwner();
+						bShouldRender = (dynamic_cast<AGravityWall*>(Owner) != nullptr);
+					}
+
+					if (bShouldRender)
+					{
+						Component->RenderDebugVolume(OwnerRenderer);
+					}
 				}
 			}
 		}

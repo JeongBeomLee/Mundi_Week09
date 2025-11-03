@@ -367,7 +367,7 @@ void UEditorEngine::StartPIE()
     bPIEActive = true;
 
     // PIE 모드에서 충돌 컴포넌트 디버그 활성화
-    PIEWorld->GetRenderSettings().EnableShowFlag(EEngineShowFlags::SF_Collision);
+    //PIEWorld->GetRenderSettings().EnableShowFlag(EEngineShowFlags::SF_Collision);
 
     // PIE World에 GameMode/GameState 자동 생성
     PIEWorld->GameState = PIEWorld->SpawnActor<AGameStateBase>();
