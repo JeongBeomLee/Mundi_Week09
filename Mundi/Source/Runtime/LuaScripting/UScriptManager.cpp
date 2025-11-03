@@ -70,6 +70,7 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString&
             LuaLocalValue.MyActor,
             Script->LuaTemplateFunctions.OnOverlap
         );
+        LinkRestartToDeligate(Script->LuaTemplateFunctions.Restart);
     }
     catch (std::exception& e)
     {
@@ -764,8 +765,9 @@ void UScriptManager::RegisterGlobalFuncToLua()
 
     // 마우스에서 Ray 생성 함수 (마우스 방향 계산용)
     Lua["MakeRayFromMouse"] = &MakeRayFromMouse;
-    
+
     Lua["GetRunnerGameMode"] = GetRunnerGameMode;
+    Lua["IsGamePlaying"] = IsGamePlaying;
 
     // Cast 헬퍼 함수: AActor를 AStaticMeshActor로 캐스팅
     // 캐스팅 실패 시 nullptr 반환 (Lua에서는 nil)
@@ -838,6 +840,12 @@ void UScriptManager::LinkOnOverlapWithShapeComponent(AActor* MyActor, sol::funct
             );
         }
     }
+}
+
+void UScriptManager::LinkRestartToDeligate(sol::function Restart)
+{
+    ARunnerGameMode* GameMode = Cast<ARunnerGameMode>(GEngine.GetPIEWorld()->GetGameMode());
+    GameMode->GetOnGameRestarted().Add(Restart);
 }
 
 // Lua로부터 Template 함수를 가져온다.

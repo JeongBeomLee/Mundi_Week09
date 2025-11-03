@@ -31,7 +31,7 @@ local ObstaclePool = Queue.new();
 -- 충돌 컴포넌트가 포함되어 있으면 다른 물체와 OnOVerlap될 수 있으므로
 -- Pool마다 STORAGE_POSITION을 다르게 해야 함.
 local STORAGE_POSITION = FTransform();
-STORAGE_POSITION.Translation = FVector(-1000.0, -100.0, 0.0);
+STORAGE_POSITION.Translation = FVector(-5000.0, -100.0, 0.0);
 STORAGE_POSITION.Scale3D = FVector(Scale, Scale, Scale);
 STORAGE_POSITION.Rotation = FQuat.MakeFromEuler(0, 0, 0);
 
@@ -74,7 +74,9 @@ end
 
 local function SpawnNextObstacle()
     while (true) do
-        SpawnObstacle();
+        if IsGamePlaying(GlobalObjectManager.GetPIEWorld()) then
+            SpawnObstacle();
+        end
         coroutine.yield(math.random(SpawnDelayMin, SpawnDelayMax));
     end
 end
@@ -122,4 +124,12 @@ function Tick(dt)
 end
 
 -- 부활 작업
-function Restart() end
+function Restart()
+    while not Queue.isEmpty(ObstaclesSpawned) do
+        local Obstacle = Queue.pop(ObstaclesSpawned);
+        if Obstacle ~= nil then
+            Obstacle:SetTransform(STORAGE_POSITION);
+            Queue.push(ObstaclePool);
+        end
+    end
+end

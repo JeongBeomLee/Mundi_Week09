@@ -61,20 +61,5 @@ void ACoinActor::SetMeshPath(const FString& MeshPath)
 
 void ACoinActor::BeginPlay()
 {
-	// Lua 스크립트 자동 연결 (Super::BeginPlay() 전에!)
-	FLuaLocalValue LuaLocalValue;
-	LuaLocalValue.MyActor = this;
-	LuaLocalValue.GameMode = World ? World->GetGameMode() : nullptr;
-
-	try
-	{
-		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "coin_collision.lua");
-	}
-	catch (std::exception& e)
-	{
-		UE_LOG("[coin_collision.lua] ERROR: Lua script attachment failed: %s", e.what());
-	}
-
-	// 이제 Super::BeginPlay() 호출 → Actor::BeginPlay()에서 Lua BeginPlay 호출됨
 	Super::BeginPlay();
 }

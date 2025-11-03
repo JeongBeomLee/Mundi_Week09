@@ -67,6 +67,9 @@ public:
 	AGameStateBase* GetGameState() const { return GameState.Get(); }
 	void SetGameState(AGameStateBase* NewGameState);
 
+	// 델리게이트 접근자
+	FOnGameRestarted& GetOnGameRestarted() { return OnGameRestarted; }
+
 	// 델리게이트
 	FOnGameStarted OnGameStarted;
 	FOnGameEnded OnGameEnded;
