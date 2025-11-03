@@ -46,6 +46,8 @@ local function InitializePool()
         CapsuleComponent:SetCapsuleSize(4.0, 5.5, true);
         CapsuleComponent:SetRelativeLocation(FVector(0.0, 3.0, 0.5));
 
+        Obstacle:AttachScript("Obstacle.lua");
+
         Queue.push(ObstaclePool, Obstacle);
     end
 end

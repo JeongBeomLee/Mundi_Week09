@@ -1,5 +1,7 @@
 local _ENV = ...
 
+local Health = 5;
+
 -- BeginPlay: Actor가 생성되거나 레벨이 시작될 때 호출
 function BeginPlay()
     -- PrintToConsole("[coin_collision Begin Play] ");
@@ -21,12 +23,14 @@ function OnOverlap(
     local actorName = OtherActor:GetName():ToString()
     -- PrintToConsole("[coin_collision] Collided with: " .. actorName)
 
-    if actorName == "DefaultActor" then
-        -- PrintToConsole("[coin_collision] Coin collected!")
-        GameMode:OnCoinCollected(1)
-        -- MyActor:SetActorHiddenInGame(true)
-        -- MyActor:DestroyAllComponents()
-        MyActor:Destroy()
+    if actorName == "Projectile Actor" then
+        Health = Health - 1
+        if Health <= 0 then
+            -- PrintToConsole("[coin_collision] Coin collected!")
+            MyActor:Destroy()
+        else
+            -- PrintToConsole("[coin_collision] Health remaining: " .. Health)
+        end
     end
 end
 
