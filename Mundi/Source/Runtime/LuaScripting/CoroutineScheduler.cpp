@@ -66,7 +66,8 @@ void UCoroutineScheduler::Update(double Dt)
 
 
 		// auto로 받아서 sol2가 자동으로 타입 추론하도록 함
-        auto result = Entry.Co(); // 다음 yield에 도달할 때까지 코루틴 실행 -> yield의 인자 리턴
+        // DeltaTime을 코루틴에 전달
+        auto result = Entry.Co(Dt); // 다음 yield에 도달할 때까지 코루틴 실행 -> yield의 인자 리턴
 
         // 에러 체크
         if (!result.valid())

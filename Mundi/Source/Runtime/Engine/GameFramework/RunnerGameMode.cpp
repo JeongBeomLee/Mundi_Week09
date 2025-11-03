@@ -63,15 +63,25 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 		APawn* PlayerPawn = PlayerController->GetPawn();
 		ACameraActor* Camera = World->GetCameraActor();
 
-		// 플레이어 위치
-		FVector PlayerLocation = PlayerPawn->GetActorLocation();
+		// RunnerCharacter로 캐스팅 (중력 방향 정보 필요)
+		ARunnerCharacter* RunnerChar = dynamic_cast<ARunnerCharacter*>(PlayerPawn);
+		if (RunnerChar)
+		{
+			// 플레이어 위치
+			FVector PlayerLocation = PlayerPawn->GetActorLocation();
 
-		// 카메라 위치: 플레이어 뒤쪽(-600) 위쪽(+300)
-		FVector CameraOffset(-3.0f, 0.0f, 3.0f);
-		FVector CameraLocation = PlayerLocation + CameraOffset;
+			// 캐릭터의 로컬 좌표계 방향 가져오기
+			FVector UpDirection = RunnerChar->GetUpDirection();        // 중력 반대 = 위
+			FVector ForwardDirection = RunnerChar->GetForwardDirection(); // 전진 방향
 
-		// 카메라 위치 설정
-		Camera->SetActorLocation(CameraLocation);
+			// 로컬 좌표계 기준 오프셋 계산
+			// 뒤쪽(-Forward) 3.0, 위쪽(+Up) 3.0
+			FVector CameraOffset = ForwardDirection * -3.0f + UpDirection * 3.0f;
+			FVector CameraLocation = PlayerLocation + CameraOffset;
+
+			// 카메라 위치 설정
+			Camera->SetActorLocation(CameraLocation);
+		}
 
 		//// 카메라가 플레이어를 향하도록 회전
 		//FVector LookAtTarget = PlayerLocation + FVector(0.0f, 0.0f, 50.0f); // 플레이어 중심보다 약간 위
