@@ -3,6 +3,7 @@
 local Queue = require("Queue");
 local GlobalObjectManager = require("GlobalObjectManager");
 local RandomManager = require("RandomManager");
+local CollisionUtility = require("CollisionUtility");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
@@ -92,6 +93,7 @@ end
 -- Template functions
 function BeginPlay()
     PrintToConsole("[ObstacleGenerator] Begin Play");
+    RandomManager.SetNewRandomSeed();
 
     -- 풀 초기화
     InitializePool();
@@ -107,31 +109,8 @@ function EndPlay()
 end
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
-    -- OtherActor를 StaticMeshActor로 캐스팅
-    local StaticMeshActor = CastToStaticMeshActor(OtherActor);
-    if (StaticMeshActor == nil) then
-        return;
-    end
-
-    -- StaticMeshComponent 가져오기
-    local StaticMeshComponent = StaticMeshActor:GetStaticMeshComponent();
-    if (StaticMeshComponent == nil) then
-        return;
-    end
-
-    -- StaticMesh 가져오기
-    local StaticMesh = StaticMeshComponent:GetStaticMesh();
-    if (StaticMesh == nil) then
-        return;
-    end
-
-    -- 경로 비교
-    local FilePath = StaticMesh:GetCacheFilePath();
-
-    if (
-            FilePath == OBSTACLE_OBJ_FILE_PATH or 
-            FilePath == "DerivedDataCache/Model/smokegrenade.obj.bin"
-    ) then
+    -- PrintToConsole("[ObstacleGenerator] OnOverlap");
+    if (CollisionUtility.IsObstacleActor(OtherActor)) then
         GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
     end
 end
@@ -139,3 +118,6 @@ end
 function Tick(dt)
     CheckObstacleLocationAndWithDraw();
 end
+
+-- 부활 작업
+function Restart() end

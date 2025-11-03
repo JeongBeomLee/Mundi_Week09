@@ -25,3 +25,5 @@ end
 function Tick(dt)
     PrintToConsole("[template.lue Tick] ");
 end
+
+function Restart() end

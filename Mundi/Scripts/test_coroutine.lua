@@ -35,6 +35,9 @@ function Tick(dt)
     -- PrintToConsole("[MyActor's Name] ".. MyActor:GetName():ToString())
 end
 
+-- 부활 작업
+function Restart() end
+
 function MoveWithCo()
     PrintToConsole("In lua: Coroutine Start:".. MyActor:GetName():ToString());
     -- 스케일 변경

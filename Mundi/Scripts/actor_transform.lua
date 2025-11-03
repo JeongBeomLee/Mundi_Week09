@@ -84,6 +84,9 @@ function EndPlay()
     PrintToConsole("[Lua] Total elapsed time: " .. elapsed)
 end
 
+-- 부활 작업
+function Restart() end
+
 -- 커스텀 함수: 특정 위치로 이동
 function MoveTo(x, y, z)
     local targetPos = FVector.new(x, y, z)
