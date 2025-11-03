@@ -57,8 +57,6 @@ void UCollisionManager::RegisterComponent(UShapeComponent* Component)
 
 	// 대량 등록 시 재구축 플래그 설정
 	bNeedsFullRebuild = true;
-
-	UE_LOG("CollisionManager: Registered component {}", Component->GetName());
 }
 
 void UCollisionManager::UnregisterComponent(UShapeComponent* Component)
@@ -90,8 +88,6 @@ void UCollisionManager::UnregisterComponent(UShapeComponent* Component)
 	);
 
 	bNeedsFullRebuild = true;
-
-	UE_LOG("CollisionManager: Unregistered component {}", Component->GetName());
 }
 
 void UCollisionManager::MarkComponentDirty(UShapeComponent* Component)

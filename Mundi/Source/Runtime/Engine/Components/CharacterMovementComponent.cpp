@@ -359,12 +359,28 @@ bool UCharacterMovementComponent::CheckWallCollision()
 			float DotProduct = FVector::Dot(WallNormal, MovementDirection);
 			if (DotProduct < -0.3f)
 			{
+				// 측면 충돌 체크: WallNormal이 중력 방향과 거의 수직인가?
+				float GravityDot = FVector::Dot(WallNormal, GravityDirection);
+				if (FMath::Abs(GravityDot) < 0.3f)
+				{
+					// 측면 충돌! Lua 콜백 호출
+					if (WallCollisionLuaCallback.valid())
+					{
+						WallCollisionLuaCallback(WallNormal);
+					}
+				}
+
 				return true;
 			}
 		}
 	}
 
 	return false;
+}
+
+void UCharacterMovementComponent::SetOnWallCollisionCallback(sol::function Callback)
+{
+	WallCollisionLuaCallback = Callback;
 }
 
 bool UCharacterMovementComponent::CheckGround()

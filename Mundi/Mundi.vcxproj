@@ -221,6 +221,7 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\Components\SpotLightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\ProjectileActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\CoinActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\GravityWall.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.cpp" />
@@ -523,6 +524,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\CoinActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\GravityWall.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\ProjectileActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Controller.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.h" />
@@ -686,8 +688,11 @@ if "$(Configuration)"=="Debug" (
   <ItemGroup>
     <None Include="Scripts\actor_transform.lua" />
     <None Include="Scripts\coin_collision.lua" />
+    <None Include="Scripts\GravitySystem.lua" />
     <None Include="Scripts\MapGenerator.lua" />
     <None Include="Scripts\print_debug_log.lua" />
+    <None Include="Scripts\Projectile.lua" />
+    <None Include="Scripts\Queue.lua" />
     <None Include="Scripts\RunnerCharacter.lua" />
     <None Include="Scripts\template.lua" />
     <None Include="Scripts\test_coroutine.lua">

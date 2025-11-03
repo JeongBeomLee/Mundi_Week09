@@ -1,8 +1,9 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
 #include "CameraActor.h"
+#include "CameraComponent.h"
 #include "SceneComponent.h"
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
 #include "Pawn.h"
@@ -19,6 +20,8 @@
 #include "StaticMeshComponent.h"
 #include "GravityWall.h"
 #include "CoinActor.h"
+#include "ProjectileActor.h"
+#include "ProjectileMovementComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -290,6 +293,18 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetBoxExtent", &UBoxComponent::GetBoxExtent
     );
 
+    // UCameraComponent 등록 (카메라 컴포넌트)
+    Lua.new_usertype<UCameraComponent>("UCameraComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>(),
+        "SetFOV", &UCameraComponent::SetFOV,
+        "GetFOV", &UCameraComponent::GetFOV,
+        "SetAspectRatio", &UCameraComponent::SetAspectRatio,
+        "GetAspectRatio", &UCameraComponent::GetAspectRatio,
+        "GetForward", &UCameraComponent::GetForward,
+        "GetRight", &UCameraComponent::GetRight,
+        "GetUp", &UCameraComponent::GetUp
+    );
+
     // FVector 타입을 Lua에 등록
     Lua.new_usertype<FVector>("FVector",
         sol::call_constructor, sol::factories(
@@ -310,17 +325,51 @@ void UScriptManager::RegisterUserTypeToLua()
         "Mul", [](const FVector& v, float scalar) { return v * scalar; },
         "New", [](float x, float y, float z) { return FVector(x, y, z); }
     );
+    // FVector 정적 함수 등록
+    Lua["FVector"]["Cross"] = &FVector::Cross;
+    Lua["FVector"]["Dot"] = &FVector::Dot;
+    Lua["FVector"]["Lerp"] = &FVector::Lerp;
 
     // FQuat 타입을 Lua에 등록
     Lua.new_usertype<FQuat>("FQuat",
         sol::call_constructor, sol::factories(
             []() { return FQuat(); }
-        )
+        ),
+        // 곱셈 연산자 (회전 결합)
+        sol::meta_function::multiplication, [](const FQuat& a, const FQuat& b) { return a * b; }
     );
     // Static 함수는 별도로 등록
     Lua["FQuat"]["MakeFromEuler"] = [](float pitch, float yaw, float roll) {
         return FQuat::MakeFromEulerZYX(FVector(pitch, yaw, roll));
     };
+    Lua["FQuat"]["Slerp"] = &FQuat::Slerp;
+    Lua["FQuat"]["Mul"] = [](const FQuat& a, const FQuat& b) { return a * b; };
+    // FromToRotation: 두 벡터 사이의 회전 Quaternion 계산
+    Lua["FQuat"]["FromToRotation"] = [](const FVector& from, const FVector& to) {
+        FVector fromNorm = from.GetNormalized();
+        FVector toNorm = to.GetNormalized();
+        FVector axis = FVector::Cross(fromNorm, toNorm);
+        float dot = FVector::Dot(fromNorm, toNorm);
+
+        // 두 벡터가 거의 평행한 경우 처리
+        if (axis.SizeSquared() < 0.0001f)
+        {
+            if (dot > 0.0f)
+                return FQuat::Identity();  // 같은 방향
+            else
+                // 반대 방향: 임의의 수직 축으로 180도 회전
+                return FQuat(1, 0, 0, 0);
+        }
+
+        float w = std::sqrt(fromNorm.SizeSquared() * toNorm.SizeSquared()) + dot;
+        return FQuat(axis.X, axis.Y, axis.Z, w).GetNormalized();
+    };
+
+    // FMatrix 타입을 Lua에 등록 (카메라 행렬용)
+    Lua.new_usertype<FMatrix>("FMatrix",
+        sol::no_constructor
+        // Matrix는 복잡하므로 직접 조작은 제한하고, 함수 결과로만 사용
+    );
 
     // Actor 래퍼 클래스 등록
     Lua.new_usertype<AActor>("AActor",
@@ -411,7 +460,8 @@ void UScriptManager::RegisterUserTypeToLua()
         "GravityScale", &UCharacterMovementComponent::GravityScale,
         "AirControl", &UCharacterMovementComponent::AirControl,
         "SetGravityDirection", &UCharacterMovementComponent::SetGravityDirection,
-        "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection
+        "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection,
+        "SetOnWallCollisionCallback", &UCharacterMovementComponent::SetOnWallCollisionCallback
     );
 
     // ARunnerCharacter 클래스 등록 (ACharacter 상속)
@@ -458,6 +508,47 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetStaticMeshComponent", &AStaticMeshActor::SetStaticMeshComponent
     );
 
+    // UProjectileMovementComponent 클래스 등록
+    Lua.new_usertype<UProjectileMovementComponent>("UProjectileMovementComponent",
+        sol::no_constructor,
+        "FireInDirection", &UProjectileMovementComponent::FireInDirection,
+        "SetInitialSpeed", &UProjectileMovementComponent::SetInitialSpeed,
+        "GetInitialSpeed", &UProjectileMovementComponent::GetInitialSpeed,
+        "SetGravity", &UProjectileMovementComponent::SetGravity,
+        "GetGravity", &UProjectileMovementComponent::GetGravity,
+        "SetMaxSpeed", &UProjectileMovementComponent::SetMaxSpeed,
+        "GetMaxSpeed", &UProjectileMovementComponent::GetMaxSpeed,
+        "SetRotationFollowsVelocity", &UProjectileMovementComponent::SetRotationFollowsVelocity,
+        "GetRotationFollowsVelocity", &UProjectileMovementComponent::GetRotationFollowsVelocity,
+        "SetProjectileLifespan", &UProjectileMovementComponent::SetProjectileLifespan,
+        "GetProjectileLifespan", &UProjectileMovementComponent::GetProjectileLifespan
+    );
+
+    // AProjectileActor 클래스 등록
+    Lua.new_usertype<AProjectileActor>("AProjectileActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetMeshComponent", &AProjectileActor::GetMeshComponent,
+        "GetProjectileMovement", &AProjectileActor::GetProjectileMovement,
+        "GetCollisionComponent", &AProjectileActor::GetCollisionComponent,
+        "FireInDirection", &AProjectileActor::FireInDirection,
+        "SetInitialSpeed", &AProjectileActor::SetInitialSpeed,
+        "SetGravityScale", &AProjectileActor::SetGravityScale,
+        "SetLifespan", &AProjectileActor::SetLifespan
+    );
+
+    // ACameraActor 클래스 등록
+    Lua.new_usertype<ACameraActor>("ACameraActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetCameraComponent", &ACameraActor::GetCameraComponent,
+        "GetForward", &ACameraActor::GetForward,
+        "GetRight", &ACameraActor::GetRight,
+        "GetUp", &ACameraActor::GetUp,
+        "GetViewMatrix", &ACameraActor::GetViewMatrix,
+        "GetProjectionMatrix", sol::overload(
+            static_cast<FMatrix(ACameraActor::*)() const>(&ACameraActor::GetProjectionMatrix)
+        )
+    );
+
     // AGravityWall 클래스 등록 (AActor 상속)
     Lua.new_usertype<AGravityWall>("AGravityWall",
         sol::base_classes, sol::bases<AActor>(),
@@ -466,6 +557,15 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetMeshPath", &AGravityWall::SetMeshPath,
         "GetWallNormal", &AGravityWall::GetWallNormal,
         "SetWallNormal", &AGravityWall::SetWallNormal
+    );
+
+    // FRay 구조체 등록 (마우스 방향 계산용)
+    Lua.new_usertype<FRay>("FRay",
+        sol::call_constructor, sol::factories(
+            []() { return FRay(); }
+        ),
+        "Origin", &FRay::Origin,
+        "Direction", &FRay::Direction
     );
 
 	Lua.new_usertype<ACoinActor>("ACoinActor",
@@ -479,7 +579,7 @@ void UScriptManager::RegisterUserTypeToLua()
     Lua.new_usertype<UWorld>("UWorld",
         sol::no_constructor,
         "SpawnActor", sol::overload(
-            // AStaticMeshActor 생성 (기본)
+            // StaticMeshActor 생성
             [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
                 return World->SpawnActor<AStaticMeshActor>(Transform);
             },
@@ -509,8 +609,18 @@ void UScriptManager::RegisterUserTypeToLua()
         "SpawnCoinActor", [](UWorld* World, const FTransform& Transform) -> ACoinActor* {
             return World->SpawnActor<ACoinActor>(Transform);
         },
+        "SpawnProjectileActor", [](UWorld* World, const FTransform& Transform) -> AProjectileActor* {
+            AProjectileActor* NewProjectile = World->SpawnActor<AProjectileActor>(Transform);
+            if (NewProjectile && World->bPie)
+            {
+                NewProjectile->BeginPlay();
+            }
+            return NewProjectile;
+        },
+
         "DestroyActor", &UWorld::DestroyActor,
-        "GetActors", &UWorld::GetActors
+        "GetActors", &UWorld::GetActors,
+        "GetCameraActor", &UWorld::GetCameraActor
     );
 
     // UEditorEngine 클래스 등록
@@ -554,6 +664,9 @@ void UScriptManager::RegisterGlobalFuncToLua()
 {
     Lua["PrintToConsole"] = PrintToConsole;
 	CoroutineScheduler.RegisterCoroutineTo(Lua);
+
+    // 마우스에서 Ray 생성 함수 (마우스 방향 계산용)
+    Lua["MakeRayFromMouse"] = &MakeRayFromMouse;
 }
 
 void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)
@@ -595,6 +708,12 @@ void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalV
             InEnv["GameMode"] = LuaLocalValue.GameMode;
         }
         //UE_LOG("Params of GameMode %d", InEnv["GameMode"].JumpScore);
+    }
+
+    // World 등록 (발사체 생성 등을 위해 필요)
+    if (Actor && Actor->World)
+    {
+        InEnv["World"] = Actor->World;
     }
 }
 
