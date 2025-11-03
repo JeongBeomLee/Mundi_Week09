@@ -18,6 +18,7 @@
 #include "StaticMeshActor.h"
 #include "StaticMeshComponent.h"
 #include "GravityWall.h"
+#include "CoinActor.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -458,6 +459,13 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetWallNormal", &AGravityWall::SetWallNormal
     );
 
+	Lua.new_usertype<ACoinActor>("ACoinActor",
+		sol::base_classes, sol::bases<AActor>(),
+		"GetStaticMeshComponent", &ACoinActor::GetStaticMeshComponent,
+		"GetBoxComponent", &ACoinActor::GetBoxComponent,
+		"SetMeshPath", &ACoinActor::SetMeshPath
+	);
+
     // UWorld 클래스 등록
     Lua.new_usertype<UWorld>("UWorld",
         sol::no_constructor,
@@ -471,6 +479,23 @@ void UScriptManager::RegisterUserTypeToLua()
                 if (ActorType == "AGravityWall")
                 {
                     return World->SpawnActor<AGravityWall>(Transform);
+                }
+                else
+                {
+                    // 기본값은 nullptr 반환
+                    return nullptr;
+                }
+            }
+        ),
+		"SpawnCoinActor", sol::overload(
+            [](UWorld* World, const FTransform& Transform) -> ACoinActor* {
+                return World->SpawnActor<ACoinActor>(Transform);
+            },
+            // 타입 문자열로 Actor 생성
+            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> ACoinActor* {
+                if (ActorType == "ACoinActor")
+                {
+                    return World->SpawnActor<ACoinActor>(Transform);
                 }
                 else
                 {

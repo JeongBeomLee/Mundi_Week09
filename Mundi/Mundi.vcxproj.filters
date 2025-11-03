@@ -67,6 +67,81 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\CoinActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GravityWall.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Controller.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\EmptyActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\HeightFogActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GameStateBase.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GameModeBase.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Pawn.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\PlayerController.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\CameraActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\DecalActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\EditorEngine.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\FakeSpotLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\Level.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\StaticMeshActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\World.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\WorldPartitionManager.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
@@ -148,75 +223,6 @@
     <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.cpp">
       <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\Controller.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\EmptyActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\HeightFogActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\Info.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\GameStateBase.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\GameModeBase.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\Pawn.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\PlayerController.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\PointLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\CameraActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\DecalActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\EditorEngine.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\FakeSpotLightActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\Level.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\StaticMeshActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\World.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\WorldPartitionManager.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Collision\AABB.cpp">
       <Filter>Source\Runtime\Engine\Collision</Filter>
     </ClCompile>
@@ -253,15 +259,6 @@
     <ClCompile Include="Source\Runtime\Engine\Spatial\Octree.cpp">
       <Filter>Source\Runtime\Engine\Spatial</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\LuaScripting\CoroutineScheduler.cpp">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Runtime\Core\Misc\Color.cpp">
       <Filter>Source\Runtime\Core\Misc</Filter>
     </ClCompile>
@@ -288,6 +285,15 @@
     </ClCompile>
     <ClCompile Include="Source\Runtime\Core\Memory\PlatformTime.cpp">
       <Filter>Source\Runtime\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\LuaScripting\CoroutineScheduler.cpp">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.cpp">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\LuaScripting\UScriptManager.cpp">
+      <Filter>Source\Runtime\LuaScripting</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Renderer\LightManager.cpp">
       <Filter>Source\Runtime\Renderer</Filter>
@@ -539,10 +545,79 @@
     </ClInclude>
     <ClInclude Include="BoxSphereBounds.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
-      <Filter>Source\Runtime\Core\Misc</Filter>
-    </ClInclude>
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\CoinActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GravityWall.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Controller.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\EmptyActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\HeightFogActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Pawn.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\PlayerController.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GameStateBase.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GameModeBase.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\CameraActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\DecalActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\EditorEngine.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\FakeSpotLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\Level.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\StaticMeshActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\World.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Components\CharacterMovementComponent.h">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClInclude>
@@ -624,72 +699,6 @@
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\SphereComponent.h">
       <Filter>Source\Runtime\Engine\Components\CollisionComponent</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\Controller.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\DirectionalLightActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\EmptyActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\HeightFogActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\Info.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\Pawn.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\PlayerController.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\GameStateBase.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\GameModeBase.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\CameraActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\DecalActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\EditorEngine.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\FakeSpotLightActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\Level.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\StaticMeshActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\World.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Collision\AABB.h">
       <Filter>Source\Runtime\Engine\Collision</Filter>
     </ClInclude>
@@ -729,14 +738,8 @@
     <ClInclude Include="Source\Runtime\Engine\Spatial\WorldPartitionManager.h">
       <Filter>Source\Runtime\Engine\Spatial</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\LuaScripting\CoroutineScheduler.h">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h">
-      <Filter>Source\Runtime\LuaScripting</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h">
-      <Filter>Source\Runtime\LuaScripting</Filter>
+    <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
+      <Filter>Source\Runtime\Core\Misc</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h">
       <Filter>Source\Runtime\Core\Misc</Filter>
@@ -797,6 +800,15 @@
     </ClInclude>
     <ClInclude Include="Source\Runtime\Core\Memory\PlatformTime.h">
       <Filter>Source\Runtime\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\LuaScripting\CoroutineScheduler.h">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h">
+      <Filter>Source\Runtime\LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h">
+      <Filter>Source\Runtime\LuaScripting</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Renderer\LightManager.h">
       <Filter>Source\Runtime\Renderer</Filter>
@@ -1058,10 +1070,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Scripts\MapGenerator.lua">
+    <None Include="Scripts\actor_transform.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\actor_transform.lua">
+    <None Include="Scripts\coin_collision.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\MapGenerator.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\print_debug_log.lua">
@@ -1076,124 +1091,121 @@
     <None Include="Scripts\test_coroutine.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\coin_collision.lua">
-      <Filter>Scripts</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
-      <UniqueIdentifier>{a0458ed6-fe08-4ec7-82bf-07a4dc2732c7}</UniqueIdentifier>
+      <UniqueIdentifier>{c8743452-2c9d-42d1-a335-2047f05051ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime">
-      <UniqueIdentifier>{b9a86e08-4ceb-4ae5-b3cb-1974e5ad0bf1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core">
-      <UniqueIdentifier>{83ace7c2-3d2b-4112-bc9c-8b8a6474810c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Misc">
-      <UniqueIdentifier>{10a8c3a3-e4c3-45df-8d75-509a3a0674da}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts">
-      <UniqueIdentifier>{dd3ee517-6ddd-4305-8cf2-fd2f18d981ef}</UniqueIdentifier>
+      <UniqueIdentifier>{f9bddbb9-593d-42a5-b49c-57be37f4ad22}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine">
-      <UniqueIdentifier>{910971f3-65d2-43cf-8d4f-f25fea36cc81}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components">
-      <UniqueIdentifier>{0637c8f6-6a30-40af-adb1-d1dc3e4d8499}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
-      <UniqueIdentifier>{f7aa90af-fc23-437b-bf5f-bf1b36613f3e}</UniqueIdentifier>
+      <UniqueIdentifier>{4414fff0-ea49-40d3-a167-292002625ea9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine\GameFramework">
-      <UniqueIdentifier>{aa4f6e9b-c620-49a7-8d81-6b0db0d604c0}</UniqueIdentifier>
+      <UniqueIdentifier>{ca75e848-9b02-493c-b2e8-6d2841eab8c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components">
+      <UniqueIdentifier>{dc02c852-faa9-4abe-9e68-ebbf0bd10acf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
+      <UniqueIdentifier>{4a187b5e-5b0c-4b01-a3f0-c379747e4b65}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine\Collision">
-      <UniqueIdentifier>{343fd3d4-f2c5-4d53-ae53-bf984b9e0ace}</UniqueIdentifier>
+      <UniqueIdentifier>{f1494585-915f-4e62-862c-876915395bcd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine\Spatial">
-      <UniqueIdentifier>{627117ea-375f-4dc1-8b03-740bfe09b7f3}</UniqueIdentifier>
+      <UniqueIdentifier>{7649a7cb-57b4-4593-9e1c-0bcfea972e90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Runtime\LuaScripting">
-      <UniqueIdentifier>{984ef35d-2fd6-4751-abea-bcd305336021}</UniqueIdentifier>
+    <Filter Include="Source\Runtime\Core">
+      <UniqueIdentifier>{8192afdc-b7a5-4641-bf64-ba9cdab6cef1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Misc">
+      <UniqueIdentifier>{0d8e9f8e-fbec-4cde-89d4-c0438e8a2b0a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Core\Object">
-      <UniqueIdentifier>{feb89283-c8b1-4ba6-bc8b-5b6b2f2e900a}</UniqueIdentifier>
+      <UniqueIdentifier>{ed20c87b-0c5d-47ac-8bac-cf94abbe58e5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Core\Math">
-      <UniqueIdentifier>{957607a5-3e6f-486e-a144-e114c97ad026}</UniqueIdentifier>
+      <UniqueIdentifier>{9e555a3d-81fb-4b96-8b87-fea3648e3576}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Core\Containers">
-      <UniqueIdentifier>{f52cc90b-f978-4482-9f13-fc32cc641329}</UniqueIdentifier>
+      <UniqueIdentifier>{8652bf00-1ade-4431-af35-b73989a61051}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Core\Memory">
-      <UniqueIdentifier>{ed2028b2-331d-4aa7-afdc-bc9e428aa815}</UniqueIdentifier>
+      <UniqueIdentifier>{c5fdefa4-b4a7-4813-be2d-a938c5fe3811}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\LuaScripting">
+      <UniqueIdentifier>{0687bbbe-e4a0-4d3f-b559-ef74c0d21d75}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Renderer">
-      <UniqueIdentifier>{5a123bf9-11bf-42b5-ac67-89b1e26bba05}</UniqueIdentifier>
+      <UniqueIdentifier>{77a4ab86-cb57-46be-91bf-4847afa977ca}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\RHI">
-      <UniqueIdentifier>{f701cf1d-faff-4dee-a031-2a9fdf69fd30}</UniqueIdentifier>
+      <UniqueIdentifier>{8547d445-76cc-44df-a5ad-40c0793e141c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\AssetManagement">
-      <UniqueIdentifier>{7bd82906-1900-4dd8-83a8-dc714f53f7b6}</UniqueIdentifier>
+      <UniqueIdentifier>{00b930c0-4709-4ffb-aef4-a90fa5ba4afe}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\InputCore">
-      <UniqueIdentifier>{5e445a84-b31f-4972-a488-47a45dc6939d}</UniqueIdentifier>
+      <UniqueIdentifier>{f9083926-32c7-4d8d-8632-aa1bd207a005}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate">
-      <UniqueIdentifier>{d21656e7-b7e5-4760-a927-bbbcab2de104}</UniqueIdentifier>
+      <UniqueIdentifier>{25738df0-19d6-4b98-86ab-6e49a8dc41f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\Widgets">
-      <UniqueIdentifier>{a717213c-c73f-4388-84e6-e76283524ae0}</UniqueIdentifier>
+      <UniqueIdentifier>{561bb83a-e1d0-422f-b58c-c6ec07da5a11}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\Windows">
-      <UniqueIdentifier>{a8f6f721-6bc9-40f6-b89e-1e127ce54cc8}</UniqueIdentifier>
+      <UniqueIdentifier>{4b0bba45-d81f-4abf-8cdf-10cc35d95a9a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\Factory">
-      <UniqueIdentifier>{48941f4d-27c8-4c98-bcc9-e92ba4865bcc}</UniqueIdentifier>
+      <UniqueIdentifier>{3ea0799b-c83e-447d-8530-ac523314b2f0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\ImGui">
-      <UniqueIdentifier>{9cdb6941-2ce5-4652-8443-5c451bed089e}</UniqueIdentifier>
+      <UniqueIdentifier>{602a309f-d884-44c1-bd87-598ed60f7e2f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Editor">
-      <UniqueIdentifier>{84d82a53-0f84-456b-9b77-ca3e706e41bd}</UniqueIdentifier>
+      <UniqueIdentifier>{f3d4840d-8494-4d1e-a13b-78c335fb3488}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Editor\Clipboard">
-      <UniqueIdentifier>{e9c5d775-0c01-477d-b476-2d8e3bf4db10}</UniqueIdentifier>
+      <UniqueIdentifier>{8b99960a-2dd6-475e-a242-45bfda5346b9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Editor\Gizmo">
-      <UniqueIdentifier>{68f680b9-5871-4d89-b088-1b11b09bb94d}</UniqueIdentifier>
+      <UniqueIdentifier>{5478831d-7910-4569-9e39-2bc228d896cd}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Editor\Grid">
-      <UniqueIdentifier>{2bc5fc1c-6d3c-47eb-87d1-b4c96e954ddc}</UniqueIdentifier>
+      <UniqueIdentifier>{03363d24-e190-48df-acdb-026ca6020cf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{a283e9c5-9e39-4509-ade8-d8c66da5bbad}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders">
-      <UniqueIdentifier>{9306a39b-afa8-49ee-9515-cafbce68ab15}</UniqueIdentifier>
+      <UniqueIdentifier>{69b9a2ef-6144-4c86-b64b-0d6d0747e8c0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Effects">
-      <UniqueIdentifier>{03d3ff5a-6f5e-47d8-aca6-74e1644c334e}</UniqueIdentifier>
+      <UniqueIdentifier>{af8daec3-9b1b-49fe-9ced-429140723d5c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\PostProcess">
-      <UniqueIdentifier>{9961eaff-a9f8-4833-8143-0805d7a21b26}</UniqueIdentifier>
+      <UniqueIdentifier>{5cf28487-175b-46a3-b8e2-bdae7db059ea}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Utility">
-      <UniqueIdentifier>{d9058501-621c-4bb3-81e9-6cfe986e759d}</UniqueIdentifier>
+      <UniqueIdentifier>{b322a22e-12ee-4588-88c4-2f822a9a37e4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\UI">
-      <UniqueIdentifier>{f9cf4804-4307-4a42-9307-860cbdea7344}</UniqueIdentifier>
+      <UniqueIdentifier>{8f3edc29-d329-47fa-a5b9-eff769f2f85e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Materials">
-      <UniqueIdentifier>{af10004e-07b2-46d9-a8f9-e08d4fdf3c13}</UniqueIdentifier>
+      <UniqueIdentifier>{d3183a8b-d415-4476-915e-c1ca2176299b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Common">
-      <UniqueIdentifier>{34cb3ce0-688a-4de0-b8f1-05f14f962d49}</UniqueIdentifier>
+      <UniqueIdentifier>{19037b4f-cb8f-4ff0-a95e-297bb3c379e8}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{d6b7a956-c293-41c2-9154-732ea1a32bd7}</UniqueIdentifier>
+      <UniqueIdentifier>{7ae64641-f18c-4841-b4ff-68fe8ec8b281}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\ImGui">
-      <UniqueIdentifier>{b9a3116d-cc36-4363-96a0-c4b31716ae49}</UniqueIdentifier>
+      <UniqueIdentifier>{da45b460-2b77-4841-86d0-17ed5a7c089c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
