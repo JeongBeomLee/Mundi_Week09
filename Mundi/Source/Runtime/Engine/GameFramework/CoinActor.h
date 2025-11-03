@@ -11,7 +11,7 @@ class ACoinActor : public AActor
 {
 public:
 	DECLARE_CLASS(ACoinActor, AActor)
-	//GENERATED_REFLECTION_BODY()
+	GENERATED_REFLECTION_BODY()
 	
 	ACoinActor();
 	virtual ~ACoinActor() override;
@@ -26,6 +26,8 @@ public:
 	/*void DuplicateSubObjects() override;
 	DECLARE_ACTOR_DUPLICATE(ACoinActor)
 	void OnSerialized() override;*/
+
+	void BeginPlay() override;
 
 protected:
 	UStaticMeshComponent* StaticMeshComponent;
