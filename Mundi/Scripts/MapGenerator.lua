@@ -1,6 +1,7 @@
 local _ENV = ...
 
 local Queue = require("Queue");
+local RandomManager = require("RandomManager");
 
 -- lua는 클래스 개념이 없는 언어이므로 파일을 class 취급하여 작성하겠습니다.
 -- local 키워드는 해당 파일에서만 접근할 수 있어 private처럼 활용합니다.
@@ -23,21 +24,21 @@ local FillRate = DEFAULT_FILLRATE;
 local MapStart = DEFAULT_MAPSTART_INDEX;
 
 local CellChunks = {};
-local MapChunks = {};
+local MapChunksSpawned = {};
 local CurrentMapId = 0;
 local ChunkRemovalId = 0;
 
-local PlaceOfExile = FTransform();
-PlaceOfExile.Translation = FVector(-1000.0, 0.0, 0.0);
-PlaceOfExile.Scale3D = FVector(Scale, Scale, Scale);
-PlaceOfExile.Rotation = FQuat.MakeFromEuler(0, 0, 0);
+local STORAGE_POSITION = FTransform();
+STORAGE_POSITION.Translation = FVector(-1000.0, 0.0, 0.0);
+STORAGE_POSITION.Scale3D = FVector(Scale, Scale, Scale);
+STORAGE_POSITION.Rotation = FQuat.MakeFromEuler(0, 0, 0);
 
 local ChunkPool = Queue.new();
 
-local function SetNewRandomSeed()
-    local Seed = math.floor(os.clock() * 1000);  -- 정수로 변환
-    math.randomseed(Seed);
-end
+--local function SetNewRandomSeed()
+--    local Seed = math.floor(os.clock() * 1000);  -- 정수로 변환
+--    math.randomseed(Seed);
+--end
 
 local function CreateCellChunk()
     local CellChunk = {};
@@ -177,12 +178,12 @@ local function DeleteMapChunks(MapChunk)
         for j = 1, Width do
             local TargetTop = MapChunk.Top[i][j];
             if TargetTop ~= nil then
-                TargetTop:SetTransform(PlaceOfExile);
+                TargetTop:SetTransform(STORAGE_POSITION);
                 Queue.push(ChunkPool, TargetTop);
             end
             local TargetBottom = MapChunk.Bottom[i][j];
             if TargetBottom ~= nil then
-                TargetBottom:SetTransform(PlaceOfExile);
+                TargetBottom:SetTransform(STORAGE_POSITION);
                 Queue.push(ChunkPool, TargetBottom);
             end
         end
@@ -193,12 +194,12 @@ local function DeleteMapChunks(MapChunk)
         for j = 1, Height do
             local TargetLeft = MapChunk.Left[i][j];
             if TargetLeft ~= nil then
-                TargetLeft:SetTransform(PlaceOfExile);
+                TargetLeft:SetTransform(STORAGE_POSITION);
                 Queue.push(ChunkPool, TargetLeft);
             end
             local TargetRight = MapChunk.Right[i][j];
             if TargetRight ~= nil then
-                TargetRight:SetTransform(PlaceOfExile);
+                TargetRight:SetTransform(STORAGE_POSITION);
                 Queue.push(ChunkPool, TargetRight);
             end
         end
@@ -226,7 +227,7 @@ end
 local function InitializeMap()
     for i = 1, MapSizeIndex do
         CellChunks[i] = CreateCellChunk();
-        MapChunks[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStart - 1));
+        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStart - 1));
     end
 end
 
@@ -243,7 +244,7 @@ local function Update()
     -- 디버그: 플레이어 위치와 현재 청크 ID 출력 (매 프레임마다는 너무 많으니 청크 전환 시에만)
     if Tmp ~= CurrentMapId then
         -- 가장 오래된 청크 삭제
-        local ChunkToDelete = MapChunks[ChunkRemovalId + 1];
+        local ChunkToDelete = MapChunksSpawned[ChunkRemovalId + 1];
         if ChunkToDelete == nil then
             -- PrintToConsole("[MapGenerator] ERROR: ChunkToDelete is nil at index " .. (ChunkRemovalId + 1));
         else
@@ -257,7 +258,7 @@ local function Update()
         
         local NewChunk = CreateCellChunk();
         CellChunks[ChunkRemovalId + 1] = NewChunk;
-        MapChunks[ChunkRemovalId + 1] = CreateMapChunkWithCellChunk(NewChunk, NewChunkXPosition);
+        MapChunksSpawned[ChunkRemovalId + 1] = CreateMapChunkWithCellChunk(NewChunk, NewChunkXPosition);
 
         -- 다음 삭제 대상 청크 인덱스 업데이트 (0, 1, 2 순환)
         ChunkRemovalId = (ChunkRemovalId + 1) % MapSizeIndex;
@@ -303,7 +304,7 @@ function BeginPlay()
     PrintToConsole("[MapGenerator] Begin Play");
 
     -- 랜덤 시드를 한 번만 설정 (모든 청크가 다른 패턴을 가지도록)
-    SetNewRandomSeed();
+    RandomManager.SetNewRandomSeed();
     Initialize();
 end
 
@@ -318,3 +319,4 @@ end
 function Tick(dt)
     Update();
 end
+

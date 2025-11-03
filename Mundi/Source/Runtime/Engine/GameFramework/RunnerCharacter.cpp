@@ -67,7 +67,8 @@ void ARunnerCharacter::BeginPlay()
 	{
 		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "RunnerCharacter.lua");
 		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "MapGenerator.lua");
-		UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua, MapGenerator.lua");
+		UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, "ObstacleGenerator.lua");
+		UE_LOG("[RunnerCharacter] Auto-attached Lua script: RunnerCharacter.lua, MapGenerator.lua, ObstacleGenerator.lua");
 	}
 	catch (std::exception& e)
 	{
