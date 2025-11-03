@@ -295,10 +295,10 @@ void UCharacterMovementComponent::MoveUpdatedComponent(float DeltaTime)
 	// 위치 업데이트
 	CharacterOwner->SetActorLocation(NewLocation);
 
-	// 벽 충돌 체크 (오버랩 발생 시 이동 취소)
+	// 벽 충돌 체크
 	if (CheckWallCollision())
 	{
-		// 이동 취소: 이전 위치로 복원
+		// 이전 위치로 복원
 		CharacterOwner->SetActorLocation(CurrentLocation);
 
 		// 수평 속도 초기화 (Z축 속도는 유지 - 중력/점프 영향)
