@@ -76,7 +76,19 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     -- CollisionUtility를 사용하여 장애물인지 확인
     if CollisionUtility.IsObstacleActor(OtherActor) then
         if Config.bDebugLog then
-            PrintToConsole("[Projectile] Hit Obstacle! Destroying both obstacle and projectile...")
+            PrintToConsole("[Projectile] Hit Obstacle! Spawning decal and destroying...")
+        end
+
+        -- 충돌 위치에 데칼 생성
+        if World and ContactPoint then
+            local decalScale = FVector(0.1, 0.1, 0.1)  -- 데칼 크기
+            local decalTransform = FTransform(ContactPoint, FQuat(), decalScale)
+            local decal = World:SpawnActor(decalTransform, "ADecalActor")
+
+            if decal and Config.bDebugLog then
+                PrintToConsole(string.format("[Projectile] Decal spawned at (%.2f, %.2f, %.2f)",
+                    ContactPoint.X, ContactPoint.Y, ContactPoint.Z))
+            end
         end
 
         -- 장애물 파괴

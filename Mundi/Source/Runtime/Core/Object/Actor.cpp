@@ -21,6 +21,25 @@ AActor::AActor()
 
 AActor::~AActor()
 {
+	// GameMode 델리게이트 구독 해제 (이 Actor에 등록된 핸들만 제거)
+	if (World)
+	{
+		AGameModeBase* GameMode = World->GetGameMode();
+		if (GameMode)
+		{
+			if (GameStartedHandle != 0)
+				GameMode->OnGameStarted.RemoveDynamic(GameStartedHandle);
+			if (GameEndedHandle != 0)
+				GameMode->OnGameEnded.RemoveDynamic(GameEndedHandle);
+			if (GameRestartedHandle != 0)
+				GameMode->OnGameRestarted.RemoveDynamic(GameRestartedHandle);
+			if (GamePausedHandle != 0)
+				GameMode->OnGamePaused.RemoveDynamic(GamePausedHandle);
+			if (GameResumedHandle != 0)
+				GameMode->OnGameResumed.RemoveDynamic(GameResumedHandle);
+		}
+	}
+
 	// UE처럼 역순/안전 소멸: 모든 컴포넌트 DestroyComponent
 	for (UActorComponent* Comp : OwnedComponents)
 		if (Comp) Comp->DestroyComponent();  // 안에서 Unregister/Detach 처리한다고 가정
@@ -45,22 +64,23 @@ void AActor::BeginPlay()
 		Script->LuaTemplateFunctions.BeginPlay();
 	}
 
-	// GameMode 델리게이트 구독
+	// GameMode 델리게이트 구독 (핸들 저장)
 	if (World)
 	{
 		AGameModeBase* GameMode = World->GetGameMode();
 		if (GameMode)
 		{
-			GameMode->OnGameStarted.AddDynamic(this, &AActor::OnGameStartedHandler);
-			GameMode->OnGameEnded.AddDynamic(this, &AActor::OnGameEndedHandler);
-			GameMode->OnGameRestarted.AddDynamic(this, &AActor::OnGameRestartedHandler);
-			GameMode->OnGamePaused.AddDynamic(this, &AActor::OnGamePausedHandler);
-			GameMode->OnGameResumed.AddDynamic(this, &AActor::OnGameResumedHandler);
+			GameStartedHandle = GameMode->OnGameStarted.AddDynamic(this, &AActor::OnGameStartedHandler);
+			GameEndedHandle = GameMode->OnGameEnded.AddDynamic(this, &AActor::OnGameEndedHandler);
+			GameRestartedHandle = GameMode->OnGameRestarted.AddDynamic(this, &AActor::OnGameRestartedHandler);
+			GamePausedHandle = GameMode->OnGamePaused.AddDynamic(this, &AActor::OnGamePausedHandler);
+			GameResumedHandle = GameMode->OnGameResumed.AddDynamic(this, &AActor::OnGameResumedHandler);
 
 			UE_LOG("[Actor] Subscribed to GameMode delegates");
 		}
 	}
 }
+
 
 void AActor::Tick(float DeltaSeconds)
 {

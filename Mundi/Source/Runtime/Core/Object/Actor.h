@@ -202,6 +202,13 @@ protected:
     /** 게임 시작 여부 (델리게이트로 관리) */
     bool bGameStarted = false;
 
+    /** 게임 모드 델리게이트 핸들 (등록 해제용) */
+    size_t GameStartedHandle = 0;
+    size_t GameEndedHandle = 0;
+    size_t GameRestartedHandle = 0;
+    size_t GamePausedHandle = 0;
+    size_t GameResumedHandle = 0;
+
 private:
-   
+
 };

@@ -23,6 +23,8 @@
 #include "CoinActor.h"
 #include "ProjectileActor.h"
 #include "ProjectileMovementComponent.h"
+#include "DecalActor.h"
+#include "DecalComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -585,6 +587,17 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetLifespan", &AProjectileActor::SetLifespan
     );
 
+    // UDecalComponent 클래스 등록
+    Lua.new_usertype<UDecalComponent>("UDecalComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>()
+    );
+
+    // ADecalActor 클래스 등록
+    Lua.new_usertype<ADecalActor>("ADecalActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetDecalComponent", &ADecalActor::GetDecalComponent
+    );
+
     // ACameraActor 클래스 등록
     Lua.new_usertype<ACameraActor>("ACameraActor",
         sol::base_classes, sol::bases<AActor>(),
@@ -664,6 +677,11 @@ void UScriptManager::RegisterUserTypeToLua()
                     }
                     return sol::make_object(lua, projectile);
 				}
+                else if(ActorType == "ADecalActor")
+                {
+                    ADecalActor* decal = World->SpawnActor<ADecalActor>(Transform);
+                    return sol::make_object(lua, decal);
+                }
                 else
                 {
                     return sol::nil;
