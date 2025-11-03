@@ -89,8 +89,12 @@ function BeginPlay()
 end
 
 function Tick(deltaTime)
+    -- 회전 중에는 모든 입력 무시
+    if GravitySystem and GravitySystem.IsCurrentlyRotating and GravitySystem.IsCurrentlyRotating() then
+        return
+    end
+
     -- 자동 전진 처리 (Lua에서!)
-   
     if Config.bAutoForward then
         -- GameMode:OnCoinCollected(3)
         ProcessAutoForward(deltaTime)

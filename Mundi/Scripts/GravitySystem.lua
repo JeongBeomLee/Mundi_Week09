@@ -183,9 +183,17 @@ function Initialize(actor)
 end
 
 -- ────────────────────────────────────────────────────────────────────────────
+-- 회전 상태 확인
+-- ────────────────────────────────────────────────────────────────────────────
+function IsCurrentlyRotating()
+    return IsRotating
+end
+
+-- ────────────────────────────────────────────────────────────────────────────
 -- Export (다른 Lua 스크립트에서 require 가능)
 -- ────────────────────────────────────────────────────────────────────────────
 return {
     Initialize = Initialize,
-    OnWallCollision = OnWallCollision
+    OnWallCollision = OnWallCollision,
+    IsCurrentlyRotating = IsCurrentlyRotating
 }

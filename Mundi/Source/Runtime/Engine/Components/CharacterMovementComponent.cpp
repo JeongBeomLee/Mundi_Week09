@@ -325,6 +325,21 @@ void UCharacterMovementComponent::SetGravityDirection(const FVector& NewDirectio
 	}
 }
 
+void UCharacterMovementComponent::SetIsRotating(bool bInIsRotating)
+{
+	bIsRotating = bInIsRotating;
+
+	// 회전 시작 시: 현재 중력 방향의 속도 성분을 제거 (낙하 중이었어도 멈춤)
+	if (bIsRotating)
+	{
+		// 중력 방향의 속도 성분 계산
+		float VerticalSpeed = FVector::Dot(Velocity, GravityDirection);
+
+		// 중력 방향 속도 제거 (수평 속도만 유지)
+		Velocity -= GravityDirection * VerticalSpeed;
+	}
+}
+
 void UCharacterMovementComponent::MoveUpdatedComponent(float DeltaTime)
 {
 	if (Velocity.SizeSquared() == 0.0f)

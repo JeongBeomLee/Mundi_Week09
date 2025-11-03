@@ -245,7 +245,7 @@ public:
 	 * 회전 중일 때는 모든 움직임과 중력이 멈춥니다.
 	 * @param bInIsRotating - true면 회전 중, false면 정상 이동
 	 */
-	void SetIsRotating(bool bInIsRotating) { bIsRotating = bInIsRotating; }
+	void SetIsRotating(bool bInIsRotating);
 
 	/**
 	 * 현재 회전 중인지 확인합니다.
