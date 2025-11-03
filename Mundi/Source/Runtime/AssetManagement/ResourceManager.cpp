@@ -222,7 +222,7 @@ void UResourceManager::CreateTextBillboardMesh()
 
     UQuad* Mesh = NewObject<UQuad>();
     Mesh->Load(BillboardData, Device, true);
-    Add<UQuad>("TextBillboard", Mesh);
+    Add<UQuad>("TextBillboard.dds", Mesh);
     UMeshLoader::GetInstance().AddMeshData("TextBillboard", BillboardData);
 }
 

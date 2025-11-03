@@ -18,8 +18,8 @@ END_PROPERTIES()
 UTextRenderComponent::UTextRenderComponent()
 {
     auto& RM = UResourceManager::GetInstance();
-    TextQuad = RM.Get<UQuad>("TextBillboard");
-    SetMaterialByName(0, "TextBillboard");
+    TextQuad = RM.Get<UQuad>("TextBillboard.dds");
+    SetMaterialByName(0, "TextBillboard.dds");
 
     //if (auto* M = RM.Get<UMaterial>("TextBillboard"))
     //{

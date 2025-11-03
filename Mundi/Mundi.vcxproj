@@ -694,6 +694,7 @@ if "$(Configuration)"=="Debug" (
     <None Include="Scripts\GlobalVariable.lua" />
     <None Include="Scripts\GravitySystem.lua" />
     <None Include="Scripts\MapGenerator.lua" />
+    <None Include="Scripts\Obstacle.lua" />
     <None Include="Scripts\ObstacleGenerator.lua" />
     <None Include="Scripts\print_debug_log.lua" />
     <None Include="Scripts\Projectile.lua" />

@@ -16,6 +16,8 @@ local DEFAULT_POOL_SIZE = 50;
 
 local OBSTACLE_OBJ_FILE_PATH = "Data/Model/smokegrenade.obj";
 
+local BILLBOARD_COUNT = 5;  -- 빌보드 컴포넌트 개수
+
 local HorizontalSpawnRange = DEFAULT_HORIZONTAL_SPAWN_RANGE;
 local VerticalSpawnRange = DEFAULT_VERTICAL_SPAWN_RANGE;
 local Scale = DEFAULT_SCALE;
@@ -42,11 +44,32 @@ local function InitializePool()
         local Obstacle = PieWorld:SpawnActor(STORAGE_POSITION);
         local StaticMeshComponent = Obstacle:GetStaticMeshComponent();
         StaticMeshComponent:SetStaticMesh(OBSTACLE_OBJ_FILE_PATH);
+
         local CapsuleComponent = Obstacle:CreateCapsuleComponent("CollisionComponent");
         CapsuleComponent:SetCapsuleSize(4.0, 5.5, true);
         CapsuleComponent:SetRelativeLocation(FVector(0.0, 3.0, 0.5));
 
+        -- PrintToConsole("[ObstacleGenerator] Obstacle CapsuleComponent created.");
+
+        -- -- 빌보드 컴포넌트를 여러 개 생성
+        -- local centerY = 2.5
+        -- local spacing = 2.5
+
+        -- -- 빌보드 개수가 홀수/짝수일 때 중앙 정렬 계산
+        -- local startOffset = -(BILLBOARD_COUNT - 1) * spacing / 2
+
+        -- for j = 1, BILLBOARD_COUNT do
+        --     local yOffset = startOffset + (j - 1) * spacing
+        --     local BillboardComponent = Obstacle:CreateBillboardComponent("BillboardComponent" .. j);
+        --     BillboardComponent:SetTextureName("Data/UI/Icons/Pawn_64x.png");
+        --     BillboardComponent:SetRelativeLocation(FVector(-5.0, centerY + yOffset, 4.0));
+            
+        --     PrintToConsole("[ObstacleGenerator] Obstacle BillboardComponent " .. j .. " created at Y: " .. (centerY + yOffset));
+        -- end
+
         Obstacle:AttachScript("Obstacle.lua");
+
+        -- PrintToConsole("[ObstacleGenerator] Obstacle script attached.");
 
         Queue.push(ObstaclePool, Obstacle);
     end

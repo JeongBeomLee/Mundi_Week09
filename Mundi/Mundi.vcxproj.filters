@@ -1113,6 +1113,9 @@
     <None Include="Scripts\CoinGenerator.lua">
       <Filter>Scripts</Filter>
     </None>
+    <None Include="Scripts\Obstacle.lua">
+      <Filter>Scripts</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

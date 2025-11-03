@@ -25,6 +25,8 @@
 #include "ProjectileMovementComponent.h"
 #include "DecalActor.h"
 #include "DecalComponent.h"
+#include "TextRenderComponent.h"
+#include "BillboardComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -279,6 +281,19 @@ void UScriptManager::RegisterUserTypeToLua()
         sol::no_constructor);
     NameType["ToString"] = &FName::ToString;
     
+    // UActorComponent 등록
+    Lua.new_usertype<UActorComponent>("UActorComponent",
+        sol::constructors<UActorComponent()>(),
+        "SetActive", &UActorComponent::SetActive,
+        "IsActive", &UActorComponent::IsActive,
+        "SetTickEnabled", &UActorComponent::SetTickEnabled,
+        "IsTickEnabled", &UActorComponent::IsTickEnabled,
+        "SetHiddenInGame", &UActorComponent::SetHiddenInGame,
+        "GetHiddenInGame", &UActorComponent::GetHiddenInGame,
+        "GetOwner", &UActorComponent::GetOwner,
+        "IsRegistered", &UActorComponent::IsRegistered
+    );
+
     // USceneComponent 등록
     sol::usertype<USceneComponent> SceneComponentType = Lua.new_usertype<USceneComponent>(
         "USceneComponent",
@@ -327,6 +342,25 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetCapsuleCenter", &UCapsuleComponent::GetCapsuleCenter,
         "CapsuleRadius", &UCapsuleComponent::CapsuleRadius,
         "CapsuleHalfHeight", &UCapsuleComponent::CapsuleHalfHeight
+    );
+
+	// UTextRenderComponent 등록
+    Lua.new_usertype<UTextRenderComponent>("UTextRenderComponent",
+        sol::base_classes, sol::bases<UPrimitiveComponent, USceneComponent, UActorComponent>(),
+        "GetStaticMesh", &UTextRenderComponent::GetStaticMesh,
+        "GetMaterial", &UTextRenderComponent::GetMaterial,
+        "SetMaterial", &UTextRenderComponent::SetMaterial,
+		"CreateVerticesForString", &UTextRenderComponent::CreateVerticesForString
+    );
+
+    // UBillboardComponent 등록
+    Lua.new_usertype<UBillboardComponent>("UBillboardComponent",
+        sol::base_classes, sol::bases<UPrimitiveComponent, USceneComponent, UActorComponent>(),
+        "GetStaticMesh", &UBillboardComponent::GetStaticMesh,
+        "GetMaterial", &UBillboardComponent::GetMaterial,
+        "SetMaterial", &UBillboardComponent::SetMaterial,
+        "SetTextureName", &UBillboardComponent::SetTextureName,
+        "GetFilePath", &UBillboardComponent::GetFilePath
     );
 
     // FVector 타입을 Lua에 등록
@@ -422,6 +456,7 @@ void UScriptManager::RegisterUserTypeToLua()
 		"SetActorHiddenInGame", &AActor::SetActorHiddenInGame,
 		"DestroyAllComponents", &AActor::DestroyAllComponents,
 		"Destroy", &AActor::Destroy,
+        "AddOwnedComponent", &AActor::AddOwnedComponent,
         // CapsuleComponent 생성 및 부착 헬퍼
         "CreateCapsuleComponent", [](AActor* self, sol::optional<FString> name) -> UCapsuleComponent* {
             if (!self) return nullptr;
@@ -433,17 +468,63 @@ void UScriptManager::RegisterUserTypeToLua()
             }
             return Capsule;
         },
-		// 스크립트 부착 헬퍼 함수
-		"AttachScript", [](AActor* self, const FString& scriptName) -> void {
+        "CreateTextRenderComponent", [](AActor* self, sol::optional<FString> name) -> UTextRenderComponent* {
+            if (!self) return nullptr;
+            FName componentName = name.value_or("TextRenderComponent");
+            UTextRenderComponent* TextRender = self->CreateDefaultSubobject<UTextRenderComponent>(componentName);
+            if (TextRender) {
+                // Owner 설정
+                TextRender->SetOwner(self);
+
+                // Actor에 컴포넌트 등록
+                self->AddOwnedComponent(TextRender);
+
+                // RootComponent에 부착 (옵션)
+                if (self->GetRootComponent()) {
+                    TextRender->SetupAttachment(self->GetRootComponent(), EAttachmentRule::KeepRelative);
+                }
+            }
+            return TextRender;
+		},
+        "CreateBillboardComponent", [](AActor* self, sol::optional<FString> name) -> UBillboardComponent* {
+            if (!self) return nullptr;
+            FName componentName = name.value_or("BillboardComponent");
+            UBillboardComponent* Billboard = self->CreateDefaultSubobject<UBillboardComponent>(componentName);
+            if (Billboard) {
+                // Owner 설정
+                Billboard->SetOwner(self);
+                // Actor에 컴포넌트 등록
+                self->AddOwnedComponent(Billboard);
+                // RootComponent에 부착 (옵션)
+                if (self->GetRootComponent()) {
+                    Billboard->SetupAttachment(self->GetRootComponent(), EAttachmentRule::KeepRelative);
+                }
+
+                Billboard->SetHiddenInGame(false);
+            }
+
+			return Billboard;
+
+            //if (!self) return nullptr;
+            //FName componentName = name.value_or("BillboardComponent");
+            //UBillboardComponent* Billboard = self->CreateDefaultSubobject<UBillboardComponent>(componentName);
+            //if (Billboard && self->GetRootComponent()) {
+            //    // RootComponent에 부착하여 Transform 동기화
+            //    Billboard->SetupAttachment(self->GetRootComponent(), EAttachmentRule::KeepRelative);
+            //}
+            //return Billboard;
+
+		},
+        "AttachScript", [](AActor* self, const FString& scriptName) -> void {
             if (!self) return;
             FLuaLocalValue LuaLocalValue;
             LuaLocalValue.MyActor = self;
             LuaLocalValue.GameMode = self->World ? self->World->GetGameMode() : nullptr;
             UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, scriptName);
-            if(self->World->bPie)
-            {
-                self->BeginPlay(); // BeginPlay 호출
-			}
+   //         if(self->World->bPie)
+   //         {
+   //             self->BeginPlay(); // BeginPlay 호출
+			//}
 		}
     );
 
