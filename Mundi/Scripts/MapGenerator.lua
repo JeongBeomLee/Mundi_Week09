@@ -80,6 +80,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
+                    Row[j]:SetIsFloor(false);  -- 상단은 벽
                 end
             else
                 Row[j] = nil;
@@ -103,6 +104,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
+                    Row[j]:SetIsFloor(true);  -- 하단은 바닥
                 end
             else
                 Row[j] = nil;
@@ -126,6 +128,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
+                    Row[j]:SetIsFloor(false);  -- 왼쪽은 벽
                 end
             else
                 Row[j] = nil;
@@ -149,6 +152,7 @@ local function CreateMapChunkWithCellChunk(CellChunk, XPosition)
                 Row[j] = Queue.pop(ChunkPool);
                 if Row[j] then
                     Row[j]:SetLocation(Location);
+                    Row[j]:SetIsFloor(false);  -- 오른쪽은 벽
                 end
             else
                 Row[j] = nil;
@@ -210,8 +214,8 @@ local function InitializePool()
     local PoolSize = (Width + Height) * Depth * 2 * MapSize;
     PrintToConsole("[MapGenerator] Creating pool with " .. PoolSize .. " actors");
 
-    for i = 1, PoolSize do 
-        Queue.push(ChunkPool, world:SpawnActor(PlaceOfExile));
+    for i = 1, PoolSize do
+        Queue.push(ChunkPool, world:SpawnActor(PlaceOfExile, "AGravityWall"));
     end
 
     PrintToConsole("[MapGenerator] Pool initialized. Queue size: " .. (ChunkPool.last - ChunkPool.first + 1));

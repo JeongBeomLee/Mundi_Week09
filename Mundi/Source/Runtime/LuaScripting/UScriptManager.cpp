@@ -462,19 +462,20 @@ void UScriptManager::RegisterUserTypeToLua()
     Lua.new_usertype<UWorld>("UWorld",
         sol::no_constructor,
         "SpawnActor", sol::overload(
-            // AStaticMeshActor 생성
+            // AStaticMeshActor 생성 (기본)
             [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
                 return World->SpawnActor<AStaticMeshActor>(Transform);
             },
-            // AGravityWall 생성 (타입 문자열로 구분)
-            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> AActor* {
+            // 타입 문자열로 Actor 생성
+            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> AGravityWall* {
                 if (ActorType == "AGravityWall")
                 {
                     return World->SpawnActor<AGravityWall>(Transform);
                 }
                 else
                 {
-                    return World->SpawnActor<AStaticMeshActor>(Transform);
+                    // 기본값은 nullptr 반환
+                    return nullptr;
                 }
             }
         ),
