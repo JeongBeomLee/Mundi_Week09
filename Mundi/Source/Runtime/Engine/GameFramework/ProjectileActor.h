@@ -71,12 +71,12 @@ public:
 	 */
 	void SetLifespan(float Lifespan);
 
+	virtual void BeginPlay() override;
 protected:
 	// ────────────────────────────────────────────────
 	// 생명주기
 	// ────────────────────────────────────────────────
 
-	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
 	// ────────────────────────────────────────────────

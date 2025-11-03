@@ -532,7 +532,11 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetCameraComponent", &ACameraActor::GetCameraComponent,
         "GetForward", &ACameraActor::GetForward,
         "GetRight", &ACameraActor::GetRight,
-        "GetUp", &ACameraActor::GetUp
+        "GetUp", &ACameraActor::GetUp,
+        "GetViewMatrix", &ACameraActor::GetViewMatrix,
+        "GetProjectionMatrix", sol::overload(
+            static_cast<FMatrix(ACameraActor::*)() const>(&ACameraActor::GetProjectionMatrix)
+        )
     );
 
     // AGravityWall 클래스 등록 (AActor 상속)
@@ -552,18 +556,6 @@ void UScriptManager::RegisterUserTypeToLua()
         ),
         "Origin", &FRay::Origin,
         "Direction", &FRay::Direction
-    );
-
-    // ACameraActor 클래스 등록
-    Lua.new_usertype<ACameraActor>("ACameraActor",
-        sol::base_classes, sol::bases<AActor>(),
-        "GetForward", &ACameraActor::GetForward,
-        "GetRight", &ACameraActor::GetRight,
-        "GetUp", &ACameraActor::GetUp,
-        "GetViewMatrix", &ACameraActor::GetViewMatrix,
-        "GetProjectionMatrix", sol::overload(
-            static_cast<FMatrix(ACameraActor::*)() const>(&ACameraActor::GetProjectionMatrix)
-        )
     );
 
     // UWorld 클래스 등록
@@ -597,7 +589,12 @@ void UScriptManager::RegisterUserTypeToLua()
             }
         ),
         "SpawnProjectileActor", [](UWorld* World, const FTransform& Transform) -> AProjectileActor* {
-            return World->SpawnActor<AProjectileActor>(Transform);
+            AProjectileActor* NewProjectile = World->SpawnActor<AProjectileActor>(Transform);
+            if (NewProjectile && World->bPie)
+            {
+                NewProjectile->BeginPlay();
+            }
+            return NewProjectile;
         },
 
         "DestroyActor", &UWorld::DestroyActor,
