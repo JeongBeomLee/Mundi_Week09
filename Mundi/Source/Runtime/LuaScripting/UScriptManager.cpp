@@ -484,6 +484,16 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetLifespan", &AProjectileActor::SetLifespan
     );
 
+    // AGravityWall 클래스 등록 (AActor 상속)
+    Lua.new_usertype<AGravityWall>("AGravityWall",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetStaticMeshComponent", &AGravityWall::GetStaticMeshComponent,
+        "GetBoxComponent", &AGravityWall::GetBoxComponent,
+        "SetMeshPath", &AGravityWall::SetMeshPath,
+        "GetWallNormal", &AGravityWall::GetWallNormal,
+        "SetWallNormal", &AGravityWall::SetWallNormal
+    );
+
     // FRay 구조체 등록 (마우스 방향 계산용)
     Lua.new_usertype<FRay>("FRay",
         sol::call_constructor, sol::factories(
