@@ -34,3 +34,6 @@ end
 function Tick(dt)
     -- PrintToConsole("[coin_collision] Tick] ");
 end
+
+-- 부활 작업
+function Restart() end

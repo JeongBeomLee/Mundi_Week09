@@ -29,3 +29,6 @@ function Tick(dt)
     end
     PrintToConsole("[MyActor's Name] ".. MyActor:GetName():ToString())
 end
+
+-- 부활 작업
+function Restart() end

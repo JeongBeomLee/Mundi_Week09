@@ -711,6 +711,7 @@ if "$(Configuration)"=="Debug" (
     <Content Include="Scripts\ObstacleGenerator.lua" />
     <Content Include="Scripts\Queue.lua" />
     <Content Include="Scripts\RandomManager.lua" />
+    <Content Include="Scripts\CollisionUtility.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
