@@ -139,7 +139,7 @@ void AActor::DestroyImmediate()
 	ClearSceneComponentCaches();
 	
 	// Lua 스크립트 정리
-	//UScriptManager::GetInstance().DetachAllScriptFrom(this);
+	UScriptManager::GetInstance().DetachAllScriptFrom(this);
 }
 
 
