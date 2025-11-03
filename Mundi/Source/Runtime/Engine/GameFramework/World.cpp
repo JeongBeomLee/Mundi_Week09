@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "SelectionManager.h"
 #include "Picking.h"
 #include "CameraActor.h"
@@ -102,31 +102,26 @@ void UWorld::InitializeGizmo()
 
 void UWorld::Tick(float DeltaSeconds)
 {
-	// ⭐ 프레임 끝에 지연 삭제된 Actor들 처리
-	ProcessPendingActorDestruction();
-
 	Partition->Update(DeltaSeconds, /*budget*/256);
 
 	//순서 바꾸면 안댐
 	if (Level)
 	{
-		// Index-based iteration: Tick 중에 Actor가 추가/삭제되어도 안전
-		const TArray<AActor*>& Actors = Level->GetActors();
-		for (size_t i = 0; i < Actors.size(); ++i)
+		for (AActor* Actor : Level->GetActors())
 		{
-			AActor* Actor = Actors[i];
-			if (Actor && (Actor->CanTickInEditor() || bPie))
+			// PendingKill 상태인 Actor는 Tick하지 않음
+			if (Actor && !Actor->IsPendingKill() && (Actor->CanTickInEditor() || bPie))
 			{
 				Actor->Tick(DeltaSeconds);
 			}
 		}
 	}
-
-	// EditorActors도 인덱스 기반 순회로 변경
-	for (size_t i = 0; i < EditorActors.size(); ++i)
+	for (AActor* EditorActor : EditorActors)
 	{
-		AActor* EditorActor = EditorActors[i];
-		if (EditorActor && !bPie) EditorActor->Tick(DeltaSeconds);
+		if (EditorActor && !EditorActor->IsPendingKill() && !bPie)
+		{
+			EditorActor->Tick(DeltaSeconds);
+		}
 	}
 
 	// 충돌 감지 업데이트
@@ -134,6 +129,9 @@ void UWorld::Tick(float DeltaSeconds)
 	{
 		CollisionManager->UpdateCollisions(DeltaSeconds);
 	}
+
+	// ⭐ 프레임 끝에 지연 삭제된 Actor들 처리
+	ProcessPendingActorDestruction();
 }
 
 UWorld* UWorld::DuplicateWorldForPIE(UWorld* InEditorWorld)
@@ -273,20 +271,40 @@ void UWorld::ProcessPendingActorDestruction()
 			SelectionMgr->DeselectActor(Actor);
 		}
 
-		// 실제 파괴 수행
-		Actor->DestroyImmediate();
+		Actor->EndPlay(EEndPlayReason::Destroyed);
 
-		// 레벨에서 제거
-		if (Level)
+		// 컴포넌트 정리 (등록 해제 → 파괴)
+		TArray<USceneComponent*> Components = Actor->GetSceneComponents();
+		for (USceneComponent* Comp : Components)
 		{
-			Level->RemoveActor(Actor);
+			if (Comp)
+			{
+				Comp->SetOwner(nullptr); // 소유자 해제
+			}
 		}
 
 		// 옥트리에서 제거
 		OnActorDestroyed(Actor);
 
-		// 메모리 해제
-		ObjectFactory::DeleteObject(Actor);
+		// 실제 파괴 수행
+		Actor->DestroyImmediate();
+
+		// 레벨에서 제거
+		if (Level && Level->RemoveActor(Actor))
+		{
+			// 옥트리에서 제거
+			OnActorDestroyed(Actor);
+
+			// 메모리 해제
+			ObjectFactory::DeleteObject(Actor);
+
+			// 삭제된 액터 정리
+			if (SelectionMgr)
+			{
+				SelectionMgr->CleanupInvalidActors();
+				SelectionMgr->ClearSelection();
+			}
+		}
 	}
 
 	// 삭제된 액터 정리

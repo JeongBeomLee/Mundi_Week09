@@ -683,6 +683,7 @@ if "$(Configuration)"=="Debug" (
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\actor_transform.lua" />
+    <None Include="Scripts\coin_collision.lua" />
     <None Include="Scripts\MapGenerator.lua" />
     <None Include="Scripts\print_debug_log.lua" />
     <None Include="Scripts\RunnerCharacter.lua" />
