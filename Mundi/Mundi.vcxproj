@@ -712,6 +712,7 @@ if "$(Configuration)"=="Debug" (
     <Content Include="Scripts\GlobalVariable.lua" />
     <Content Include="Scripts\MapGenerator.lua" />
     <Content Include="Scripts\ObstacleGenerator.lua" />
+    <Content Include="Scripts\PlayerRotationUtility.lua" />
     <Content Include="Scripts\Queue.lua" />
     <Content Include="Scripts\RandomManager.lua" />
     <Content Include="Scripts\CollisionUtility.lua" />

@@ -4,6 +4,7 @@ local Queue = require("Queue");
 local GlobalObjectManager = require("GlobalObjectManager");
 local RandomManager = require("RandomManager");
 local CollisionUtility = require("CollisionUtility");
+local PlayerRotationUtility = require("PlayerRotationUtility");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
@@ -27,6 +28,9 @@ local ObstaclesSpawned = Queue.new();
 
 local PoolSize = DEFAULT_POOL_SIZE;
 local ObstaclePool = Queue.new();
+
+local PRU = PlayerRotationUtility.New();
+local ObstacleRotation = FVector(0.0, 0.0, 0.0);  -- BeginPlay에서 초기화됨
 
 -- 충돌 컴포넌트가 포함되어 있으면 다른 물체와 OnOVerlap될 수 있으므로
 -- Pool마다 STORAGE_POSITION을 다르게 해야 함.
@@ -69,6 +73,7 @@ local function SpawnObstacle()
     end
     local ObstacleLocation = GetObstacleSpawnLocation();
     Obstacle:SetLocation(ObstacleLocation);
+    Obstacle:SetRotation(ObstacleRotation);
     Queue.push(ObstaclesSpawned, Obstacle);
 end
 
@@ -94,6 +99,20 @@ local function CheckObstacleLocationAndWithDraw()
     end
 end
 
+local function UpdateObstaclesRotation()
+    local queueSize = ObstaclesSpawned.last - ObstaclesSpawned.first + 1;
+    local MyActorRotation = MyActor:GetRotation();
+    
+    for i = 1, queueSize do
+        local Obstacle = Queue.pop(ObstaclesSpawned);
+        if (Obstacle ~= nil) then
+            Obstacle:SetRotation(MyActorRotation);
+        end
+        Queue.push(ObstaclesSpawned, Obstacle);
+    end
+    ObstacleRotation = MyActorRotation;
+end
+
 -- Template functions
 function BeginPlay()
     PrintToConsole("[ObstacleGenerator] Begin Play");
@@ -101,6 +120,9 @@ function BeginPlay()
 
     -- 풀 초기화
     InitializePool();
+    
+    -- 현재 회전값 저장
+    PlayerRotationUtility.Initilaize(PRU, MyActor:GetRotation());
 
     -- 코루틴으로 장애물 스폰 시작 (한 번만 실행)
     StartCoroutine(function()
@@ -121,6 +143,10 @@ end
 
 function Tick(dt)
     CheckObstacleLocationAndWithDraw();
+
+    if PlayerRotationUtility.IsUpdated(PRU, MyActor:GetRotation()) then
+        UpdateObstaclesRotation();
+    end
 end
 
 -- 부활 작업
