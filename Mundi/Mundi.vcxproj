@@ -688,11 +688,15 @@ if "$(Configuration)"=="Debug" (
   <ItemGroup>
     <None Include="Scripts\actor_transform.lua" />
     <None Include="Scripts\coin_collision.lua" />
+    <None Include="Scripts\GlobalObjectManager.lua" />
+    <None Include="Scripts\GlobalVariable.lua" />
     <None Include="Scripts\GravitySystem.lua" />
     <None Include="Scripts\MapGenerator.lua" />
+    <None Include="Scripts\ObstacleGenerator.lua" />
     <None Include="Scripts\print_debug_log.lua" />
     <None Include="Scripts\Projectile.lua" />
     <None Include="Scripts\Queue.lua" />
+    <None Include="Scripts\RandomManager.lua" />
     <None Include="Scripts\RunnerCharacter.lua" />
     <None Include="Scripts\template.lua" />
     <None Include="Scripts\test_coroutine.lua">

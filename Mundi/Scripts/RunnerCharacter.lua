@@ -52,6 +52,16 @@ local CharacterMovement = nil
 -- ════════════════════════════════════════════════════════════════════════════
 
 function BeginPlay()
+    -- 캐릭터 메시 변경
+    if MyActor.GetStaticMesh then
+        local StaticMeshComponent = MyActor:GetStaticMesh()
+        if StaticMeshComponent then
+            -- 원하는 메시 파일 경로로 변경
+            StaticMeshComponent:SetStaticMesh("Data/Model/Cube.obj")
+          --  PrintToConsole("[RunnerCharacter] Character mesh changed to smokegrenade.obj")
+        end
+    end
+
     -- CharacterMovement 컴포넌트 가져오기 및 설정 적용
     if MyActor.GetCharacterMovement then
         CharacterMovement = MyActor:GetCharacterMovement()

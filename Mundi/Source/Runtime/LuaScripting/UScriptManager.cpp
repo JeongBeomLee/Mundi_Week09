@@ -487,7 +487,8 @@ void UScriptManager::RegisterUserTypeToLua()
         "MoveRight", &ACharacter::MoveRight,
         "Turn", &ACharacter::Turn,
         "LookUp", &ACharacter::LookUp,
-        "GetCharacterMovement", &ACharacter::GetCharacterMovement
+        "GetCharacterMovement", &ACharacter::GetCharacterMovement,
+        "GetStaticMesh", &ACharacter::GetStaticMesh
     );
 
     // UCharacterMovementComponent 클래스 등록
