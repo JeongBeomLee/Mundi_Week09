@@ -45,7 +45,6 @@ void UCoroutineScheduler::Update(double Dt)
 
         if (Entry.WaitingNextFrame)
         {
-            UE_LOG("[Coroutine] Ready: WaitingNextFrame, Entry index %u", index);
             Ready = true;
             Entry.WaitingNextFrame = false;
         }
@@ -53,7 +52,6 @@ void UCoroutineScheduler::Update(double Dt)
         {
             if (Entry.WaitUntil())
             {
-                UE_LOG("[Coroutine] Ready: WaitUntil condition met, Entry index %u", index);
                 Ready = true;
                 Entry.WaitUntil = nullptr;
             }
@@ -61,19 +59,16 @@ void UCoroutineScheduler::Update(double Dt)
         else if (CurrentTime >= Entry.WakeTime)
         {
 
-            UE_LOG("[Coroutine] Ready: WakeTime reached (CurrentTime: %.3f >= WakeTime: %.3f), Entry index %u",
-                   CurrentTime, Entry.WakeTime, index);
             Ready = true;
         }
 
         if (!Ready) { continue; }
 
-        UE_LOG("[Coroutine] Executing coroutine..., Entry index %u", index);
 
-		// ✅ auto로 받아서 sol2가 자동으로 타입 추론하도록 함
+		// auto로 받아서 sol2가 자동으로 타입 추론하도록 함
         auto result = Entry.Co(); // 다음 yield에 도달할 때까지 코루틴 실행 -> yield의 인자 리턴
 
-        // ✅ 에러 체크
+        // 에러 체크
         if (!result.valid())
         {
             sol::error err = result;
@@ -82,37 +77,32 @@ void UCoroutineScheduler::Update(double Dt)
             continue;
         }
 
-        // ✅ 코루틴 상태 확인
+        // 코루틴 상태 확인
         if (Entry.Co.status() == sol::call_status::ok)
         {
-            UE_LOG("[Coroutine] Finished (status: ok), Entry index %u", index);
 			Entry.bFinished = true;
             continue;
         }
 
-        // ✅ yield 값 해석 - sol::object로 명시적 변환
+        // yield 값 해석 - sol::object로 명시적 변환
         sol::object YieldedValue = result;  // auto -> sol::object
         sol::type ValueType = YieldedValue.get_type();
 
-        UE_LOG("[Coroutine] Yielded value type: %d, Entry index %u", static_cast<int>(ValueType), index);
 
-        // ✅ nil 체크
+        // nil 체크
         if (ValueType == sol::type::lua_nil)
         {
-            UE_LOG("[Coroutine] Yielded: nil (wait next frame), Entry index %u", index);
             Entry.WaitingNextFrame = true;
         }
-        // ✅ number 타입
+        // number 타입
         else if (ValueType == sol::type::number)
         {
             double Sec = YieldedValue.as<double>();
             Entry.WakeTime = CurrentTime + Sec;
-            UE_LOG("[Coroutine] Yielded: %.3f seconds (WakeTime: %.3f), Entry index %u", Sec, Entry.WakeTime, index);
         }
-        // ✅ function 타입
+        // function 타입
         else if (ValueType == sol::type::function)
         {
-            UE_LOG("[Coroutine] Yielded: function (wait until condition), Entry index %u", index);
             sol::function Pred = YieldedValue.as<sol::function>();
             Entry.WaitUntil = [Pred]() {
                 sol::protected_function_result R = Pred();
@@ -121,7 +111,6 @@ void UCoroutineScheduler::Update(double Dt)
         }
         else
         {
-            UE_LOG("[Coroutine] Yielded: unknown type (%d) (wait next frame), Entry index %u", static_cast<int>(ValueType), index);
             Entry.WaitingNextFrame = true;
         }
     }
