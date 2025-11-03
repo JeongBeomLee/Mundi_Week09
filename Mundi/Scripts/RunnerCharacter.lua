@@ -31,7 +31,7 @@ local Config = {
     RightInput = 0.0,           -- D 키 입력
 
     -- 프로젝타일 설정
-    ProjectileSpeed = 2000.0,    -- 발사체 속도 (cm/s)
+    ProjectileSpeed = 1500.0,    -- 발사체 속도 (cm/s)
     ProjectileSpawnOffset = FVector(0, 0, 0), -- 발사 위치 오프셋 (캐릭터 위치에서 시작)
     ProjectileGravityScale = 1.0, -- 발사체 중력 스케일
     ProjectileLifespan = 5.0,   -- 발사체 생명 시간 (초)
