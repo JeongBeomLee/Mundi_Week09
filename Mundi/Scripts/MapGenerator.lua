@@ -10,10 +10,10 @@ local RandomManager = require("RandomManager");
 local DEFAULT_WIDTH = 10;
 local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
-local DEFAULT_MAP_SIZE = 20;
+local DEFAULT_MAP_SIZE = 30;
 local DEFAULT_SCALE = 2.0;
 local DEFAULT_FILLRATE = 1.1;
-local DEFAULT_MAPSTART_OFFSET = -5.0;
+local DEFAULT_MAPSTART_OFFSET = -10.0;
 
 local DEFAULT_CURRENT_MAP_ID = 0;
 local DEFAULT_CHUNK_REMOVAL_ID = 0;
@@ -240,7 +240,10 @@ end
 local function InitializeMap()
     for i = 1, MapSize do
         CellChunks[i] = CreateCellChunk();
-        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStartOffset - 1));
+        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(
+                CellChunks[i],
+                Depth * Scale * (i + MapStartOffset)
+        );
     end
 end
 
