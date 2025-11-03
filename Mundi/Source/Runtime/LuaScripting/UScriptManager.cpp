@@ -332,8 +332,14 @@ void UScriptManager::RegisterUserTypeToLua()
     // FQuat 타입을 Lua에 등록
     Lua.new_usertype<FQuat>("FQuat",
         sol::call_constructor, sol::factories(
-            []() { return FQuat(); }
+            []() { return FQuat(); },
+            [](float x, float y, float z, float w) { return FQuat(x, y, z, w); }
         ),
+        // 멤버 변수 접근
+        "X", &FQuat::X,
+        "Y", &FQuat::Y,
+        "Z", &FQuat::Z,
+        "W", &FQuat::W,
         // 곱셈 연산자 (회전 결합)
         sol::meta_function::multiplication, [](const FQuat& a, const FQuat& b) { return a * b; }
     );
@@ -533,6 +539,11 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetForward", &ACameraActor::GetForward,
         "GetRight", &ACameraActor::GetRight,
         "GetUp", &ACameraActor::GetUp,
+        "GetRotation", &ACameraActor::GetActorRotation,
+        "SetRotation", sol::overload(
+            static_cast<void(ACameraActor::*)(const FVector&)>(&ACameraActor::SetActorRotation),
+            static_cast<void(ACameraActor::*)(const FQuat&)>(&ACameraActor::SetActorRotation)
+        ),
         "GetViewMatrix", &ACameraActor::GetViewMatrix,
         "GetProjectionMatrix", sol::overload(
             static_cast<FMatrix(ACameraActor::*)() const>(&ACameraActor::GetProjectionMatrix)

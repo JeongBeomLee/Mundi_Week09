@@ -4,7 +4,7 @@
 -- ────────────────────────────────────────────────────────────────────────────
 
 -- 상수 정의
-local ROTATION_DURATION = 0.2  -- 회전 애니메이션 시간 (초)
+local ROTATION_DURATION = 0.5  -- 회전 애니메이션 시간 (초)
 local GRAVITY_MAGNITUDE = 980.0  -- 중력 크기 (cm/s²)
 
 -- 상태 변수
@@ -79,6 +79,13 @@ local function RotateToNewGravity(newGravityDir)
 
         while elapsed < ROTATION_DURATION do
             local dt = coroutine.yield()  -- DeltaTime 반환
+
+            -- dt가 nil이면 기본값 사용
+            if not dt then
+                PrintToConsole("[GravitySystem] WARNING: dt is nil, using default 0.016")
+                dt = 0.016  -- 기본 60 FPS
+            end
+
             elapsed = elapsed + dt
 
             local alpha = math.min(1.0, elapsed / ROTATION_DURATION)
