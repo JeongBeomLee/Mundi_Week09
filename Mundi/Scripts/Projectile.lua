@@ -4,6 +4,12 @@ local _ENV = ...
 -- ProjectileActor에 부착되어 사용됩니다
 
 -- ════════════════════════════════════════════════════════════════════════════
+-- 외부 모듈
+-- ════════════════════════════════════════════════════════════════════════════
+
+local CollisionUtility = require("CollisionUtility")
+
+-- ════════════════════════════════════════════════════════════════════════════
 -- 설정
 -- ════════════════════════════════════════════════════════════════════════════
 
@@ -67,17 +73,24 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         PrintToConsole("[Projectile] Hit: " .. actorName)
     end
 
-    -- 장애물인지 확인 (이름에 "Obstacle" 포함)
-    if string.find(actorName, "Obstacle") then
+    -- CollisionUtility를 사용하여 장애물인지 확인
+    if CollisionUtility.IsObstacleActor(OtherActor) then
         if Config.bDebugLog then
-            PrintToConsole("[Projectile] Hit Obstacle! Destroying projectile...")
+            PrintToConsole("[Projectile] Hit Obstacle! Destroying both obstacle and projectile...")
         end
 
-        -- 장애물과 충돌 시 발사체 파괴
+        -- 장애물 파괴
+        if OtherActor.SetActorHiddenInGame then
+            OtherActor:SetActorHiddenInGame(true)
+        end
+        if OtherActor.Destroy then
+            OtherActor:Destroy()
+        end
+
+        -- 발사체도 파괴
         if MyActor.SetActorHiddenInGame then
             MyActor:SetActorHiddenInGame(true)
         end
-
         if MyActor.Destroy then
             MyActor:Destroy()
         end

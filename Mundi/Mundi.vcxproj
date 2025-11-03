@@ -688,6 +688,7 @@ if "$(Configuration)"=="Debug" (
   <ItemGroup>
     <None Include="Scripts\actor_transform.lua" />
     <None Include="Scripts\coin_collision.lua" />
+    <None Include="Scripts\CollisionUtility.lua" />
     <None Include="Scripts\GlobalObjectManager.lua" />
     <None Include="Scripts\GlobalVariable.lua" />
     <None Include="Scripts\GravitySystem.lua" />
