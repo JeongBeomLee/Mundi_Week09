@@ -5,6 +5,9 @@
 #include "pch.h"
 #include "CharacterMovementComponent.h"
 #include "Character.h"
+#include "RunnerCharacter.h"
+#include "CollisionComponent/BoxComponent.h"
+#include "GravityWall.h"
 
 IMPLEMENT_CLASS(UCharacterMovementComponent)
 
@@ -291,6 +294,52 @@ void UCharacterMovementComponent::MoveUpdatedComponent(float DeltaTime)
 
 	// 위치 업데이트
 	CharacterOwner->SetActorLocation(NewLocation);
+
+	// 벽 충돌 체크 (오버랩 발생 시 이동 취소)
+	if (CheckWallCollision())
+	{
+		// 이동 취소: 이전 위치로 복원
+		CharacterOwner->SetActorLocation(CurrentLocation);
+
+		// 수평 속도 초기화 (Z축 속도는 유지 - 중력/점프 영향)
+		Velocity.X = 0.0f;
+		Velocity.Y = 0.0f;
+	}
+}
+
+bool UCharacterMovementComponent::CheckWallCollision()
+{
+	if (!CharacterOwner)
+	{
+		return false;
+	}
+
+	// RunnerCharacter의 CollisionBox 가져오기
+	ARunnerCharacter* RunnerChar = Cast<ARunnerCharacter>(CharacterOwner);
+	if (!RunnerChar)
+	{
+		return false;
+	}
+
+	UBoxComponent* CollisionBox = RunnerChar->GetCollisionBox();
+	if (!CollisionBox)
+	{
+		return false;
+	}
+
+	// CollisionBox의 오버랩 정보 확인
+	for (const FOverlapInfo& Info : CollisionBox->OverlapInfos)
+	{
+		// GravityWall과 충돌했는지 확인
+		AGravityWall* Wall = Cast<AGravityWall>(Info.OtherActor);
+		if (Wall && !Wall->IsFloor())
+		{
+			// 벽과 충돌 중 (bIsFloor = false)
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool UCharacterMovementComponent::CheckGround()
@@ -300,23 +349,54 @@ bool UCharacterMovementComponent::CheckGround()
 		return false;
 	}
 
-	FVector Location = CharacterOwner->GetActorLocation();
-
-	// 간단한 지면 체크: Z = 0을 지면으로 가정
-	// 나중에 충돌 시스템과 연결하여 제대로 구현
-	constexpr float GroundLevel = 0.0f;
-	constexpr float GroundTolerance = 0.01f; // 1cm 오차 허용
-
-	// 지면 근처에 있고, 아래로 떨어지지 않고 있으면 지면에 있음
-	bool bNearGround = Location.Z <= (GroundLevel + GroundTolerance);
-	bool bNotRising = Velocity.Z <= 0.0f;
-
-	if (bNearGround && bNotRising)
+	// RunnerCharacter의 CollisionBox 가져오기
+	ARunnerCharacter* RunnerChar = Cast<ARunnerCharacter>(CharacterOwner);
+	if (!RunnerChar)
 	{
-		// 지면에 정확히 맞춤
-		Location.Z = GroundLevel;
-		CharacterOwner->SetActorLocation(Location);
-		return true;
+		return false;
+	}
+
+	UBoxComponent* CollisionBox = RunnerChar->GetCollisionBox();
+	if (!CollisionBox)
+	{
+		return false;
+	}
+
+	// CollisionBox의 오버랩 정보 확인
+	for (const FOverlapInfo& Info : CollisionBox->OverlapInfos)
+	{
+		// GravityWall과 충돌했는지 확인
+		AGravityWall* Wall = Cast<AGravityWall>(Info.OtherActor);
+		if (Wall)
+		{
+			if (Wall->IsFloor())
+			{
+
+				// 하강 중이거나 정지 상태일 때만 바닥에 스냅
+				if (Velocity.Z <= 0.0f)
+				{
+					// 바닥의 상단 위치 계산 (Wall의 Z 위치 + BoxComponent의 높이 절반)
+					UBoxComponent* WallBox = Wall->GetBoxComponent();
+					if (WallBox)
+					{
+						FVector WallLocation = Wall->GetActorLocation();
+						FVector WallScale = Wall->GetActorScale();
+						FVector BoxExtent = WallBox->GetBoxExtent() * 1.5f;
+
+						// 바닥 표면 높이 = Wall Z위치 + (BoxExtent.Z * Scale.Z)
+						float FloorHeight = WallLocation.Z + (BoxExtent.Z * WallScale.Z);
+
+						// 캐릭터를 바닥 위에 배치
+						FVector CharLocation = CharacterOwner->GetActorLocation();
+
+						CharLocation.Z = FloorHeight;
+						CharacterOwner->SetActorLocation(CharLocation);
+					}
+				}
+
+				return true;
+			}
+		}
 	}
 
 	return false;

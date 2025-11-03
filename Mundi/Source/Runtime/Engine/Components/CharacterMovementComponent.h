@@ -209,12 +209,20 @@ protected:
 	void MoveUpdatedComponent(float DeltaTime);
 
 	/**
-	 * 지면 체크 (나중에 충돌 시스템과 연결)
-	 * 현재는 Y = 0을 지면으로 가정합니다.
+	 * 지면 체크 (BoxComponent 오버랩 기반)
+	 * AGravityWall의 IsFloor()가 true인 경우 지면으로 인식합니다.
 	 *
 	 * @return 지면에 있으면 true
 	 */
 	bool CheckGround();
+
+	/**
+	 * 벽 충돌 체크 (BoxComponent 오버랩 기반)
+	 * AGravityWall의 IsFloor()가 false인 경우 벽으로 인식합니다.
+	 *
+	 * @return 벽과 충돌 중이면 true
+	 */
+	bool CheckWallCollision();
 
 	// ────────────────────────────────────────────────
 	// 멤버 변수
