@@ -32,26 +32,16 @@ USceneComponent::USceneComponent()
 
 USceneComponent::~USceneComponent()
 {
-    // 자식 메모리 해제
-    // 복사본을 만들어 부모 리스트 무효화 문제를 피함
-    TArray<USceneComponent*> ChildrenCopy = AttachChildren;
-    AttachChildren.clear();
-    for (USceneComponent* Child : ChildrenCopy)
-    {
-        if (Child && !Child->IsPendingDestroy())
-        {
-            // DestroyComponent를 통한 적절한 정리
-            Child->DestroyComponent();
-        }
-    }
+    // OnUnregister에서 이미 부모-자식 관계를 정리했으므로
+    // 여기서는 안전장치만 추가
 
-    // 부모에서 자신 제거
-    if (AttachParent)
+    // 혹시 OnUnregister가 호출되지 않은 경우를 대비한 최종 정리
+    if (AttachParent && !AttachParent->IsPendingDestroy())
     {
-        TArray<USceneComponent*>& ParentChildren = AttachParent->AttachChildren;
-        ParentChildren.Remove(this);
-        AttachParent = nullptr;
+        AttachParent->AttachChildren.Remove(this);
     }
+    AttachParent = nullptr;
+    AttachChildren.clear();
 }
 
 // ──────────────────────────────
@@ -367,6 +357,32 @@ void USceneComponent::OnRegister(UWorld* InWorld)
         SpriteComponent->SetTextureName(GDataDir + "/UI/Icons/EmptyActor.dds");
 
     }
+}
+
+void USceneComponent::OnUnregister()
+{
+    // 부모-자식 관계 정리 (댕글링 포인터 방지)
+    // 이 시점에서 정리하면 소멸자보다 먼저 실행되어 안전함
+
+    // 자식들의 AttachParent 참조 끊기
+    TArray<USceneComponent*> ChildrenCopy = AttachChildren;
+    for (USceneComponent* Child : ChildrenCopy)
+    {
+        if (Child && !Child->IsPendingDestroy())
+        {
+            Child->AttachParent = nullptr;
+        }
+    }
+    AttachChildren.clear();
+
+    // 부모에서 자신 제거
+    if (AttachParent && !AttachParent->IsPendingDestroy())
+    {
+        AttachParent->AttachChildren.Remove(this);
+    }
+    AttachParent = nullptr;
+
+    Super::OnUnregister();
 }
 
 void USceneComponent::OnSerialized()

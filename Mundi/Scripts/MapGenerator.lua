@@ -39,6 +39,9 @@ STORAGE_POSITION.Rotation = FQuat.MakeFromEuler(0, 0, 0);
 local ChunkPool = Queue.new();
 local PoolSize = (Width + Height) * Depth * 2 * MapSize;
 
+local HeightFogActor;
+local HeightFogComponent;
+
 local function CreateCellChunk()
     local CellChunk = {};
 
@@ -246,6 +249,10 @@ local function Initialize()
     InitializeMap();
 end
 
+local function DecreaseFillRateByTime(deltatime)
+    FillRate = FillRate - 0.01 * deltatime;
+end
+
 local function Update()
     local ActorLocation = MyActor:GetLocation();
     local Tmp = CurrentMapId;
@@ -316,6 +323,14 @@ function BeginPlay()
     -- 랜덤 시드를 한 번만 설정 (모든 청크가 다른 패턴을 가지도록)
     RandomManager.SetNewRandomSeed();
     Initialize();
+
+    -- HeightFogActor 스폰
+    local fogTransform = FTransform();
+    fogTransform.Translation = FVector(0.0, 0.0, 0.0);
+    HeightFogActor = GlobalObjectManager.GetPIEWorld():SpawnActor(fogTransform, "AHeightFogActor");
+    
+    HeightFogComponent = HeightFogActor:GetHeightFogComponent();
+    HeightFogComponent:SetFogDensity(0.0);
 end
 
 function EndPlay()
@@ -328,6 +343,12 @@ end
 
 function Tick(dt)
     Update();
+    DecreaseFillRateByTime(dt);
+
+    if HeightFogComponent ~= nil then
+        local FogDensity = HeightFogComponent:GetFogDensity();
+        HeightFogComponent:SetFogDensity(FogDensity + 0.0002 * dt);
+    end
 end
 
 -- 부활 작업
@@ -338,7 +359,8 @@ function Restart()
         end
     end
     
-    -- EmptyOutPool();
+    FillRate = DEFAULT_FILLRATE;
+    HeightFogComponent:SetFogDensity(0.0);
 
     CurrentMapId = DEFAULT_CURRENT_MAP_ID;
     ChunkRemovalId = DEFAULT_CHUNK_REMOVAL_ID;

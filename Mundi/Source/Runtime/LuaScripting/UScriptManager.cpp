@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
@@ -27,6 +27,8 @@
 #include "DecalComponent.h"
 #include "TextRenderComponent.h"
 #include "BillboardComponent.h"
+#include "HeightFogActor.h"
+#include "HeightFogComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -452,6 +454,7 @@ void UScriptManager::RegisterUserTypeToLua()
         "AddWorldRotation", sol::overload(
             static_cast<void(AActor::*)(const FQuat&)>(&AActor::AddActorWorldRotation)
         ),
+        "GetRootComponent", &AActor::GetRootComponent,
         "GetName", &AActor::GetName,
 		"SetActorHiddenInGame", &AActor::SetActorHiddenInGame,
 		"DestroyAllComponents", &AActor::DestroyAllComponents,
@@ -692,6 +695,33 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetDecalComponent", &ADecalActor::GetDecalComponent
     );
 
+    // UHeightFogComponent 클래스 등록
+    Lua.new_usertype<UHeightFogComponent>("UHeightFogComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>(),
+        "GetFogDensity", &UHeightFogComponent::GetFogDensity,
+        "SetFogDensity", &UHeightFogComponent::SetFogDensity,
+        "GetFogHeightFalloff", &UHeightFogComponent::GetFogHeightFalloff,
+        "SetFogHeightFalloff", &UHeightFogComponent::SetFogHeightFalloff,
+        "GetStartDistance", &UHeightFogComponent::GetStartDistance,
+        "SetStartDistance", &UHeightFogComponent::SetStartDistance,
+        "GetFogCutoffDistance", &UHeightFogComponent::GetFogCutoffDistance,
+        "SetFogCutoffDistance", &UHeightFogComponent::SetFogCutoffDistance,
+        "GetFogMaxOpacity", &UHeightFogComponent::GetFogMaxOpacity,
+        "SetFogMaxOpacity", &UHeightFogComponent::SetFogMaxOpacity,
+        "GetFogInscatteringColor", &UHeightFogComponent::GetFogInscatteringColor,
+        "SetFogInscatteringColor", &UHeightFogComponent::SetFogInscatteringColor,
+        "GetFogHeight", &UHeightFogComponent::GetFogHeight
+    );
+
+    // AHeightFogActor 클래스 등록
+    Lua.new_usertype<AHeightFogActor>("AHeightFogActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetHeightFogComponent", [](AHeightFogActor* Actor)-> UHeightFogComponent*
+        {
+            return Cast<UHeightFogComponent>(Actor->GetRootComponent());
+        }
+    );
+
     // ACameraActor 클래스 등록
     Lua.new_usertype<ACameraActor>("ACameraActor",
         sol::base_classes, sol::bases<AActor>(),
@@ -775,6 +805,11 @@ void UScriptManager::RegisterUserTypeToLua()
                 {
                     ADecalActor* decal = World->SpawnActor<ADecalActor>(Transform);
                     return sol::make_object(lua, decal);
+                }
+                else if(ActorType == "AHeightFogActor")
+                {
+                    AHeightFogActor* fog = World->SpawnActor<AHeightFogActor>(Transform);
+                    return sol::make_object(lua, fog);
                 }
                 else
                 {

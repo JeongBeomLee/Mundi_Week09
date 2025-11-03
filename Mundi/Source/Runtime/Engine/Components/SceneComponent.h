@@ -94,6 +94,7 @@ public:
     // Serialize
     void Serialize(const bool bInIsLoading, JSON& InOutHandle) override;
     void OnRegister(UWorld* InWorld) override;
+    void OnUnregister() override;
     void OnSerialized() override;
 
     virtual void OnTransformUpdated();

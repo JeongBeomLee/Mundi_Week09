@@ -41,8 +41,12 @@ AActor::~AActor()
 	}
 
 	// UE처럼 역순/안전 소멸: 모든 컴포넌트 DestroyComponent
-	for (UActorComponent* Comp : OwnedComponents)
-		if (Comp) Comp->DestroyComponent();  // 안에서 Unregister/Detach 처리한다고 가정
+	// DestroyComponent 내부에서 RemoveOwnedComponent를 호출하므로 복사본으로 순회
+	TSet<UActorComponent*> ComponentsCopy = OwnedComponents;
+	for (UActorComponent* Comp : ComponentsCopy)
+		if (Comp && !Comp->IsPendingDestroy())
+			Comp->DestroyComponent();  // 안에서 Unregister/Detach/Remove 처리
+
 	OwnedComponents.clear();
 	SceneComponents.Empty();
 	RootComponent = nullptr;

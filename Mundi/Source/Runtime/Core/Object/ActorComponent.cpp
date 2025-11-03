@@ -81,12 +81,19 @@ void UActorComponent::DestroyComponent()
     if (bPendingDestroy) return;
     bPendingDestroy = true;
 
+    // Owner에서 이 컴포넌트 제거 (댕글링 포인터 방지)
+    if (Owner)
+    {
+        Owner->RemoveOwnedComponent(this);
+    }
+
     // 등록 중이면 우선 해제(EndPlay 포함)
     if (bRegistered) UnregisterComponent();
 
-    DeleteObject(this);
     // Owner 참조 끊기
-    //Owner = nullptr;
+    Owner = nullptr;
+
+    DeleteObject(this);
 }
 
 // ─────────────── Lifecycle (게임 수명)
