@@ -9,16 +9,18 @@ local Queue = require("Queue");
 local DEFAULT_WIDTH = 10;
 local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
-local DEFAULT_MAP_SIZE = 30;
+local DEFAULT_MAP_SIZE = 40;
 local DEFAULT_SCALE = 2.0;
 local DEFAULT_FILLRATE = 0.5;
+local DEFAULT_MAPSTART_INDEX = -5.0;
 
 local Width = DEFAULT_WIDTH;
 local Height = DEFAULT_HEIGHT;
 local Depth = DEFAULT_DEPTH;
 local Scale = DEFAULT_SCALE;
-local MapSize = DEFAULT_MAP_SIZE;
+local MapSizeIndex = DEFAULT_MAP_SIZE;
 local FillRate = DEFAULT_FILLRATE;
+local MapStart = DEFAULT_MAPSTART_INDEX;
 
 local CellChunks = {};
 local MapChunks = {};
@@ -207,7 +209,7 @@ local function InitializePool()
     end
 
     -- Pool의 청크들은 시야에 보이지 않는 곳에 대기
-    local PoolSize = (Width + Height) * Depth * 2 * MapSize;
+    local PoolSize = (Width + Height) * Depth * 2 * MapSizeIndex;
     PrintToConsole("[MapGenerator] Creating pool with " .. PoolSize .. " actors");
 
     for i = 1, PoolSize do 
@@ -218,9 +220,9 @@ local function InitializePool()
 end
 
 local function InitializeMap()
-    for i = 1, MapSize do
+    for i = 1, MapSizeIndex do
         CellChunks[i] = CreateCellChunk();
-        MapChunks[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i - 1));
+        MapChunks[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStart - 1));
     end
 end
 
@@ -246,7 +248,7 @@ local function Update()
         end
 
         -- 새 청크 생성 (플레이어 앞쪽에)
-        local NewChunkXPosition = (CurrentMapId + MapSize) * Depth * Scale;
+        local NewChunkXPosition = (CurrentMapId + MapStart + MapSizeIndex) * Depth * Scale;
         -- PrintToConsole("[MapGenerator] Creating new chunk at X: " .. NewChunkXPosition);
         
         local NewChunk = CreateCellChunk();
@@ -254,7 +256,7 @@ local function Update()
         MapChunks[ChunkRemovalId + 1] = CreateMapChunkWithCellChunk(NewChunk, NewChunkXPosition);
 
         -- 다음 삭제 대상 청크 인덱스 업데이트 (0, 1, 2 순환)
-        ChunkRemovalId = (ChunkRemovalId + 1) % MapSize;
+        ChunkRemovalId = (ChunkRemovalId + 1) % MapSizeIndex;
         -- PrintToConsole("[MapGenerator] New ChunkRemovalId: " .. ChunkRemovalId);
     end
 end
