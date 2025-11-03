@@ -39,7 +39,10 @@ public:
     void DestroyComponent();                           // 소멸(EndPlay 포함)
 
     // ─────────────── 활성화/틱
-    void SetActive(bool bNewActive) { bIsActive = bNewActive; }
+    void SetActive(bool bNewActive) 
+    { 
+        bIsActive = bNewActive; 
+    }
     bool IsActive() const { return bIsActive; }
 
     void SetTickEnabled(bool bEnabled) { bTickEnabled = bEnabled; }
@@ -48,7 +51,10 @@ public:
     void SetEditability(bool InEditable) { bIsEditable = InEditable; }
     bool IsEditable() const { return bIsEditable; }
 
-    void SetHiddenInGame(bool bInHidden) { bHiddenInGame = bInHidden; }
+    void SetHiddenInGame(bool bInHidden) 
+    { 
+        bHiddenInGame = bInHidden; 
+    }
     bool GetHiddenInGame() const { return bHiddenInGame; }
 
     void SetCanEverTick(bool b) { bCanEverTick = b; }

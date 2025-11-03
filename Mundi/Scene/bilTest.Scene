@@ -1,0 +1,106 @@
+{
+  "Level" : {
+    "Actors" : {
+      "770" : {
+        "Name" : "Directional Light Actor",
+        "OwnedComponents" : [{
+            "CSMLambda" : 0.500000,
+            "Id" : 771,
+            "Intensity" : 1.000000,
+            "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+            "NumCascades" : 3,
+            "ParentId" : 0,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [-62.900280, 16.769619, -62.900280],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShadowBias" : 0.005000,
+            "ShadowMapType" : 1,
+            "ShadowProjectionType" : 0,
+            "ShadowSharpen" : 1.000000,
+            "ShadowSlopeBias" : 2.000000,
+            "Temperature" : 6500.000000,
+            "Type" : "UDirectionalLightComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsCastShadows" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 771,
+        "Type" : "ADirectionalLightActor"
+      },
+      "772" : {
+        "Name" : "Ambient Light Actor",
+        "OwnedComponents" : [{
+            "Id" : 773,
+            "Intensity" : 0.100000,
+            "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+            "ParentId" : 0,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShadowBias" : 0.001000,
+            "ShadowSharpen" : 1.000000,
+            "ShadowSlopeBias" : 0.000000,
+            "Temperature" : 6500.000000,
+            "Type" : "UAmbientLightComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsCastShadows" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 773,
+        "Type" : "AAmbientLightActor"
+      },
+      "777" : {
+        "Name" : "스태틱 메시_1",
+        "OwnedComponents" : [{
+            "Id" : 778,
+            "MaterialSlots" : [{
+                "AssetPath" : "M18_Smoke",
+                "Type" : "UMaterial"
+              }],
+            "ParentId" : 0,
+            "RelativeLocation" : [4.184410, -0.032067, 1.044552],
+            "RelativeRotationEuler" : [0.000000, -0.000000, 0.000000],
+            "RelativeScale" : [0.400000, 0.400000, 0.400000],
+            "StaticMesh" : "Data/Model/smokegrenade.obj",
+            "Type" : "UStaticMeshComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "Id" : 779,
+            "ParentId" : 778,
+            "RelativeLocation" : [0.000000, -3.006166, 0.000000],
+            "RelativeRotationEuler" : [0.000000, -0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "Texture" : "Data/UI/Icons/Pawn_64x.png",
+            "Type" : "UBillboardComponent",
+            "bHiddenInGame" : true,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 778,
+        "Type" : "AStaticMeshActor"
+      }
+    },
+    "NextUUID" : 780,
+    "PerspectiveCamera" : {
+      "FOV" : [60.000000],
+      "FarClip" : [1000.000000],
+      "Location" : [-13.612801, 0.949710, 6.952902],
+      "NearClip" : [0.100000],
+      "Rotation" : [0.000000, 14.799923, -0.300047]
+    },
+    "Version" : 1
+  },
+  "WorldSettings" : {
+    "DefaultPawnClass" : "ARunnerCharacter",
+    "GameModeClass" : "ARunnerGameMode",
+    "PlayerSpawnLocation" : [0.000000, 0.000000, 0.000000]
+  }
+}

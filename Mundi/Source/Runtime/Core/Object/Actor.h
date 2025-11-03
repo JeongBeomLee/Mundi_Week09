@@ -52,6 +52,15 @@ public:
     const TArray<USceneComponent*>& GetSceneComponents() const { return SceneComponents; }
     const TSet<UActorComponent*>& GetOwnedComponents() const { return OwnedComponents; }
     
+    USceneComponent* GetComponentByIndex(size_t Index)
+    { 
+        if (Index >= SceneComponents.size())
+        {
+            return nullptr; 
+        }
+        return SceneComponents[Index];
+    }
+
     // 컴포넌트 생성 (템플릿)
     template<typename T>
     T* CreateDefaultSubobject(const FName& SubobjectName)

@@ -80,7 +80,7 @@ void AActor::BeginPlay()
 			GamePausedHandle = GameMode->OnGamePaused.AddDynamic(this, &AActor::OnGamePausedHandler);
 			GameResumedHandle = GameMode->OnGameResumed.AddDynamic(this, &AActor::OnGameResumedHandler);
 
-			UE_LOG("[Actor] Subscribed to GameMode delegates");
+			//UE_LOG("[Actor] Subscribed to GameMode delegates");
 		}
 	}
 }
@@ -790,29 +790,29 @@ void AActor::UnregisterComponentTree(USceneComponent* SceneComp)
 void AActor::OnGameStartedHandler()
 {
 	bGameStarted = true;
-	UE_LOG("[Actor] Game Started - %s", GetName().ToString());
+	//UE_LOG("[Actor] Game Started - %s", GetName().ToString());
 }
 
 void AActor::OnGameEndedHandler(bool bVictory)
 {
 	bGameStarted = false;
-	UE_LOG("[Actor] Game Ended - %s (Victory: %d)", GetName().ToString(), bVictory);
+	//UE_LOG("[Actor] Game Ended - %s (Victory: %d)", GetName().ToString(), bVictory);
 }
 
 void AActor::OnGameRestartedHandler()
 {
 	bGameStarted = true;
-	UE_LOG("[Actor] Game Restarted - %s", GetName().ToString());
+	//UE_LOG("[Actor] Game Restarted - %s", GetName().ToString());
 }
 
 void AActor::OnGamePausedHandler()
 {
 	bGameStarted = false;
-	UE_LOG("[Actor] Game Paused - %s", GetName().ToString());
+	//UE_LOG("[Actor] Game Paused - %s", GetName().ToString());
 }
 
 void AActor::OnGameResumedHandler()
 {
 	bGameStarted = true;
-	UE_LOG("[Actor] Game Resumed - %s", GetName().ToString());
+	//UE_LOG("[Actor] Game Resumed - %s", GetName().ToString());
 }

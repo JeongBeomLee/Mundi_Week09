@@ -2,9 +2,37 @@ local _ENV = ...
 
 local Health = 5;
 
+local BILLBOARD_COUNT = Health;  -- 빌보드 컴포넌트 개수
+local BillboardComponents = {};  -- 빌보드 컴포넌트를 저장할 배열
+
+local Cnt = 0;
+
 -- BeginPlay: Actor가 생성되거나 레벨이 시작될 때 호출
 function BeginPlay()
+
+    -- PrintToConsole("[Obstacle] Begin Play, " .. Cnt);
+    Cnt = Cnt + 1;
     -- PrintToConsole("[coin_collision Begin Play] ");
+    -- 빌보드 컴포넌트를 여러 개 생성
+    local centerY = 2.5
+    local spacing = 2.5
+
+    -- 빌보드 개수가 홀수/짝수일 때 중앙 정렬 계산
+    local startOffset = -(BILLBOARD_COUNT - 1) * spacing / 2
+
+    -- PrintToConsole("[Obstacle] Creaate BillBoard, " .. Cnt);
+    for j = 1, BILLBOARD_COUNT do
+        local yOffset = startOffset + (j - 1) * spacing
+        local BillboardComponent = MyActor:CreateBillboardComponent("BillboardComponent" .. j);
+        BillboardComponent:SetTextureName("Data/Icon/heart.png");
+        BillboardComponent:SetRelativeLocation(FVector(-5.0, centerY + yOffset, 4.0));
+        -- BillboardComponent:SetActive(false);
+        
+        -- 배열에 빌보드 컴포넌트 추가
+        BillboardComponents[j] = BillboardComponent;
+        
+        -- PrintToConsole("[ObstacleGenerator] Obstacle BillboardComponent " .. j .. " created at Y: " .. (centerY + yOffset));
+    end
 end
 
 -- EndPlay: Actor가 제거되거나 레벨이 종료될 때 호출
@@ -24,7 +52,20 @@ function OnOverlap(
     -- PrintToConsole("[coin_collision] Collided with: " .. actorName)
 
     if actorName == "Projectile Actor" then
+        -- Health가 줄기 전에 현재 Health에 해당하는 빌보드를 숨김
+        if Health > 0 and BillboardComponents[Health] then
+            for j = 1, Health do
+                BillboardComponents[Health]:SetActive(false);
+            end
+            -- PrintToConsole("[Obstacle] BillboardComponent found, calling SetActive")
+            -- BillboardComponents[Health]:SetActive(false);
+            -- PrintToConsole("[Obstacle] Billboard " .. Health .. " hidden")
+        else
+            -- PrintToConsole("[Obstacle] BillboardComponent at Health index is nil!")
+        end
+        
         Health = Health - 1
+        
         if Health <= 0 then
             -- PrintToConsole("[coin_collision] Coin collected!")
             GameMode:OnCoinCollected(1)
