@@ -371,6 +371,11 @@ bool UCharacterMovementComponent::CheckGround()
 		{
 			if (Wall->IsFloor())
 			{
+				// 상승 중이면 지면으로 인식하지 않음 (점프 허용)
+				if (Velocity.Z > 0.0f)
+				{
+					return false;
+				}
 
 				// 하강 중이거나 정지 상태일 때만 바닥에 스냅
 				if (Velocity.Z <= 0.0f)
@@ -381,16 +386,19 @@ bool UCharacterMovementComponent::CheckGround()
 					{
 						FVector WallLocation = Wall->GetActorLocation();
 						FVector WallScale = Wall->GetActorScale();
-						FVector BoxExtent = WallBox->GetBoxExtent() * 1.5f;
+						FVector WallBoxExtent = WallBox->GetBoxExtent();
 
-						// 바닥 표면 높이 = Wall Z위치 + (BoxExtent.Z * Scale.Z)
-						float FloorHeight = WallLocation.Z + (BoxExtent.Z * WallScale.Z);
+						float FloorSurface = WallLocation.Z + (WallBoxExtent.Z * WallScale.Z);
 
-						// 캐릭터를 바닥 위에 배치
+						FVector CharBoxExtent = CollisionBox->GetBoxExtent();
+						FVector CharScale = CharacterOwner->GetActorScale();
+						float CharHalfHeight = CharBoxExtent.Z * CharScale.Z;
+
 						FVector CharLocation = CharacterOwner->GetActorLocation();
-
-						CharLocation.Z = FloorHeight;
+						CharLocation.Z = FloorSurface + CharHalfHeight;
 						CharacterOwner->SetActorLocation(CharLocation);
+
+						Velocity.Z = 0.0f;
 					}
 				}
 
