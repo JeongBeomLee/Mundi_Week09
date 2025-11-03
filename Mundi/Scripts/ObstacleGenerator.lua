@@ -120,4 +120,12 @@ function Tick(dt)
 end
 
 -- 부활 작업
-function Restart() end
+function Restart()
+    while not Queue.isEmpty(ObstaclesSpawned) do
+        local Obstacle = Queue.pop(ObstaclesSpawned);
+        if Obstacle ~= nil then
+            Obstacle:SetTransform(STORAGE_POSITION);
+            Queue.push(ObstaclePool);
+        end
+    end
+end

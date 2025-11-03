@@ -706,6 +706,7 @@ if "$(Configuration)"=="Debug" (
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\CoinGenerator.lua" />
     <Content Include="Scripts\GlobalObjectManager.lua" />
     <Content Include="Scripts\GlobalVariable.lua" />
     <Content Include="Scripts\MapGenerator.lua" />

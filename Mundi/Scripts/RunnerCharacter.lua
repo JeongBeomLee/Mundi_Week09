@@ -112,7 +112,9 @@ function EndPlay()
 end
 
 -- 부활 작업
-function Restart() end
+function Restart()
+    MyActor:SetLocation(FVector(0.0, 0.0, 3.0));
+end
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 입력 바인딩

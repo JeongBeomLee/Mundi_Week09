@@ -12,21 +12,24 @@ local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
 local DEFAULT_MAP_SIZE = 20;
 local DEFAULT_SCALE = 2.0;
-local DEFAULT_FILLRATE = 0.70;
-local DEFAULT_MAPSTART_INDEX = -5.0;
+local DEFAULT_FILLRATE = 1.0;
+local DEFAULT_MAPSTART_OFFSET = -5.0;
+
+local DEFAULT_CURRENT_MAP_ID = 0;
+local DEFAULT_CHUNK_REMOVAL_ID = 0;
 
 local Width = DEFAULT_WIDTH;
 local Height = DEFAULT_HEIGHT;
 local Depth = DEFAULT_DEPTH;
 local Scale = DEFAULT_SCALE;
-local MapSizeIndex = DEFAULT_MAP_SIZE;
+local MapSize = DEFAULT_MAP_SIZE;
 local FillRate = DEFAULT_FILLRATE;
-local MapStart = DEFAULT_MAPSTART_INDEX;
+local MapStartOffset = DEFAULT_MAPSTART_OFFSET;
 
 local CellChunks = {};
 local MapChunksSpawned = {};
-local CurrentMapId = 0;
-local ChunkRemovalId = 0;
+local CurrentMapId = DEFAULT_CURRENT_MAP_ID;
+local ChunkRemovalId = DEFAULT_CHUNK_REMOVAL_ID;
 
 local STORAGE_POSITION = FTransform();
 STORAGE_POSITION.Translation = FVector(-1000.0, 0.0, 0.0);
@@ -34,6 +37,7 @@ STORAGE_POSITION.Scale3D = FVector(Scale, Scale, Scale);
 STORAGE_POSITION.Rotation = FQuat.MakeFromEuler(0, 0, 0);
 
 local ChunkPool = Queue.new();
+local PoolSize = (Width + Height) * Depth * 2 * MapSize;
 
 local function CreateCellChunk()
     local CellChunk = {};
@@ -207,7 +211,6 @@ local function InitializePool()
     end
 
     -- Pool의 청크들은 시야에 보이지 않는 곳에 대기
-    local PoolSize = (Width + Height) * Depth * 2 * MapSizeIndex;
     PrintToConsole("[MapGenerator] Creating pool with " .. PoolSize .. " actors");
 
     for i = 1, PoolSize do
@@ -222,10 +225,19 @@ local function InitializePool()
     PrintToConsole("[MapGenerator] Pool initialized. Queue size: " .. (ChunkPool.last - ChunkPool.first + 1));
 end
 
+local function EmptyOutPool()
+    for i = 1, PoolSize do
+        local Chunk = Queue.pop(ChunkPool);
+        if (Chunk ~= nil) then
+            GlobalObjectManager.GetPIEWorld():DestroyActor(Chunk);
+        end
+    end
+end
+
 local function InitializeMap()
-    for i = 1, MapSizeIndex do
+    for i = 1, MapSize do
         CellChunks[i] = CreateCellChunk();
-        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStart - 1));
+        MapChunksSpawned[i] = CreateMapChunkWithCellChunk(CellChunks[i], Depth * Scale * (i + MapStartOffset - 1));
     end
 end
 
@@ -251,7 +263,7 @@ local function Update()
         end
 
         -- 새 청크 생성 (플레이어 앞쪽에)
-        local NewChunkXPosition = (CurrentMapId + MapStart + MapSizeIndex) * Depth * Scale;
+        local NewChunkXPosition = (CurrentMapId + MapStartOffset + MapSize) * Depth * Scale;
         -- PrintToConsole("[MapGenerator] Creating new chunk at X: " .. NewChunkXPosition);
         
         local NewChunk = CreateCellChunk();
@@ -259,7 +271,7 @@ local function Update()
         MapChunksSpawned[ChunkRemovalId + 1] = CreateMapChunkWithCellChunk(NewChunk, NewChunkXPosition);
 
         -- 다음 삭제 대상 청크 인덱스 업데이트 (0, 1, 2 순환)
-        ChunkRemovalId = (ChunkRemovalId + 1) % MapSizeIndex;
+        ChunkRemovalId = (ChunkRemovalId + 1) % MapSize;
         -- PrintToConsole("[MapGenerator] New ChunkRemovalId: " .. ChunkRemovalId);
     end
 end
@@ -319,5 +331,16 @@ function Tick(dt)
 end
 
 -- 부활 작업
-function Restart() end
+function Restart()
+    for i = 1, MapSize do
+        if (MapChunksSpawned[i] ~= nil) then
+            DeleteMapChunks(MapChunksSpawned[i]);
+        end
+    end
+    
+    -- EmptyOutPool();
 
+    CurrentMapId = DEFAULT_CURRENT_MAP_ID;
+    ChunkRemovalId = DEFAULT_CHUNK_REMOVAL_ID;
+    InitializeMap();
+end

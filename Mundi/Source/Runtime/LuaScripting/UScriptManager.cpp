@@ -68,6 +68,7 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString&
             LuaLocalValue.MyActor,
             Script->LuaTemplateFunctions.OnOverlap
         );
+        LinkRestartToDeligate(Script->LuaTemplateFunctions.Restart);
     }
     catch (std::exception& e)
     {
@@ -808,6 +809,12 @@ void UScriptManager::LinkOnOverlapWithShapeComponent(AActor* MyActor, sol::funct
             );
         }
     }
+}
+
+void UScriptManager::LinkRestartToDeligate(sol::function Restart)
+{
+    ARunnerGameMode* GameMode = Cast<ARunnerGameMode>(GEngine.GetPIEWorld()->GetGameMode());
+    GameMode->GetOnGameRestarted().Add(Restart);
 }
 
 // Lua로부터 Template 함수를 가져온다.

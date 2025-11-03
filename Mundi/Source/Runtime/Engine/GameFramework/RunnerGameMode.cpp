@@ -103,32 +103,30 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 
 void ARunnerGameMode::RestartGame()
 {
-	UE_LOG("[RunnerGameMode] RestartGame called!");
-	// 플레이어 리스폰
-	if (PlayerController)
-	{
-		UE_LOG("[RunnerGameMode] Restarting player...");
-		RestartPlayer(PlayerController);
-
-		// RunnerCharacter::BeginPlay()에서 자동으로 스크립트 연결됨
-		APawn* SpawnedPawn = PlayerController->GetPawn();
-		if (SpawnedPawn)
-		{
-			UE_LOG("[RunnerGameMode] New Pawn location: (%.1f, %.1f, %.1f)",
-				SpawnedPawn->GetActorLocation().X,
-				SpawnedPawn->GetActorLocation().Y,
-				SpawnedPawn->GetActorLocation().Z);
-			UE_LOG("[RunnerGameMode] Player restarted successfully!");
-		}
-		else
-		{
-			UE_LOG("[RunnerGameMode] ERROR: Failed to get spawned pawn after restart!");
-		}
-	}
+	// UE_LOG("[RunnerGameMode] RestartGame called!");
+	// // 플레이어 리스폰
+	// if (PlayerController)
+	// {
+	// 	UE_LOG("[RunnerGameMode] Restarting player...");
+	// 	RestartPlayer(PlayerController);
+	//
+	// 	// RunnerCharacter::BeginPlay()에서 자동으로 스크립트 연결됨
+	// 	APawn* SpawnedPawn = PlayerController->GetPawn();
+	// 	if (SpawnedPawn)
+	// 	{
+	// 		UE_LOG("[RunnerGameMode] New Pawn location: (%.1f, %.1f, %.1f)",
+	// 			SpawnedPawn->GetActorLocation().X,
+	// 			SpawnedPawn->GetActorLocation().Y,
+	// 			SpawnedPawn->GetActorLocation().Z);
+	// 		UE_LOG("[RunnerGameMode] Player restarted successfully!");
+	// 	}
+	// 	else
+	// 	{
+	// 		UE_LOG("[RunnerGameMode] ERROR: Failed to get spawned pawn after restart!");
+	// 	}
+	// }
 	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
 	Super::RestartGame();
-
-	
 }
 
 // ────────────────────────────────────────────────────────────────────────────
