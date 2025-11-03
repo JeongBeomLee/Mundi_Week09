@@ -104,8 +104,12 @@ FVector ARunnerCharacter::GetUpDirection() const
 	if (CharacterMovement)
 	{
 		// 중력 반대 방향 = 위쪽
-		return CharacterMovement->GetGravityDirection() * -1.0f;
+		FVector GravityDir = CharacterMovement->GetGravityDirection();
+		FVector UpDir = GravityDir * -1.0f;
+
+		return UpDir;
 	}
+
 	return FVector(0.0f, 0.0f, 1.0f); // 기본값: Z 위쪽
 }
 
@@ -123,7 +127,9 @@ FVector ARunnerCharacter::GetRightDirection() const
 		RightDir = FVector::Cross(UpDir, FVector(0.0f, 1.0f, 0.0f));
 	}
 
-	return RightDir.GetNormalized();
+	FVector Result = RightDir.GetNormalized();
+
+	return Result;
 }
 
 FVector ARunnerCharacter::GetForwardDirection() const

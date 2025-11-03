@@ -88,9 +88,10 @@ void UCharacterMovementComponent::TickComponent(float DeltaTime)
 	// 5. 이동 모드 업데이트
 	if (bIsNowGrounded && !bWasGrounded)
 	{
-		// 착지
+		// 착지 - 중력 방향의 속도 성분 제거
 		SetMovementMode(EMovementMode::Walking);
-		Velocity.Z = 0.0f;
+		float VerticalSpeed = FVector::Dot(Velocity, GravityDirection);
+		Velocity -= GravityDirection * VerticalSpeed;
 		TimeInAir = 0.0f;
 		bIsJumping = false;
 	}
@@ -137,10 +138,18 @@ void UCharacterMovementComponent::AddInputVector(FVector WorldDirection, float S
 		return;
 	}
 
-	// XY 평면으로 제한 (수평 이동만)
-	WorldDirection.Z = 0.0f;
-	FVector NormalizedDirection = WorldDirection.GetNormalized();
+	// 중력 방향에 수직인 평면으로 입력 제한
+	// 입력 벡터에서 중력 방향 성분을 제거 (투영 후 빼기)
+	float DotWithGravity = FVector::Dot(WorldDirection, GravityDirection);
+	FVector HorizontalDirection = WorldDirection - (GravityDirection * DotWithGravity);
 
+	// 방향 벡터가 0이면 무시
+	if (HorizontalDirection.SizeSquared() < 0.0001f)
+	{
+		return;
+	}
+
+	FVector NormalizedDirection = HorizontalDirection.GetNormalized();
  	PendingInputVector += NormalizedDirection * ScaleValue;
 }
 
@@ -152,8 +161,9 @@ bool UCharacterMovementComponent::Jump()
 		return false;
 	}
 
-	// 점프 속도 적용
-	Velocity.Z = JumpZVelocity;
+	// 중력 반대 방향으로 점프 속도 적용
+	FVector JumpVelocity = GravityDirection * -1.0f * JumpZVelocity;
+	Velocity += JumpVelocity;
 
 	// 이동 모드 변경
 	SetMovementMode(EMovementMode::Falling);
@@ -165,9 +175,14 @@ bool UCharacterMovementComponent::Jump()
 void UCharacterMovementComponent::StopJumping()
 {
 	// 점프 키를 뗐을 때 상승 속도를 줄임
-	if (bIsJumping && Velocity.Z > 0.0f)
+	// 중력 반대 방향으로의 속도만 감소
+	FVector UpDirection = GravityDirection * -1.0f;
+	float UpwardSpeed = FVector::Dot(Velocity, UpDirection);
+
+	if (bIsJumping && UpwardSpeed > 0.0f)
 	{
-		Velocity.Z *= 0.5f;
+		// 상승 속도 성분만 감소
+		Velocity -= UpDirection * (UpwardSpeed * 0.5f);
 	}
 }
 
@@ -184,8 +199,10 @@ void UCharacterMovementComponent::SetMovementMode(EMovementMode NewMode)
 	// 모드 전환 시 처리
 	if (MovementMode == EMovementMode::Walking)
 	{
-		// 착지 시 수직 속도 제거
-		Velocity.Z = 0.0f;
+		// 착지 시 중력 방향의 속도 성분 제거
+		FVector UpDirection = GravityDirection * -1.0f;
+		float VerticalSpeed = FVector::Dot(Velocity, GravityDirection);
+		Velocity -= GravityDirection * VerticalSpeed;
 	}
 }
 
@@ -205,9 +222,12 @@ void UCharacterMovementComponent::UpdateVelocity(float DeltaTime)
 		// 목표 속도
 		FVector TargetVelocity = InputDirection * MaxWalkSpeed;
 
-		// 수평 속도만 보간 (Z는 중력이 처리)
-		FVector HorizontalVelocity(Velocity.X, Velocity.Y, 0.0f);
-		FVector HorizontalTarget(TargetVelocity.X, TargetVelocity.Y, 0.0f);
+		// 중력 방향에 수직인 평면으로 속도 분리
+		float VerticalSpeed = FVector::Dot(Velocity, GravityDirection);
+		FVector HorizontalVelocity = Velocity - (GravityDirection * VerticalSpeed);
+
+		float TargetVerticalSpeed = FVector::Dot(TargetVelocity, GravityDirection);
+		FVector HorizontalTarget = TargetVelocity - (GravityDirection * TargetVerticalSpeed);
 
 		// 가속도 적용
 		FVector Delta = HorizontalTarget - HorizontalVelocity;
@@ -227,13 +247,15 @@ void UCharacterMovementComponent::UpdateVelocity(float DeltaTime)
 			HorizontalVelocity = HorizontalVelocity.GetNormalized() * MaxWalkSpeed;
 		}
 
-		Velocity.X = HorizontalVelocity.X;
-		Velocity.Y = HorizontalVelocity.Y;
+		// 수평 속도와 수직 속도 결합
+		Velocity = HorizontalVelocity + (GravityDirection * VerticalSpeed);
 	}
 	else if (IsGrounded())
 	{
 		// 입력이 없으면 마찰 적용 (지면에서만)
-		FVector HorizontalVelocity(Velocity.X, Velocity.Y, 0.0f);
+		// 중력 방향에 수직인 속도 성분만 추출
+		float VerticalSpeed = FVector::Dot(Velocity, GravityDirection);
+		FVector HorizontalVelocity = Velocity - (GravityDirection * VerticalSpeed);
 		float CurrentSpeed = HorizontalVelocity.Size();
 
 		if (CurrentSpeed > 0.0f)
@@ -242,9 +264,11 @@ void UCharacterMovementComponent::UpdateVelocity(float DeltaTime)
 			float NewSpeed = FMath::Max(0.0f, CurrentSpeed - FrictionAmount);
 			float SpeedRatio = NewSpeed / CurrentSpeed;
 
-			Velocity.X *= SpeedRatio;
-			Velocity.Y *= SpeedRatio;
+			HorizontalVelocity *= SpeedRatio;
 		}
+
+		// 수평 속도와 수직 속도 결합
+		Velocity = HorizontalVelocity + (GravityDirection * VerticalSpeed);
 	}
 }
 
@@ -309,9 +333,9 @@ void UCharacterMovementComponent::MoveUpdatedComponent(float DeltaTime)
 		// 이전 위치로 복원
 		CharacterOwner->SetActorLocation(CurrentLocation);
 
-		// 수평 속도 초기화 (Z축 속도는 유지 - 중력/점프 영향)
-		Velocity.X = 0.0f;
-		Velocity.Y = 0.0f;
+		// 중력 방향에 수직인 속도만 초기화 (중력/점프 영향은 유지)
+		float VerticalSpeed = FVector::Dot(Velocity, GravityDirection);
+		Velocity = GravityDirection * VerticalSpeed;
 	}
 }
 
@@ -335,8 +359,9 @@ bool UCharacterMovementComponent::CheckWallCollision()
 		return false;
 	}
 
-	// 수평 이동 방향 계산 (Z축 제외)
-	FVector HorizontalVelocity(Velocity.X, Velocity.Y, 0.0f);
+	// 중력 방향에 수직인 이동 방향 계산
+	float VerticalSpeed = FVector::Dot(Velocity, GravityDirection);
+	FVector HorizontalVelocity = Velocity - (GravityDirection * VerticalSpeed);
 	if (HorizontalVelocity.SizeSquared() < 0.01f)
 	{
 		// 이동하지 않으면 충돌 검사 안 함

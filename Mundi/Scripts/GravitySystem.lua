@@ -28,61 +28,43 @@ local function RotateToNewGravity(newGravityDir)
     end
 
     IsRotating = true
-    PrintToConsole("[GravitySystem] Starting rotation to new gravity: " ..
-        newGravityDir.X .. ", " .. newGravityDir.Y .. ", " .. newGravityDir.Z)
 
     StartCoroutine(function()
-        PrintToConsole("[GravitySystem] Coroutine started")
-
+        local newGravityCopy = FVector(newGravityDir.X, newGravityDir.Y, newGravityDir.Z)
         local oldGravityDir = CurrentGravityDirection
-        local newUpDir = FVector.Mul(newGravityDir, -1)  -- 중력 반대 = Up 방향
+        local newUpDir = FVector.Mul(newGravityCopy, -1)  -- 중력 반대 = Up 방향
         local oldUpDir = FVector.Mul(oldGravityDir, -1)
-
-        PrintToConsole("[GravitySystem] Old up: " .. oldUpDir.X .. ", " .. oldUpDir.Y .. ", " .. oldUpDir.Z)
-        PrintToConsole("[GravitySystem] New up: " .. newUpDir.X .. ", " .. newUpDir.Y .. ", " .. newUpDir.Z)
 
         -- 캐릭터와 카메라 가져오기
         local world = GEngine:GetPIEWorld()
         if not world then
-            PrintToConsole("[GravitySystem] ERROR: World is nil!")
             IsRotating = false
             return
         end
 
         local camera = world:GetCameraActor()
         if not camera then
-            PrintToConsole("[GravitySystem] ERROR: Camera is nil!")
             IsRotating = false
             return
         end
-
-        PrintToConsole("[GravitySystem] Camera obtained")
 
         -- 시작 회전
         local charStartRot = ActorReference:GetRotation()
         local camStartRot = camera:GetRotation()
 
-        PrintToConsole("[GravitySystem] Start rotations obtained")
-
         -- 목표 회전 계산: oldUp에서 newUp으로 회전하는 Quaternion
         local rotationQuat = FQuat.FromToRotation(oldUpDir, newUpDir)
-        PrintToConsole("[GravitySystem] Rotation quat calculated: " .. rotationQuat.X .. ", " .. rotationQuat.Y .. ", " .. rotationQuat.Z .. ", " .. rotationQuat.W)
 
         local charTargetRot = FQuat.Mul(rotationQuat, charStartRot)
         local camTargetRot = FQuat.Mul(rotationQuat, camStartRot)
 
-        PrintToConsole("[GravitySystem] Target rotations calculated")
-
         -- 부드러운 회전 (ROTATION_DURATION 초 동안)
         local elapsed = 0.0
-        PrintToConsole("[GravitySystem] Starting rotation loop")
-
         while elapsed < ROTATION_DURATION do
             local dt = coroutine.yield()  -- DeltaTime 반환
 
             -- dt가 nil이면 기본값 사용
             if not dt then
-                PrintToConsole("[GravitySystem] WARNING: dt is nil, using default 0.016")
                 dt = 0.016  -- 기본 60 FPS
             end
 
@@ -98,17 +80,15 @@ local function RotateToNewGravity(newGravityDir)
             camera:SetRotation(currentCamRot)
         end
 
-        PrintToConsole("[GravitySystem] Rotation loop complete")
-
         -- 최종 위치 보정
         ActorReference:SetRotation(charTargetRot)
         camera:SetRotation(camTargetRot)
 
-        -- 중력 방향 업데이트
-        CurrentGravityDirection = newGravityDir
-        ActorReference:GetCharacterMovement():SetGravityDirection(newGravityDir)
+        -- 중력 방향 업데이트 (복사본 사용)
+        CurrentGravityDirection = newGravityCopy
 
-        PrintToConsole("[GravitySystem] Rotation complete. New gravity direction set.")
+        ActorReference:GetCharacterMovement():SetGravityDirection(newGravityCopy)
+
         IsRotating = false
         LastWallNormal = nil  -- 회전 완료 후 초기화
     end)
@@ -146,6 +126,10 @@ function OnWallCollision(wallNormal)
 
         -- 새로운 중력 방향 = 벽 Normal의 반대
         local newGravityDir = FVector.Mul(wallNormal, -1)
+
+        -- 디버그: 계산된 새 중력 방향 출력
+        PrintToConsole("[GravitySystem] WallNormal: (" .. wallNormal.X .. ", " .. wallNormal.Y .. ", " .. wallNormal.Z .. ")")
+        PrintToConsole("[GravitySystem] NewGravityDir (after Mul): (" .. newGravityDir.X .. ", " .. newGravityDir.Y .. ", " .. newGravityDir.Z .. ")")
 
         -- 마지막 벽 Normal 저장
         LastWallNormal = wallNormal
