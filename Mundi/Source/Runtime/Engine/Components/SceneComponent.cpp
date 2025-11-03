@@ -369,6 +369,32 @@ void USceneComponent::OnRegister(UWorld* InWorld)
     }
 }
 
+void USceneComponent::OnUnregister()
+{
+    // 부모-자식 관계 정리 (댕글링 포인터 방지)
+    // 이 시점에서 정리하면 소멸자보다 먼저 실행되어 안전함
+
+    // 자식들의 AttachParent 참조 끊기
+    TArray<USceneComponent*> ChildrenCopy = AttachChildren;
+    for (USceneComponent* Child : ChildrenCopy)
+    {
+        if (Child && !Child->IsPendingDestroy())
+        {
+            Child->AttachParent = nullptr;
+        }
+    }
+    AttachChildren.clear();
+
+    // 부모에서 자신 제거
+    if (AttachParent && !AttachParent->IsPendingDestroy())
+    {
+        AttachParent->AttachChildren.Remove(this);
+    }
+    AttachParent = nullptr;
+
+    Super::OnUnregister();
+}
+
 void USceneComponent::OnSerialized()
 {
 	Super::OnSerialized();
