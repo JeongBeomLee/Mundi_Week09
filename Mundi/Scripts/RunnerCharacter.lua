@@ -222,10 +222,10 @@ end
 -- ════════════════════════════════════════════════════════════════════════════
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
-    PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
-    if Config.bDebugLog then
-        PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
-    end
+    --PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
+    --if Config.bDebugLog then
+    --    PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
+    --end
 
     -- TODO: 벽면 감지 및 중력 방향 전환 로직
     -- 예: OtherActor의 태그를 확인해서 "WallTrigger"면 중력 방향 변경
