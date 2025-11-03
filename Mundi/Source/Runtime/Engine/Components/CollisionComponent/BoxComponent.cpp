@@ -21,9 +21,6 @@ END_PROPERTIES()
 
 UBoxComponent::UBoxComponent()
 {
-	// 기본 Box 크기 (50 x 50 x 50 단위)
-	BoxExtent = FVector(50.0f, 50.0f, 50.0f);
-
 	// 초기 Bounds 계산
 	UpdateBounds();
 }
