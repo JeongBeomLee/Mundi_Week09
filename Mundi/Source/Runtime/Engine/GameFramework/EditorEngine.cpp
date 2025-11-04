@@ -2,12 +2,15 @@
 #include "EditorEngine.h"
 #include "USlateManager.h"
 #include "SelectionManager.h"
-#include <ObjManager.h>
+#include "ObjManager.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include "SoundManager.h"
+
 #include "GameModeBase.h"
 #include "GameStateBase.h"
-#include"RunnerGameMode.h"
-#include"CameraActor.h"
+#include "RunnerGameMode.h"
+#include "CameraActor.h"
+
 float UEditorEngine::ClientWidth = 1024.0f;
 float UEditorEngine::ClientHeight = 1024.0f;
 
@@ -199,6 +202,7 @@ bool UEditorEngine::Startup(HINSTANCE hInstance)
     //매니저 초기화
     UI.Initialize(HWnd, RHIDevice.GetDevice(), RHIDevice.GetDeviceContext());
     INPUT.Initialize(HWnd);
+    USoundManager::GetInstance().Initialize(); // FMOD 사운드 시스템 초기화
 
     FObjManager::Preload();
 
@@ -238,6 +242,7 @@ void UEditorEngine::Tick(float DeltaSeconds)
     SLATE.Update(DeltaSeconds);
     UI.Update(DeltaSeconds);
     INPUT.Update();
+    USoundManager::GetInstance().Update(DeltaSeconds); // FMOD 사운드 시스템 업데이트 (매 프레임 필수)
 }
 
 void UEditorEngine::Render()
@@ -268,7 +273,6 @@ void UEditorEngine::HandleUVInput(float DeltaSeconds)
         UVScrollTime += DeltaSeconds;
         if (Renderer) Renderer->GetRHIDevice()->UpdateUVScrollConstantBuffers(UVScrollSpeed, UVScrollTime);
     }
-
 }
 
 void UEditorEngine::MainLoop()
@@ -333,6 +337,9 @@ void UEditorEngine::MainLoop()
 
 void UEditorEngine::Shutdown()
 {
+    // FMOD 사운드 시스템 종료 (다른 리소스보다 먼저 정리)
+    USoundManager::GetInstance().Shutdown();
+
     // Release ImGui first (it may hold D3D11 resources)
     UUIManager::GetInstance().Release();
 

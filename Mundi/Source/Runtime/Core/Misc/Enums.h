@@ -300,6 +300,7 @@ enum class ResourceType : uint8
     Shader,
     Texture,
     Material,
+    Sound,  // FMOD 사운드 리소스
 
     End
 };

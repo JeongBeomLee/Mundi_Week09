@@ -16,6 +16,14 @@
 // lua
 #pragma comment(lib, "lua.lib")
 
+// FMOD
+#ifdef _DEBUG
+#pragma comment(lib, "fmodL_vc.lib")
+#else
+#pragma comment(lib, "fmod_vc.lib")
+#endif
+
+
 // Standard Library (MUST come before UEContainer.h)
 #include <vector>
 #include <map>
@@ -85,6 +93,7 @@
 #include "InputManager.h"
 #include "UIManager.h"
 #include "ResourceManager.h"
+#include "SoundManager.h"
 
 #include "JsonSerializer.h"
 
