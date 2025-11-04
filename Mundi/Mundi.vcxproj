@@ -209,6 +209,7 @@ if "$(Configuration)"=="Debug" (
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp" />
+    <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp" />
@@ -518,6 +519,7 @@ if "$(Configuration)"=="Debug" (
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
+    <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\PathUtils.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\WeakPtr.h" />

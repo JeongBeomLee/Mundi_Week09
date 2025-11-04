@@ -225,6 +225,9 @@ void UEditorEngine::Tick(float DeltaSeconds)
     //@TODO UV 스크롤 입력 처리 로직 이동
     HandleUVInput(DeltaSeconds);
 
+    // FMOD 사운드 테스트 입력 처리
+    HandleSoundTestInput(DeltaSeconds);
+
     for (auto& WorldContext : WorldContexts)
     {
         WorldContext.World->Tick(DeltaSeconds);
@@ -273,8 +276,104 @@ void UEditorEngine::HandleUVInput(float DeltaSeconds)
         UVScrollTime += DeltaSeconds;
         if (Renderer) Renderer->GetRHIDevice()->UpdateUVScrollConstantBuffers(UVScrollSpeed, UVScrollTime);
     }
-
 }
+
+void UEditorEngine::HandleSoundTestInput(float DeltaSeconds)
+{
+    UInputManager& InputMgr = UInputManager::GetInstance();
+    static FMOD::Channel* LastSFXChannel = nullptr; // 마지막 SFX 채널 저장 (테스트용)
+
+    // ========== FMOD 사운드 시스템 테스트 코드 ==========
+
+    // === 사운드 재생 ===
+    // J 키: 2D SFX 사운드 재생
+    if (InputMgr.IsKeyPressed('J'))
+    {
+        UE_LOG("[EditorEngine] J 키 눌림: 2D SFX 사운드 재생");
+        LastSFXChannel = USoundManager::GetInstance().PlaySound2D("Data/Sounds/test_sfx.mp3", false, ESoundChannelType::SFX);
+    }
+
+    // K 키: 2D Music 사운드 재생
+    if (InputMgr.IsKeyPressed('K'))
+    {
+        UE_LOG("[EditorEngine] K 키 눌림: 2D Music 사운드 재생");
+        USoundManager::GetInstance().PlaySound2D("Data/Sounds/test_music.wav", false, ESoundChannelType::Music);
+    }
+
+    // L 키: 3D 사운드 재생
+    if (InputMgr.IsKeyPressed('L'))
+    {
+        UE_LOG("[EditorEngine] L 키 눌림: 3D 사운드 재생 (위치: X=100)");
+        USoundManager::GetInstance().PlaySound3D("Data/Sounds/test_3d.wav", FVector(100.0f, 0.0f, 0.0f), false);
+    }
+
+    // M 키: BGM 재생 (루프)
+    if (InputMgr.IsKeyPressed('M'))
+    {
+        UE_LOG("[EditorEngine] M 키 눌림: BGM 재생 (루프)");
+        USoundManager::GetInstance().PlayBGM("Data/Sounds/test_sfx.mp3");
+    }
+
+    // === 사운드 정지 ===
+    // N 키: BGM 정지
+    if (InputMgr.IsKeyPressed('N'))
+    {
+        UE_LOG("[EditorEngine] N 키 눌림: BGM 정지");
+        USoundManager::GetInstance().StopBGM();
+    }
+
+    // O 키: 마지막 SFX 채널 정지
+    if (InputMgr.IsKeyPressed('O'))
+    {
+        UE_LOG("[EditorEngine] O 키 눌림: 마지막 SFX 채널 정지");
+        USoundManager::GetInstance().StopChannel(LastSFXChannel);
+        LastSFXChannel = nullptr;
+    }
+
+    // 숫자 0 키: 모든 사운드 정지
+    if (InputMgr.IsKeyPressed('0'))
+    {
+        UE_LOG("[EditorEngine] 0 키 눌림: 모든 사운드 정지");
+        USoundManager::GetInstance().StopAllSounds();
+        LastSFXChannel = nullptr;
+    }
+
+    // === 볼륨 조절 ===
+    // 숫자 1 키: SFX 볼륨 증가
+    if (InputMgr.IsKeyPressed('1'))
+    {
+        float CurrentVolume = USoundManager::GetInstance().GetSFXVolume();
+        USoundManager::GetInstance().SetSFXVolume(CurrentVolume + 0.1f);
+        UE_LOG("[EditorEngine] 1 키: SFX 볼륨 증가 -> %.2f", USoundManager::GetInstance().GetSFXVolume());
+    }
+
+    // 숫자 2 키: SFX 볼륨 감소
+    if (InputMgr.IsKeyPressed('2'))
+    {
+        float CurrentVolume = USoundManager::GetInstance().GetSFXVolume();
+        USoundManager::GetInstance().SetSFXVolume(CurrentVolume - 0.1f);
+        UE_LOG("[EditorEngine] 2 키: SFX 볼륨 감소 -> %.2f", USoundManager::GetInstance().GetSFXVolume());
+    }
+
+    // 숫자 3 키: Music 볼륨 증가
+    if (InputMgr.IsKeyPressed('3'))
+    {
+        float CurrentVolume = USoundManager::GetInstance().GetMusicVolume();
+        USoundManager::GetInstance().SetMusicVolume(CurrentVolume + 0.1f);
+        UE_LOG("[EditorEngine] 3 키: Music 볼륨 증가 -> %.2f", USoundManager::GetInstance().GetMusicVolume());
+    }
+
+    // 숫자 4 키: Music 볼륨 감소
+    if (InputMgr.IsKeyPressed('4'))
+    {
+        float CurrentVolume = USoundManager::GetInstance().GetMusicVolume();
+        USoundManager::GetInstance().SetMusicVolume(CurrentVolume - 0.1f);
+        UE_LOG("[EditorEngine] 4 키: Music 볼륨 감소 -> %.2f", USoundManager::GetInstance().GetMusicVolume());
+    }
+    // ========== 사운드 테스트 코드 끝 ==========
+}
+
+
 
 void UEditorEngine::MainLoop()
 {
