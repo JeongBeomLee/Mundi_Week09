@@ -33,7 +33,7 @@ local ObstaclePool = Queue.new();
 -- PlayerController와 CameraManager 저장
 local PlayerController = nil;
 local PlayerCameraManager = nil;
-local CameraShakeModifier = nil;
+local ActiveCameraShakeModifiers = {};  -- 활성 CameraShake 추적용
 
 -- 충돌 컴포넌트가 포함되어 있으면 다른 물체와 OnOVerlap될 수 있으므로
 -- Pool마다 STORAGE_POSITION을 다르게 해야 함.
@@ -137,9 +137,6 @@ function BeginPlay()
         if PlayerController then
             PlayerCameraManager = PlayerController:GetPlayerCameraManager();
             if PlayerCameraManager then
-                -- CameraShake Modifier 생성
-                CameraShakeModifier = UCameraModifier_CameraShake();
-                CameraShakeModifier:SetRotationAmplitude(5.0);
                 PrintToConsole("[ObstacleGenerator] PlayerCameraManager initialized");
             else
                 PrintToConsole("[ObstacleGenerator] WARNING: PlayerCameraManager is nil");
@@ -161,26 +158,54 @@ function EndPlay()
     PrintToConsole("[ObstacleGenerator] End Play");
 end
 
-function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
-    -- PrintToConsole("[ObstacleGenerator] OnOverlap");
-    if (CollisionUtility.IsObstacleActor(OtherActor)) then
-        -- CameraShake 추가
-        if PlayerCameraManager and CameraShakeModifier then
-            PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
-            PrintToConsole("[ObstacleGenerator] CameraShake added to PlayerCameraManager");
-        end
+local function AddCameraShake()
+    if not PlayerCameraManager then
+        return;
+    end
 
-        GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
+    local CameraShakeModifier = UCameraModifier_CameraShake();
+    CameraShakeModifier:SetRotationAmplitude(10.0);
+
+    PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
+    table.insert(ActiveCameraShakeModifiers, CameraShakeModifier);
+end
+
+function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
+    if not CollisionUtility.IsObstacleActor(OtherActor) then
+        return;
+    end
+
+    -- 플레이어 사망 처리
+    GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
+
+    -- 카메라 셰이크 추가
+    AddCameraShake();
+end
+
+local function RemoveDisabledCameraShakes()
+    local i = 1;
+    while i <= #ActiveCameraShakeModifiers do
+        local modifier = ActiveCameraShakeModifiers[i];
+
+        if modifier:IsDisabled() then
+            PlayerCameraManager:RemoveCameraModifier(modifier);
+            table.remove(ActiveCameraShakeModifiers, i);
+        else
+            i = i + 1;
+        end
     end
 end
 
 function Tick(dt)
     CheckObstacleLocationAndWithDraw();
 
-    -- PlayerCameraManager UpdateCamera 호출
+    -- 카메라 업데이트
     if PlayerCameraManager then
         PlayerCameraManager:UpdateCamera(dt);
     end
+
+    -- 비활성화된 카메라 셰이크 제거
+    RemoveDisabledCameraShakes();
 end
 
 -- 부활 작업

@@ -54,7 +54,7 @@ void UCameraModifier::ModifyPostProcess(
 
 float UCameraModifier::GetTargetAlpha()
 {
-    return bIsFadingIn ? 0.f : 1.f;  // bIsFadingIn이 true면 1.0을 향해 증가
+    return bIsFadingIn ? 1.f : 0.f;  // bIsFadingIn이 true면 1.0을 향해 증가
 }
 
 bool UCameraModifier::IsDisabled() const
@@ -94,11 +94,11 @@ void UCameraModifier::UpdateAlpha(float DeltaTime)
         Alpha = std::min<float>(Alpha + DeltaTime / BlendTime, TargetAlpha);
     }
 
-    // // Alpha가 1.0에 도달하면 바로 비활성화
-    // if (bIsFadingIn && Alpha >= 1.f)
-    // {
-    //     DisableModifier();
-    // }
+    // Alpha가 1.0에 도달하면 바로 비활성화
+    if (bIsFadingIn && Alpha >= 1.f)
+    {
+        DisableModifier();
+    }
 }
 
 float UCameraModifier::GetAlphaInTime() const

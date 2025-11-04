@@ -25,20 +25,22 @@ void UPerlinNoiseFloat::RenewCurve()
     
     std::random_device rd;
     std::mt19937 gen(rd());
-    // 펄린 노이즈의 기울기는 [-1, 1] 범위
-    std::uniform_int_distribution<> dist(-1, 1);
+    // 펄린 노이즈의 기울기는 [-1.0, 1.0] 범위의 실수
+    std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
 
-    float GridNum = std::floor(TimeRange);
+    // TimeRange가 5.f면 SampleTime은 [0, 5] 범위이므로 ceil(5) = 5에 접근 가능
+    // 따라서 GridNum은 TimeRange + 1이어야 함
+    int32 GridNum = static_cast<int32>(std::floor(TimeRange)) + 1;
 
     // 격자마다 랜덤 기울기를 저장
     TArray<float> RandomSlopes(GridNum, 0.0f);
-    for (int i = 0; i < GridNum; i++)
+    for (int32 i = 0; i < GridNum; i++)
     {
         RandomSlopes[i] = dist(gen);
     }
 
     float StartTime = 0.0f;
-    float Interval = TimeRange / NumSamples - 1;
+    float Interval = TimeRange / (NumSamples - 1);
 
     // 시작점과 끝점은 0으로 고정
     Curve.Keys[0].Value = 0.f;

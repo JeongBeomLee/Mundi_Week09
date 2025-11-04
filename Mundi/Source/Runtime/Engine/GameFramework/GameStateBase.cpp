@@ -55,7 +55,7 @@ void AGameStateBase::SetGameState(EGameState NewState)
 		{
 			ResumeTimer();
 		}
-		else if (NewState == EGameState::Paused || NewState == EGameState::GameOver || NewState == EGameState::Victory)
+		else if (NewState == EGameState::Paused /*|| NewState == EGameState::GameOver*/ || NewState == EGameState::Victory)
 		{
 			PauseTimer();
 		}

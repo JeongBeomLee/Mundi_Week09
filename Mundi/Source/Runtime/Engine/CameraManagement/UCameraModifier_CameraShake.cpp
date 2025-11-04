@@ -9,8 +9,8 @@ END_PROPERTIES()
 
 UCameraModifier_CameraShake::UCameraModifier_CameraShake()
 {
-   SetAlphaInTime(5.f);
-   SetAlphaOutTime(5.f);
+   SetAlphaInTime(2.f);
+   SetAlphaOutTime(2.f);
    SetAlpha(0.f);
    SetIsFadingIn(true);
    EnableModifier();
@@ -60,9 +60,9 @@ void UCameraModifier_CameraShake::ModifyCamera(
       if (CurveTime >= XKeys[i].Time && CurveTime <= XKeys[i + 1].Time)
       {
          // Curve 한 번만 생성
-         PerlinNoiseXAxis.RenewCurve();
-         PerlinNoiseYAxis.RenewCurve();
-         PerlinNoiseZAxis.RenewCurve();
+         // PerlinNoiseXAxis.RenewCurve();
+         // PerlinNoiseYAxis.RenewCurve();
+         // PerlinNoiseZAxis.RenewCurve();
          
          // InterpAlpha: 두 키 사이에서의 보간 비율 [0, 1]
          float InterpAlpha = FMath::GetRangePct(XKeys[i].Time, XKeys[i + 1].Time, CurveTime);
@@ -89,13 +89,13 @@ void UCameraModifier_CameraShake::ModifyCamera(
             2.f
          ) * RotationAmplitude;
 
-         InOutViewRotation = FQuat::MakeFromEulerZYX(ViewNewRotation);
+         // InOutViewRotation = FQuat::MakeFromEulerZYX(ViewNewRotation);
 
          // [Alternative Unreal 방식 - 주석]
          // Base Rotation에 Shake Offset을 Euler 각도로 더하는 방식:
-         // FVector CurrentEuler = InOutViewRotation.GetEulerZYXDeg();
-         // FVector NewEuler = CurrentEuler + ViewNewRotation;
-         // InOutViewRotation = FQuat::MakeFromEulerZYX(NewEuler);
+         FVector CurrentEuler = InOutViewRotation.ToEulerZYXDeg();
+         FVector NewEuler = CurrentEuler + ViewNewRotation;
+         InOutViewRotation = FQuat::MakeFromEulerZYX(NewEuler);
          // 이 방식은 Shake가 끝나면 자동으로 원래 회전으로 복귀함
 
          break;
