@@ -68,7 +68,7 @@ void APlayerController::Tick(float DeltaSeconds)
 		ProcessPlayerInput();
 	}
 
-	// 카메라 업데이트 (PIE 모드에서만)
+	// 카메라 업데이트
 	if (PlayerCameraManager)
 	{
 		PlayerCameraManager->UpdateCamera(DeltaSeconds);

@@ -14,6 +14,10 @@
 #include "Clipboard/ClipboardManager.h"
 #include "InputManager.h"
 #include "USlateManager.h"
+#include "PlayerController.h"
+#include "PlayerCameraManager.h"
+#include "ViewTarget.h"
+#include "GameModeBase.h"
 
 FVector FViewportClient::CameraAddPosition{};
 
@@ -140,17 +144,44 @@ void FViewportClient::Draw(FViewport* Viewport)
 {
 	if (!Viewport || !World) return;
 
+	// PIE 모드: PlayerController의 카메라 사용
+	// 에디터 모드: FViewportClient의 Camera 사용
+	ACameraActor* RenderCamera = Camera;
+
+	if (World->bPie && World->GetCameraActor() && World->GetGameMode())
+	{
+		// PIE 모드에서 GameMode로부터 PlayerController 가져오기
+		APlayerController* PlayerController = World->GetGameMode()->GetPlayerController();
+
+		// PlayerController에서 카메라 정보 가져와서 MainCameraActor에 적용
+		if (PlayerController)
+		{
+			APlayerCameraManager* CameraManager = PlayerController->GetPlayerCameraManager();
+			if (CameraManager)
+			{
+				const FViewTarget& ViewTarget = CameraManager->GetViewTarget_Internal();
+				ACameraActor* MainCamera = World->GetCameraActor();
+
+				MainCamera->SetActorLocation(ViewTarget.POV_Location);
+				MainCamera->SetActorRotation(ViewTarget.POV_Rotation);
+				MainCamera->GetCameraComponent()->SetFOV(ViewTarget.POV_FOV);
+			}
+		}
+
+		RenderCamera = World->GetCameraActor();
+	}
+
 	// 1. 뷰 타입에 따라 카메라 설정 등 사전 작업을 먼저 수행
 	switch (ViewportType)
 	{
 	case EViewportType::Perspective:
 	{
-		Camera->GetCameraComponent()->SetProjectionMode(ECameraProjectionMode::Perspective);
+		RenderCamera->GetCameraComponent()->SetProjectionMode(ECameraProjectionMode::Perspective);
 		break;
 	}
 	default: // 모든 Orthographic 케이스
 	{
-		Camera->GetCameraComponent()->SetProjectionMode(ECameraProjectionMode::Orthographic);
+		RenderCamera->GetCameraComponent()->SetProjectionMode(ECameraProjectionMode::Orthographic);
 		SetupCameraMode();
 		break;
 	}
@@ -163,7 +194,7 @@ void FViewportClient::Draw(FViewport* Viewport)
 		World->GetRenderSettings().SetViewModeIndex(ViewModeIndex);
 
 		// 더 명확한 이름의 함수를 호출
-		Renderer->RenderSceneForView(World, Camera, Viewport);
+		Renderer->RenderSceneForView(World, RenderCamera, Viewport);
 	}
 }
 
