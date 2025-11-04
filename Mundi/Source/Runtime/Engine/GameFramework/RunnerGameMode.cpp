@@ -7,7 +7,6 @@
 #include "Character.h"
 #include "RunnerCharacter.h"
 #include "PlayerController.h"
-#include "CameraActor.h"
 #include "GameStateBase.h"
 
 IMPLEMENT_CLASS(ARunnerGameMode)
@@ -56,76 +55,10 @@ void ARunnerGameMode::BeginPlay()
 void ARunnerGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	// 카메라를 플레이어 뒤에서 따라가도록 업데이트
-	if (PlayerController && PlayerController->GetPawn() && World->GetCameraActor())
-	{
-		APawn* PlayerPawn = PlayerController->GetPawn();
-		ACameraActor* Camera = World->GetCameraActor();
-
-		// RunnerCharacter로 캐스팅 (중력 방향 정보 필요)
-		ARunnerCharacter* RunnerChar = dynamic_cast<ARunnerCharacter*>(PlayerPawn);
-		if (RunnerChar)
-		{
-			// 플레이어 위치
-			FVector PlayerLocation = PlayerPawn->GetActorLocation();
-
-			// 캐릭터의 로컬 좌표계 방향 가져오기
-			FVector UpDirection = RunnerChar->GetUpDirection();        // 중력 반대 = 위
-			FVector ForwardDirection = RunnerChar->GetForwardDirection(); // 전진 방향
-
-			// 로컬 좌표계 기준 오프셋 계산
-			// 뒤쪽(-Forward) 3.0, 위쪽(+Up) 3.0
-			FVector CameraOffset = ForwardDirection * -5.0f + UpDirection * 5.0f;
-			FVector CameraLocation = PlayerLocation + CameraOffset;
-
-			// 카메라 위치 설정
-			Camera->SetActorLocation(CameraLocation);
-		}
-
-		//// 카메라가 플레이어를 향하도록 회전
-		//FVector LookAtTarget = PlayerLocation + FVector(0.0f, 0.0f, 50.0f); // 플레이어 중심보다 약간 위
-		//FVector Direction = (LookAtTarget - CameraLocation).GetNormalized();
-
-		//// Direction으로부터 Rotation 계산
-		//float Pitch = asinf(-Direction.Z) * (180.0f / 3.14159265f);
-		//float Yaw = atan2f(Direction.Y, Direction.X) * (180.0f / 3.14159265f);
-
-		//Camera->SetActorRotation(FQuat::MakeFromEulerZYX(FVector(Pitch, Yaw, 0.0f)));
-	}
-
-	// 게임 진행 중이면 난이도 업데이트 (나중에 구현)
-	// if (GetGameState() && GetGameState()->IsMatchInProgress())
-	// {
-	//     UpdateDifficulty(DeltaSeconds);
-	// }
 }
 
 void ARunnerGameMode::RestartGame()
 {
-	// UE_LOG("[RunnerGameMode] RestartGame called!");
-	// // 플레이어 리스폰
-	// if (PlayerController)
-	// {
-	// 	UE_LOG("[RunnerGameMode] Restarting player...");
-	// 	RestartPlayer(PlayerController);
-	//
-	// 	// RunnerCharacter::BeginPlay()에서 자동으로 스크립트 연결됨
-	// 	APawn* SpawnedPawn = PlayerController->GetPawn();
-	// 	if (SpawnedPawn)
-	// 	{
-	// 		UE_LOG("[RunnerGameMode] New Pawn location: (%.1f, %.1f, %.1f)",
-	// 			SpawnedPawn->GetActorLocation().X,
-	// 			SpawnedPawn->GetActorLocation().Y,
-	// 			SpawnedPawn->GetActorLocation().Z);
-	// 		UE_LOG("[RunnerGameMode] Player restarted successfully!");
-	// 	}
-	// 	else
-	// 	{
-	// 		UE_LOG("[RunnerGameMode] ERROR: Failed to get spawned pawn after restart!");
-	// 	}
-	// }
-	// 부모 클래스의 RestartGame 호출 (GameState 초기화 + StartGame)
 	Super::RestartGame();
 }
 

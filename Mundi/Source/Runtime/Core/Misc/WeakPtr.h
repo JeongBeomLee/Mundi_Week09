@@ -61,17 +61,17 @@ public:
 	T* Get() const
 	{
 		if (!IsValid())
+		{
 			return nullptr;
+		}
 
 		UObject* Obj = GUObjectArray[Index];
 		if (!Obj)
+		{
 			return nullptr;
+		}
 
-		// 타입 체크
-		if (!Obj->IsA<T>())
-			return nullptr;
-
-		return static_cast<T*>(Obj);
+		return reinterpret_cast<T*>(Obj);
 	}
 
 	// 연산자 오버로딩

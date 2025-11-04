@@ -1,4 +1,4 @@
-// ────────────────────────────────────────────────────────────────────────────
+﻿// ────────────────────────────────────────────────────────────────────────────
 // PlayerController.cpp
 // 플레이어 입력 처리 Controller 구현
 // ────────────────────────────────────────────────────────────────────────────
@@ -7,6 +7,10 @@
 #include "Pawn.h"
 #include "InputComponent.h"
 #include "InputManager.h"
+#include "PlayerCameraManager.h"
+#include "CameraComponent.h"
+#include "World.h"
+#include "ObjectFactory.h"
 
 IMPLEMENT_CLASS(APlayerController)
 
@@ -24,11 +28,13 @@ APlayerController::APlayerController()
 	, bShowMouseCursor(true)
 	, bIsMouseLocked(false)
 	, MouseSensitivity(1.0f)
+	, PlayerCameraManager(nullptr)
 {
 }
 
 APlayerController::~APlayerController()
 {
+	DeleteObject(PlayerCameraManager);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -41,6 +47,11 @@ void APlayerController::BeginPlay()
 
 	// InputManager 참조 획득
 	InputManager = &UInputManager::GetInstance();
+
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->BeginPlay();
+	}
 }
 
 void APlayerController::Tick(float DeltaSeconds)
@@ -51,6 +62,12 @@ void APlayerController::Tick(float DeltaSeconds)
 	if (bInputEnabled)
 	{
 		ProcessPlayerInput();
+	}
+
+	// 카메라 업데이트
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->UpdateCamera(DeltaSeconds);
 	}
 }
 
@@ -79,6 +96,18 @@ void APlayerController::OnPossess(APawn* InPawn)
 		if (InputComp)
 		{
 			InPawn->SetupPlayerInputComponent(InputComp);
+		}
+
+		// PlayerCameraManager 생성 (OnPossess가 BeginPlay보다 먼저 호출됨)
+		if (!PlayerCameraManager && World && World->bPie)
+		{
+			PlayerCameraManager = World->SpawnActor<APlayerCameraManager>();
+		}
+
+		// PlayerCameraManager의 ViewTarget 설정
+		if (PlayerCameraManager)
+		{
+			PlayerCameraManager->SetViewTarget(InPawn);
 		}
 	}
 }
@@ -149,4 +178,17 @@ void APlayerController::UnlockMouseCursor()
 	{
 		InputManager->ReleaseCursor();
 	}
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 카메라 관리 (Phase 1.2에서 추가)
+// ────────────────────────────────────────────────────────────────────────────
+
+UCameraComponent* APlayerController::GetCameraComponentForRendering() const
+{
+	if (PlayerCameraManager)
+	{
+		return PlayerCameraManager->GetCameraComponentForRendering();
+	}
+	return nullptr;
 }
