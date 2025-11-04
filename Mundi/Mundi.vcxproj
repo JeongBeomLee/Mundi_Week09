@@ -222,6 +222,7 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\Components\SpotLightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\ProjectileActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\CoinActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\GravityWall.cpp" />
@@ -526,6 +527,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\CoinActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\GravityWall.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\ProjectileActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Controller.h" />
@@ -540,6 +542,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerGameMode.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\PointLightActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\CoroutineScheduler.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\ScriptGlobalFunction.h" />
     <ClInclude Include="Source\Runtime\LuaScripting\UScriptManager.h" />
