@@ -6,6 +6,7 @@
 #include "RunnerCharacter.h"
 #include "CharacterMovementComponent.h"
 #include "InputComponent.h"
+#include "CameraComponent.h"
 #include "World.h"
 #include "GameModeBase.h"
 #include "CollisionComponent/BoxComponent.h"
@@ -23,6 +24,8 @@ END_PROPERTIES()
 
 ARunnerCharacter::ARunnerCharacter()
 	: CollisionBox(nullptr)
+	, CameraComponent(nullptr)
+	, CameraOffset(-5.0f, 0.0f, 5.0f)  // 플레이어 뒤쪽 5미터, 위쪽 5미터
 {
 	// BoxComponent 생성 및 설정
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>("CollisionBox");
@@ -41,6 +44,15 @@ ARunnerCharacter::ARunnerCharacter()
 		}
 
 		CollisionBox->SetBoxExtent(FVector(0.50f, 0.50f, 0.50f));
+	}
+
+	// CameraComponent 생성 및 설정
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
+	if (CameraComponent)
+	{
+		CameraComponent->SetOwner(this);
+		CameraComponent->SetupAttachment(GetRootComponent());
+		CameraComponent->SetFOV(60.0f);
 	}
 
 	// 모든 이동 설정은 Lua에서 관리 (RunnerCharacter.lua의 Config)
@@ -81,6 +93,14 @@ void ARunnerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	UE_LOG("[RunnerCharacter] BeginPlay complete");
+}
+
+void ARunnerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// 카메라 위치 업데이트
+	UpdateCameraPosition();
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -161,14 +181,29 @@ FVector ARunnerCharacter::GetGravityDirection() const
 }
 
 // ────────────────────────────────────────────────────────────────────────────
+// 카메라 제어
+// ────────────────────────────────────────────────────────────────────────────
+
+void ARunnerCharacter::UpdateCameraPosition()
+{
+	if (!CameraComponent)
+		return;
+
+	// 캐릭터의 로컬 좌표계 기준으로 카메라 오프셋 적용
+	FQuat CharacterRotation = GetActorRotation();
+	FVector WorldOffset = CharacterRotation.RotateVector(CameraOffset);
+	FVector CameraLocation = GetActorLocation() + WorldOffset;
+
+	CameraComponent->SetWorldLocation(CameraLocation);
+	CameraComponent->SetWorldRotation(CharacterRotation);
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 // 복제 (Duplication)
 // ────────────────────────────────────────────────────────────────────────────
 
 void ARunnerCharacter::DuplicateSubObjects()
 {
 	Super::DuplicateSubObjects();
-
-	// CollisionBox는 CreateDefaultSubobject로 생성되므로 자동으로 복제됩니다.
-	// 추가적인 설정이 필요하면 여기서 처리합니다.
 }
 

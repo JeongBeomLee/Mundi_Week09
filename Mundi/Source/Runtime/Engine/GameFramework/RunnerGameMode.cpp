@@ -7,7 +7,6 @@
 #include "Character.h"
 #include "RunnerCharacter.h"
 #include "PlayerController.h"
-#include "CameraActor.h"
 #include "GameStateBase.h"
 
 IMPLEMENT_CLASS(ARunnerGameMode)
@@ -56,33 +55,6 @@ void ARunnerGameMode::BeginPlay()
 void ARunnerGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	// 카메라를 플레이어 뒤에서 따라가도록 업데이트
-	if (PlayerController && PlayerController->GetPawn() && World->GetCameraActor())
-	{
-		APawn* PlayerPawn = PlayerController->GetPawn();
-		ACameraActor* Camera = World->GetCameraActor();
-
-		// RunnerCharacter로 캐스팅 (중력 방향 정보 필요)
-		ARunnerCharacter* RunnerChar = dynamic_cast<ARunnerCharacter*>(PlayerPawn);
-		if (RunnerChar)
-		{
-			// 플레이어 위치
-			FVector PlayerLocation = PlayerPawn->GetActorLocation();
-
-			// 캐릭터의 로컬 좌표계 방향 가져오기
-			FVector UpDirection = RunnerChar->GetUpDirection();        // 중력 반대 = 위
-			FVector ForwardDirection = RunnerChar->GetForwardDirection(); // 전진 방향
-
-			// 로컬 좌표계 기준 오프셋 계산
-			// 뒤쪽(-Forward) 3.0, 위쪽(+Up) 3.0
-			FVector CameraOffset = ForwardDirection * -5.0f + UpDirection * 5.0f;
-			FVector CameraLocation = PlayerLocation + CameraOffset;
-
-			// 카메라 위치 설정
-			Camera->SetActorLocation(CameraLocation);
-		}
-	}
 }
 
 void ARunnerGameMode::RestartGame()

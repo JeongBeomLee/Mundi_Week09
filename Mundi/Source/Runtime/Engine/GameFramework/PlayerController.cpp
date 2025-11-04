@@ -34,6 +34,7 @@ APlayerController::APlayerController()
 
 APlayerController::~APlayerController()
 {
+	DeleteObject(PlayerCameraManager);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -47,14 +48,9 @@ void APlayerController::BeginPlay()
 	// InputManager 참조 획득
 	InputManager = &UInputManager::GetInstance();
 
-	// PIE 모드에서 PlayerCameraManager 생성
-	if (World && World->bPie)
+	if (PlayerCameraManager)
 	{
-		PlayerCameraManager = World->SpawnActor<APlayerCameraManager>();
-		if (PlayerCameraManager)
-		{
-			PlayerCameraManager->BeginPlay();
-		}
+		PlayerCameraManager->BeginPlay();
 	}
 }
 
@@ -102,7 +98,13 @@ void APlayerController::OnPossess(APawn* InPawn)
 			InPawn->SetupPlayerInputComponent(InputComp);
 		}
 
-		// PlayerCameraManager의 ViewTarget 설정 (PIE 모드)
+		// PlayerCameraManager 생성 (OnPossess가 BeginPlay보다 먼저 호출됨)
+		if (!PlayerCameraManager && World && World->bPie)
+		{
+			PlayerCameraManager = World->SpawnActor<APlayerCameraManager>();
+		}
+
+		// PlayerCameraManager의 ViewTarget 설정
 		if (PlayerCameraManager)
 		{
 			PlayerCameraManager->SetViewTarget(InPawn);

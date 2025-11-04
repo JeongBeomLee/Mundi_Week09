@@ -8,6 +8,7 @@
 
 // 전방 선언
 class UBoxComponent;
+class UCameraComponent;
 
 /**
  * ARunnerCharacter
@@ -37,6 +38,9 @@ public:
 
 	/** 충돌 BoxComponent를 반환합니다 */
 	UBoxComponent* GetCollisionBox() const { return CollisionBox; }
+
+	/** CameraComponent를 반환합니다 */
+	UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 
 
 	void SetupPlayerInputComponent(UInputComponent* InInputComponent) override;
@@ -75,12 +79,23 @@ public:
 	 */
 	FVector GetGravityDirection() const;
 
+	// ────────────────────────────────────────────────
+	// 카메라 제어
+	// ────────────────────────────────────────────────
+
+	/**
+	 * 카메라 위치를 캐릭터 기준으로 업데이트합니다.
+	 * CameraOffset을 로컬 좌표계에 적용하여 카메라 위치 계산
+	 */
+	void UpdateCameraPosition();
+
 protected:
 	// ────────────────────────────────────────────────
 	// 생명주기
 	// ────────────────────────────────────────────────
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	// ────────────────────────────────────────────────
 	// 입력
@@ -100,4 +115,14 @@ protected:
 
 	/** 충돌 감지용 Box 컴포넌트 */
 	UBoxComponent* CollisionBox;
+
+	/** 카메라 컴포넌트 */
+	UCameraComponent* CameraComponent;
+
+	// ────────────────────────────────────────────────
+	// 카메라 설정
+	// ────────────────────────────────────────────────
+
+	/** 카메라 오프셋 (로컬 좌표계 기준) */
+	FVector CameraOffset;
 };
