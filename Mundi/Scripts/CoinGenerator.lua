@@ -154,8 +154,8 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         PrintToConsole("[CoinGenerator] Coin collected!");
 
         local dtManager = World:GetDeltaTimeManager()
-        dtManager:ApplySlomoEffect(10.0, 1.0)
-        dtManager:ApplyHitStop(0.1)
+        dtManager:ApplySlomoEffect(10.0, 0.05)
+        -- dtManager:ApplyHitStop(0.1)
 
         -- 코인을 Pool로 회수
         OtherActor:SetTransform(STORAGE_POSITION);

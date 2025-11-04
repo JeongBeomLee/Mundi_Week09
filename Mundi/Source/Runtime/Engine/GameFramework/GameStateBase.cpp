@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "GameStateBase.h"
+#include "DeltaTimeManager.h"
 
 // AGameStateBase를 ObjectFactory에 등록
 IMPLEMENT_CLASS(AGameStateBase)
@@ -35,7 +36,7 @@ void AGameStateBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 타이머가 일시정지 상태가 아니고 게임이 진행 중일 때만 시간 증가
-	if (!bTimerPaused && CurrentGameState == EGameState::Playing)
+	if (CurrentGameState == EGameState::Playing || CurrentGameState == EGameState::Paused)
 	{
 		ElapsedTime += DeltaTime;
 		OnTimerUpdated.Broadcast(ElapsedTime);
@@ -94,11 +95,13 @@ void AGameStateBase::ResetTimer()
 
 void AGameStateBase::PauseTimer()
 {
+	GWorld->GetDeltaTimeManager()->SetGlobalTimeDilation(0.0f);
 	bTimerPaused = true;
 }
 
 void AGameStateBase::ResumeTimer()
 {
+	GWorld->GetDeltaTimeManager()->SetGlobalTimeDilation(1.0f);
 	bTimerPaused = false;
 }
 
