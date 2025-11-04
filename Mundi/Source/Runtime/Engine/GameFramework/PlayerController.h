@@ -9,6 +9,8 @@
 // 전방 선언
 class UInputManager;
 class UInputComponent;
+class APlayerCameraManager;
+class UCameraComponent;
 
 /**
  * APlayerController
@@ -117,6 +119,21 @@ public:
 	 */
 	float GetMouseSensitivity() const { return MouseSensitivity; }
 
+	// ────────────────────────────────────────────────
+	// 카메라 관리
+	// ────────────────────────────────────────────────
+
+	/**
+	 * PlayerCameraManager를 반환합니다.
+	 */
+	APlayerCameraManager* GetPlayerCameraManager() const { return PlayerCameraManager; }
+
+	/**
+	 * 렌더링용 카메라 컴포넌트를 반환합니다.
+	 * PIE 모드에서 PlayerCameraManager의 카메라를 사용합니다.
+	 */
+	UCameraComponent* GetCameraComponentForRendering() const;
+
 protected:
 	// ────────────────────────────────────────────────
 	// 생명주기
@@ -143,4 +160,7 @@ protected:
 
 	/** 마우스 감도 */
 	float MouseSensitivity;
+
+	/** 카메라 매니저 (PIE 모드에서만 사용) */
+	APlayerCameraManager* PlayerCameraManager;
 };

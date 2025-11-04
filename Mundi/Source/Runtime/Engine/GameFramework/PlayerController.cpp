@@ -1,4 +1,4 @@
-// ────────────────────────────────────────────────────────────────────────────
+﻿// ────────────────────────────────────────────────────────────────────────────
 // PlayerController.cpp
 // 플레이어 입력 처리 Controller 구현
 // ────────────────────────────────────────────────────────────────────────────
@@ -7,6 +7,10 @@
 #include "Pawn.h"
 #include "InputComponent.h"
 #include "InputManager.h"
+#include "PlayerCameraManager.h"
+#include "CameraComponent.h"
+#include "World.h"
+#include "ObjectFactory.h"
 
 IMPLEMENT_CLASS(APlayerController)
 
@@ -24,6 +28,7 @@ APlayerController::APlayerController()
 	, bShowMouseCursor(true)
 	, bIsMouseLocked(false)
 	, MouseSensitivity(1.0f)
+	, PlayerCameraManager(nullptr)
 {
 }
 
@@ -41,6 +46,16 @@ void APlayerController::BeginPlay()
 
 	// InputManager 참조 획득
 	InputManager = &UInputManager::GetInstance();
+
+	// PIE 모드에서 PlayerCameraManager 생성
+	if (World && World->bPie)
+	{
+		PlayerCameraManager = World->SpawnActor<APlayerCameraManager>();
+		if (PlayerCameraManager)
+		{
+			PlayerCameraManager->BeginPlay();
+		}
+	}
 }
 
 void APlayerController::Tick(float DeltaSeconds)
@@ -51,6 +66,12 @@ void APlayerController::Tick(float DeltaSeconds)
 	if (bInputEnabled)
 	{
 		ProcessPlayerInput();
+	}
+
+	// 카메라 업데이트 (PIE 모드에서만)
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->UpdateCamera(DeltaSeconds);
 	}
 }
 
@@ -79,6 +100,12 @@ void APlayerController::OnPossess(APawn* InPawn)
 		if (InputComp)
 		{
 			InPawn->SetupPlayerInputComponent(InputComp);
+		}
+
+		// PlayerCameraManager의 ViewTarget 설정 (PIE 모드)
+		if (PlayerCameraManager)
+		{
+			PlayerCameraManager->SetViewTarget(InPawn);
 		}
 	}
 }
@@ -149,4 +176,17 @@ void APlayerController::UnlockMouseCursor()
 	{
 		InputManager->ReleaseCursor();
 	}
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 카메라 관리 (Phase 1.2에서 추가)
+// ────────────────────────────────────────────────────────────────────────────
+
+UCameraComponent* APlayerController::GetCameraComponentForRendering() const
+{
+	if (PlayerCameraManager)
+	{
+		return PlayerCameraManager->GetCameraComponentForRendering();
+	}
+	return nullptr;
 }
