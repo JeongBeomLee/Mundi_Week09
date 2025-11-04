@@ -3,6 +3,15 @@
 
 IMPLEMENT_CLASS(UCameraModifier)
 
+BEGIN_PROPERTIES(UCameraModifier)
+	ADD_PROPERTY_RANGE(float, AlphaInTime, "Camera Modifier", 0.0f, 10.0f, false, "블렌드 인 시간")
+	ADD_PROPERTY_RANGE(float, AlphaOutTime, "Camera Modifier", 0.0f, 10.0f, false, "블렌드 아웃 시간")
+	ADD_PROPERTY_RANGE(float, Alpha, "Camera Modifier", 0.0f, 1.0f, false, "현재 알파 값")
+	ADD_PROPERTY(bool, bIsFadingIn, "Camera Modifier", false, "페이드 인 중 여부")
+	ADD_PROPERTY(bool, bDisabled, "Camera Modifier", false, "비활성화 여부")
+	ADD_PROPERTY_RANGE(int32, Priority, "Camera Modifier", 0, 255, false, "우선순위")
+END_PROPERTIES()
+
 void UCameraModifier::AddedToCamera( APlayerCameraManager* Camera ) 
 {
     CameraOwner = Camera;
@@ -10,12 +19,9 @@ void UCameraModifier::AddedToCamera( APlayerCameraManager* Camera )
 
 void UCameraModifier::ModifyCamera(
     float DeltaTime,
-    FVector ViewLocation,
-    FQuat ViewRotation,
-    float FOV,
-    FVector& NewViewLocation,
-    FQuat& NewViewRotation,
-    float& NewFOV
+    FVector& InOutViewLocation,
+    FQuat& InOutViewRotation,
+    float& InOutFOV
 )
 {
     UpdateAlpha(DeltaTime);

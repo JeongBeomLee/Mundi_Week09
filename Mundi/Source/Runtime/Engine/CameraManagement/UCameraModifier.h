@@ -3,6 +3,7 @@
 class UCameraModifier : public UObject
 {
     DECLARE_CLASS(UCameraModifier, UObject)
+    GENERATED_REFLECTION_BODY()
 public:
     /* Initialize */
     
@@ -22,12 +23,9 @@ public:
      */
     virtual void ModifyCamera(
         float DeltaTime,
-        FVector ViewLocation,
-        FQuat ViewRotation,
-        float FOV,
-        FVector& NewViewLocation,
-        FQuat& NewViewRotation,
-        float& NewFOV
+        FVector& InOutViewLocation,
+        FQuat& InOutViewRotation,
+        float& InOutFOV
     );
 
     /** Allows modifying the post process in native code. */
