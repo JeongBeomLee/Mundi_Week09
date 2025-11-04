@@ -206,6 +206,7 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
     <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\CharacterMovementComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.cpp" />
@@ -520,6 +521,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Core\Misc\WeakPtr.h" />
     <ClInclude Include="Source\Runtime\Core\Object\Property.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CharacterMovementComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.h" />

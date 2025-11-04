@@ -30,6 +30,11 @@ local ObstaclesSpawned = Queue.new();
 local PoolSize = DEFAULT_POOL_SIZE;
 local ObstaclePool = Queue.new();
 
+-- PlayerController와 CameraManager 저장
+local PlayerController = nil;
+local PlayerCameraManager = nil;
+local CameraShakeModifier = nil;
+
 -- 충돌 컴포넌트가 포함되어 있으면 다른 물체와 OnOVerlap될 수 있으므로
 -- Pool마다 STORAGE_POSITION을 다르게 해야 함.
 local STORAGE_POSITION = FTransform();
@@ -125,6 +130,27 @@ function BeginPlay()
     -- 풀 초기화
     InitializePool();
 
+    -- PlayerController와 PlayerCameraManager 가져오기
+    local GameMode = GetRunnerGameMode(GlobalObjectManager.GetPIEWorld());
+    if GameMode then
+        PlayerController = GameMode:GetPlayerController();
+        if PlayerController then
+            PlayerCameraManager = PlayerController:GetPlayerCameraManager();
+            if PlayerCameraManager then
+                -- CameraShake Modifier 생성
+                CameraShakeModifier = UCameraModifier_CameraShake();
+                CameraShakeModifier:SetRotationAmplitude(5.0);
+                PrintToConsole("[ObstacleGenerator] PlayerCameraManager initialized");
+            else
+                PrintToConsole("[ObstacleGenerator] WARNING: PlayerCameraManager is nil");
+            end
+        else
+            PrintToConsole("[ObstacleGenerator] WARNING: PlayerController is nil");
+        end
+    else
+        PrintToConsole("[ObstacleGenerator] WARNING: GameMode is nil");
+    end
+
     -- 코루틴으로 장애물 스폰 시작 (한 번만 실행)
     StartCoroutine(function()
         SpawnNextObstacle();
@@ -138,12 +164,23 @@ end
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
     -- PrintToConsole("[ObstacleGenerator] OnOverlap");
     if (CollisionUtility.IsObstacleActor(OtherActor)) then
+        -- CameraShake 추가
+        if PlayerCameraManager and CameraShakeModifier then
+            PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
+            PrintToConsole("[ObstacleGenerator] CameraShake added to PlayerCameraManager");
+        end
+
         GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
     end
 end
 
 function Tick(dt)
     CheckObstacleLocationAndWithDraw();
+
+    -- PlayerCameraManager UpdateCamera 호출
+    if PlayerCameraManager then
+        PlayerCameraManager:UpdateCamera(dt);
+    end
 end
 
 -- 부활 작업

@@ -54,7 +54,7 @@ void UCameraModifier::ModifyPostProcess(
 
 float UCameraModifier::GetTargetAlpha()
 {
-    return bIsFadingIn ? 0.f : 1.f;
+    return bIsFadingIn ? 0.f : 1.f;  // bIsFadingIn이 true면 1.0을 향해 증가
 }
 
 bool UCameraModifier::IsDisabled() const
@@ -76,7 +76,7 @@ void UCameraModifier::UpdateAlpha(float DeltaTime)
 {
     float const TargetAlpha = GetTargetAlpha();
     float const BlendTime = (TargetAlpha == 0.f) ? AlphaOutTime : AlphaInTime;
-    
+
     // interpolate!
     if (BlendTime <= 0.f)
     {
@@ -93,6 +93,12 @@ void UCameraModifier::UpdateAlpha(float DeltaTime)
         // interpolate upward to target, while protecting against overshooting
         Alpha = std::min<float>(Alpha + DeltaTime / BlendTime, TargetAlpha);
     }
+
+    // // Alpha가 1.0에 도달하면 바로 비활성화
+    // if (bIsFadingIn && Alpha >= 1.f)
+    // {
+    //     DisableModifier();
+    // }
 }
 
 float UCameraModifier::GetAlphaInTime() const
@@ -117,6 +123,10 @@ float UCameraModifier::GetAlpha() const
 {
     return Alpha;
 }
+void UCameraModifier::SetAlpha(const float InAlpha)
+{
+    Alpha = InAlpha;
+}
 
 bool UCameraModifier::IsFadingIn() const
 {
@@ -125,4 +135,13 @@ bool UCameraModifier::IsFadingIn() const
 void UCameraModifier::SetIsFadingIn(const bool InIsFadingIn)
 {
     bIsFadingIn = InIsFadingIn;
+}
+
+uint8 UCameraModifier::GetPriority() const
+{
+    return Priority;
+}
+void UCameraModifier::SetPriority(const uint8 InPriority)
+{
+    Priority = InPriority;
 }

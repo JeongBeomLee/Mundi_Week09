@@ -1,4 +1,6 @@
-﻿class APlayerCameraManager;
+﻿#pragma once
+
+class APlayerCameraManager;
 
 class UCameraModifier : public UObject
 {
@@ -67,10 +69,14 @@ public:
     void SetAlphaOutTime(const float InAlphaOutTime);
     
     float GetAlpha() const;
+    void SetAlpha(const float InAlpha);
 
     bool IsFadingIn() const;
     void SetIsFadingIn(const bool InIsFadingIn);
-private:
+
+    uint8 GetPriority() const;
+    void SetPriority(const uint8 InPriority);
+protected:
     APlayerCameraManager* CameraOwner = nullptr;
     float AlphaInTime = 1.0f;
     float AlphaOutTime = 1.0f;

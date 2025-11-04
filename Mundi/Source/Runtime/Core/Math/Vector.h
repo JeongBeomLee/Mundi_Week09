@@ -51,6 +51,19 @@ namespace FMath
 		return A + (B - A) * Alpha;
 	}
 
+	// A, B 범위 내에서 C의 위치를 [0, 1] 범위로 정규화하여 반환
+	// 예: GetRangePct(0, 10, 5) = 0.5
+	template<typename T>
+	static float GetRangePct(T A, T B, T C)
+	{
+		T Range = B - A;
+		if (Abs(Range) < KINDA_SMALL_NUMBER)
+		{
+			return 0.f;
+		}
+		return static_cast<float>((C - A) / Range);
+	}
+
 	template<typename T>
 	static T Sqrt(T Value)
 	{

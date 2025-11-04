@@ -44,6 +44,10 @@ public:
 	void StartCameraFade(float FromAlpha, float ToAlpha, float Duration, const FLinearColor& Color);
 	void StopCameraFade();
 
+	// 카메라 모디파이어 관리
+	void AddCameraModifier(UCameraModifier* NewModifier);
+	void RemoveCameraModifier(UCameraModifier* ModifierToRemove);
+
 	void Serialize(const bool bInIsLoading, JSON& InOutHandle) override;
 
 	void DuplicateSubObjects() override;

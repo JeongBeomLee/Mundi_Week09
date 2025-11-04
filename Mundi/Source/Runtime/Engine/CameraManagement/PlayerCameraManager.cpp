@@ -3,7 +3,7 @@
 #include "ObjectFactory.h"
 #include "CameraComponent.h"
 #include "CameraActor.h"
-#include "Character.h"
+#include "UCameraModifier_CameraShake.h"
 
 IMPLEMENT_CLASS(APlayerCameraManager)
 
@@ -140,17 +140,18 @@ void APlayerCameraManager::UpdateViewTarget(float DeltaTime)
 
 void APlayerCameraManager::ApplyCameraModifiers(float DeltaTime, FVector& InOutLocation, FQuat& InOutRotation, float& InOutFOV)
 {
-	// TODO: 카메라 모디파이어 적용
-	// 현재는 빈 구현
-
-	// 예시: ModifierList를 순회하며 각 모디파이어 적용
-	// for (UCameraModifier* Modifier : ModifierList)
-	// {
-	//     if (Modifier && Modifier->IsEnabled())
-	//     {
-	//         Modifier->ModifyCamera(DeltaTime, InOutLocation, InOutRotation, InOutFOV);
-	//     }
-	// }
+	for (UCameraModifier* Modifier : ModifierList)
+	{
+	    if (Modifier && !Modifier->IsDisabled())
+	    {
+	        Modifier->ModifyCamera(
+	        	DeltaTime,
+	        	InOutLocation,
+	        	InOutRotation,
+	        	InOutFOV
+	        );
+	    }
+	}
 }
 
 void APlayerCameraManager::StartCameraFade(float FromAlpha, float ToAlpha, float Duration, const FLinearColor& Color)
@@ -191,6 +192,45 @@ void APlayerCameraManager::UpdateFade(float DeltaTime)
 		// 선형 보간
 		float Alpha = 1.0f - (FadeTimeRemaining / FadeTime);
 		FadeAmount = FadeAlphaFrom + (FadeAlphaTo - FadeAlphaFrom) * Alpha;
+	}
+}
+
+void APlayerCameraManager::AddCameraModifier(UCameraModifier* NewModifier)
+{
+	if (!NewModifier)
+	{
+		return;
+	}
+
+	// 이미 리스트에 있는지 확인
+	for (UCameraModifier* Modifier : ModifierList)
+	{
+		if (Modifier == NewModifier)
+		{
+			return;
+		}
+	}
+
+	// 모디파이어 추가 및 초기화
+	ModifierList.Add(NewModifier);
+	NewModifier->AddedToCamera(this);
+}
+
+void APlayerCameraManager::RemoveCameraModifier(UCameraModifier* ModifierToRemove)
+{
+	if (!ModifierToRemove)
+	{
+		return;
+	}
+
+	// 리스트에서 제거
+	for (int32 i = 0; i < ModifierList.size(); ++i)
+	{
+		if (ModifierList[i] == ModifierToRemove)
+		{
+			ModifierList.RemoveAt(i);
+			return;
+		}
 	}
 }
 
