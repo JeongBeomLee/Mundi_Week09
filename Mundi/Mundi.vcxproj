@@ -223,6 +223,9 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\DeltaTimeManager.cpp">
+      <DeploymentContent>false</DeploymentContent>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\ProjectileActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\CoinActor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\GameFramework\GravityWall.cpp" />
@@ -506,7 +509,6 @@ if "$(Configuration)"=="Debug" (
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BoxSphereBounds.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />
@@ -526,6 +528,9 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\CoinActor.h" />
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\DeltaTimeManager.h">
+      <DeploymentContent>false</DeploymentContent>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\GravityWall.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
     <ClInclude Include="Source\Runtime\Engine\GameFramework\ProjectileActor.h" />
@@ -567,7 +572,6 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\RHI\ConstantBufferType.h" />
     <ClInclude Include="Source\Slate\Widgets\GameControlWindow.h" />
     <ClInclude Include="Source\Slate\Widgets\PropertyRenderer.h" />
-    <ClInclude Include="Sphere.h" />
     <ClInclude Include="ThirdParty\ImGui\imconfig.h" />
     <ClInclude Include="ThirdParty\ImGui\imgui.h" />
     <ClInclude Include="ThirdParty\ImGui\imgui_impl_dx11.h" />

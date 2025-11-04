@@ -153,6 +153,10 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
         PrintToConsole("[CoinGenerator] Coin collected!");
 
+        local dtManager = World:GetDeltaTimeManager()
+        dtManager:ApplySlomoEffect(10.0, 1.0)
+        dtManager:ApplyHitStop(0.1)
+
         -- 코인을 Pool로 회수
         OtherActor:SetTransform(STORAGE_POSITION);
         RemoveCoinFromSpawned(OtherActor);

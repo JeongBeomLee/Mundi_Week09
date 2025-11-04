@@ -29,6 +29,7 @@
 #include "BillboardComponent.h"
 #include "HeightFogActor.h"
 #include "HeightFogComponent.h"
+#include "DeltaTimeManager.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -820,7 +821,20 @@ void UScriptManager::RegisterUserTypeToLua()
 
         "DestroyActor", &UWorld::DestroyActor,
         "GetActors", &UWorld::GetActors,
-        "GetCameraActor", &UWorld::GetCameraActor
+        "GetCameraActor", &UWorld::GetCameraActor,
+        "GetDeltaTimeManager", & UWorld::GetDeltaTimeManager
+    );
+
+    // DeltaTimeManager 클래스 등록
+    Lua.new_usertype<UDeltaTimeManager>("UDeltaTimeManager",
+        sol::no_constructor,
+        "SetGlobalTimeDilation", &UDeltaTimeManager::SetGlobalTimeDilation,
+        "GetGlobalTimeDilation", &UDeltaTimeManager::GetGlobalTimeDilation,
+        "ApplyHitStop", &UDeltaTimeManager::ApplyHitStop,
+        "ApplySlomoEffect", &UDeltaTimeManager::ApplySlomoEffect,
+        "CancelTimeDilation", &UDeltaTimeManager::CancelTimeDilation,
+        "IsTimeDilationActive", &UDeltaTimeManager::IsTimeDilationActive,
+        "GetRemainingTimeDilationTime", &UDeltaTimeManager::GetRemainingTimeDilationTime
     );
 
     // UEditorEngine 클래스 등록

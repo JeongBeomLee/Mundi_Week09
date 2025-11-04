@@ -67,16 +67,22 @@
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\CoinActor.cpp">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.cpp">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\GravityWall.cpp">
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\ProjectileActor.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\Character.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\CoinActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\GravityWall.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.cpp">
@@ -514,8 +520,8 @@
     <ClCompile Include="ThirdParty\ImGui\imgui_widgets.cpp">
       <Filter>ThirdParty\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\GameFramework\ProjectileActor.cpp">
-      <Filter>Source</Filter>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\DeltaTimeManager.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
@@ -546,19 +552,23 @@
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
       <Filter>Source\Runtime\Core\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="BoxSphereBounds.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="Sphere.h" />
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\CoinActor.h">
-      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.h">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\GravityWall.h">
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\ProjectileActor.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\AmbientLightActor.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\Character.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\CoinActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\GravityWall.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\RunnerCharacter.h">
@@ -1071,18 +1081,54 @@
     <ClInclude Include="ThirdParty\ImGui\imstb_truetype.h">
       <Filter>ThirdParty\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\GameFramework\ProjectileActor.h">
-      <Filter>Source</Filter>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\DeltaTimeManager.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Scripts\coin_collision.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\CollisionUtility.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\GlobalObjectManager.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\GlobalVariable.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\GravitySystem.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\MapGenerator.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\ObstacleGenerator.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\RandomManager.lua">
+      <Filter>Scripts</Filter>
+    </None>
     <None Include="Scripts\actor_transform.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\CoinGenerator.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\coin_collision.lua">
       <Filter>Scripts</Filter>
     </None>
+    <None Include="Scripts\Obstacle.lua">
+      <Filter>Scripts</Filter>
+    </None>
     <None Include="Scripts\print_debug_log.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\Projectile.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\Queue.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\RunnerCharacter.lua">
@@ -1094,143 +1140,124 @@
     <None Include="Scripts\test_coroutine.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\MapGenerator.lua" />
-    <None Include="Scripts\coin_collision.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\Projectile.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\Queue.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\CollisionUtility.lua" />
-    <None Include="Scripts\GlobalObjectManager.lua" />
-    <None Include="Scripts\GlobalVariable.lua" />
-    <None Include="Scripts\GravitySystem.lua" />
-    <None Include="Scripts\ObstacleGenerator.lua" />
-    <None Include="Scripts\RandomManager.lua" />
-    <None Include="Scripts\CoinGenerator.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\Obstacle.lua">
-      <Filter>Scripts</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
-      <UniqueIdentifier>{c8743452-2c9d-42d1-a335-2047f05051ab}</UniqueIdentifier>
+      <UniqueIdentifier>{d6823eba-37f6-4022-9d7f-bb0031b16512}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime">
-      <UniqueIdentifier>{f9bddbb9-593d-42a5-b49c-57be37f4ad22}</UniqueIdentifier>
+      <UniqueIdentifier>{b128358f-8ea4-4340-ad81-1549ca670e79}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine">
-      <UniqueIdentifier>{4414fff0-ea49-40d3-a167-292002625ea9}</UniqueIdentifier>
+      <UniqueIdentifier>{e555b737-0538-46b0-9049-1a6c920ff069}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Runtime\Engine\GameFramework">
-      <UniqueIdentifier>{ca75e848-9b02-493c-b2e8-6d2841eab8c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components">
-      <UniqueIdentifier>{dc02c852-faa9-4abe-9e68-ebbf0bd10acf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
-      <UniqueIdentifier>{4a187b5e-5b0c-4b01-a3f0-c379747e4b65}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Collision">
-      <UniqueIdentifier>{f1494585-915f-4e62-862c-876915395bcd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Spatial">
-      <UniqueIdentifier>{7649a7cb-57b4-4593-9e1c-0bcfea972e90}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core">
-      <UniqueIdentifier>{8192afdc-b7a5-4641-bf64-ba9cdab6cef1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Misc">
-      <UniqueIdentifier>{0d8e9f8e-fbec-4cde-89d4-c0438e8a2b0a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Object">
-      <UniqueIdentifier>{ed20c87b-0c5d-47ac-8bac-cf94abbe58e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Math">
-      <UniqueIdentifier>{9e555a3d-81fb-4b96-8b87-fea3648e3576}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Containers">
-      <UniqueIdentifier>{8652bf00-1ade-4431-af35-b73989a61051}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Memory">
-      <UniqueIdentifier>{c5fdefa4-b4a7-4813-be2d-a938c5fe3811}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\LuaScripting">
-      <UniqueIdentifier>{0687bbbe-e4a0-4d3f-b559-ef74c0d21d75}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Renderer">
-      <UniqueIdentifier>{77a4ab86-cb57-46be-91bf-4847afa977ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\RHI">
-      <UniqueIdentifier>{8547d445-76cc-44df-a5ad-40c0793e141c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\AssetManagement">
-      <UniqueIdentifier>{00b930c0-4709-4ffb-aef4-a90fa5ba4afe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\InputCore">
-      <UniqueIdentifier>{f9083926-32c7-4d8d-8632-aa1bd207a005}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate">
-      <UniqueIdentifier>{25738df0-19d6-4b98-86ab-6e49a8dc41f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Widgets">
-      <UniqueIdentifier>{561bb83a-e1d0-422f-b58c-c6ec07da5a11}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Windows">
-      <UniqueIdentifier>{4b0bba45-d81f-4abf-8cdf-10cc35d95a9a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Factory">
-      <UniqueIdentifier>{3ea0799b-c83e-447d-8530-ac523314b2f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\ImGui">
-      <UniqueIdentifier>{602a309f-d884-44c1-bd87-598ed60f7e2f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor">
-      <UniqueIdentifier>{f3d4840d-8494-4d1e-a13b-78c335fb3488}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Clipboard">
-      <UniqueIdentifier>{8b99960a-2dd6-475e-a242-45bfda5346b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Gizmo">
-      <UniqueIdentifier>{5478831d-7910-4569-9e39-2bc228d896cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Grid">
-      <UniqueIdentifier>{03363d24-e190-48df-acdb-026ca6020cf2}</UniqueIdentifier>
+    <Filter Include="Source\Runtime\Engine\CameraManagement">
+      <UniqueIdentifier>{18ef3746-6ef2-4eb7-99e4-64351372371e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scripts">
-      <UniqueIdentifier>{a283e9c5-9e39-4509-ade8-d8c66da5bbad}</UniqueIdentifier>
+      <UniqueIdentifier>{04aa7658-65fa-4252-9a95-1f04020bdcc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\GameFramework">
+      <UniqueIdentifier>{4b8ef360-47c3-46e4-bf7e-eddb804585fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components">
+      <UniqueIdentifier>{e7299936-58c7-4d80-9694-e027d2ae9e89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
+      <UniqueIdentifier>{a3c2636b-b6ce-44ca-8561-7fc26126727a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Collision">
+      <UniqueIdentifier>{9693a77b-686f-4eae-a679-ced786e081cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Spatial">
+      <UniqueIdentifier>{2d28ab1d-d28b-4bd0-bb9d-0f896f61dec2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core">
+      <UniqueIdentifier>{ffd07699-cdde-421a-b8f3-c8feb8a56904}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Misc">
+      <UniqueIdentifier>{a41cef31-eb88-4cc5-a63f-5d0f2a67b41c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Object">
+      <UniqueIdentifier>{7f00d98f-8361-4ace-9ddb-85310359e03b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Math">
+      <UniqueIdentifier>{b67dec0e-6c9e-4a3e-9f96-a465b1b7ce76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Containers">
+      <UniqueIdentifier>{050a8629-14de-4f89-adc7-553d3629ef2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Memory">
+      <UniqueIdentifier>{81f3bce3-c1d7-4d01-8c36-b435e19d2aac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\LuaScripting">
+      <UniqueIdentifier>{7ae6dce9-5759-49cb-bfcb-73451abc9c44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Renderer">
+      <UniqueIdentifier>{6db6c76a-e22d-4125-bafc-4eb0d20aa2e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\RHI">
+      <UniqueIdentifier>{2df0d687-3abe-415d-b6fc-f309cee574dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\AssetManagement">
+      <UniqueIdentifier>{aeb23c00-9938-4b84-9c41-624335bd715a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\InputCore">
+      <UniqueIdentifier>{363c13be-cfb8-4fd3-b8ab-cd8fb97a7218}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate">
+      <UniqueIdentifier>{1e197180-aa2c-4f88-a165-f5fa6badd826}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Widgets">
+      <UniqueIdentifier>{e1714562-b55d-46d1-98f7-78fa4f6ced8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Windows">
+      <UniqueIdentifier>{eef2aa0b-d130-43ce-9600-f80463329196}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Factory">
+      <UniqueIdentifier>{c01ab6a1-6006-4aca-9b56-1a5d71682ed3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\ImGui">
+      <UniqueIdentifier>{dd4e6522-e199-421e-8194-0106d72a7103}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor">
+      <UniqueIdentifier>{d09f81c1-6c8a-47ea-8d50-0e8336b6e5c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Clipboard">
+      <UniqueIdentifier>{b76ffa46-e26e-46b1-aca3-84f2749c9aed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Gizmo">
+      <UniqueIdentifier>{60aac55d-0405-4f3f-8fd7-45f21e80e881}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Grid">
+      <UniqueIdentifier>{91eed4bb-d023-4092-97dd-e60409a095c5}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders">
-      <UniqueIdentifier>{69b9a2ef-6144-4c86-b64b-0d6d0747e8c0}</UniqueIdentifier>
+      <UniqueIdentifier>{10d3aecd-e98b-4691-b3da-77bee549aa26}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Effects">
-      <UniqueIdentifier>{af8daec3-9b1b-49fe-9ced-429140723d5c}</UniqueIdentifier>
+      <UniqueIdentifier>{e0f0a5a2-bf25-45d1-a532-33d97576ba48}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\PostProcess">
-      <UniqueIdentifier>{5cf28487-175b-46a3-b8e2-bdae7db059ea}</UniqueIdentifier>
+      <UniqueIdentifier>{f07fc832-59af-404c-b489-cb07a9be0edf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Utility">
-      <UniqueIdentifier>{b322a22e-12ee-4588-88c4-2f822a9a37e4}</UniqueIdentifier>
+      <UniqueIdentifier>{6213229a-9c65-4fbf-bfd8-a9ae4c6f0536}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\UI">
-      <UniqueIdentifier>{8f3edc29-d329-47fa-a5b9-eff769f2f85e}</UniqueIdentifier>
+      <UniqueIdentifier>{f4752628-236f-49f2-a1b4-95d1463fcc8f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Materials">
-      <UniqueIdentifier>{d3183a8b-d415-4476-915e-c1ca2176299b}</UniqueIdentifier>
+      <UniqueIdentifier>{8e37ea97-8ce0-446f-9006-af2513d0c7c8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Common">
-      <UniqueIdentifier>{19037b4f-cb8f-4ff0-a95e-297bb3c379e8}</UniqueIdentifier>
+      <UniqueIdentifier>{2b75d196-b35e-4da5-8bb5-67eea7202277}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{7ae64641-f18c-4841-b4ff-68fe8ec8b281}</UniqueIdentifier>
+      <UniqueIdentifier>{cb782b89-6930-4dbc-8bfa-7a59ea064d64}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\ImGui">
-      <UniqueIdentifier>{da45b460-2b77-4841-86d0-17ed5a7c089c}</UniqueIdentifier>
+      <UniqueIdentifier>{7db830f6-5751-4dc4-81c8-ca19d933be72}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
