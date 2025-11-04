@@ -95,13 +95,14 @@ void AGameStateBase::ResetTimer()
 
 void AGameStateBase::PauseTimer()
 {
-	GWorld->GetDeltaTimeManager()->SetGlobalTimeDilation(0.0f);
+	PauseEffectID = GWorld->GetDeltaTimeManager()->ApplyHitStop(FLT_MAX, ETimeDilationPriority::Critical);
 	bTimerPaused = true;
 }
 
 void AGameStateBase::ResumeTimer()
 {
-	GWorld->GetDeltaTimeManager()->SetGlobalTimeDilation(1.0f);
+	GWorld->GetDeltaTimeManager()->CancelEffect(PauseEffectID);
+	PauseEffectID = 0; // 디버거에서 현재 Pause효과가 적용됐는지 확인용
 	bTimerPaused = false;
 }
 

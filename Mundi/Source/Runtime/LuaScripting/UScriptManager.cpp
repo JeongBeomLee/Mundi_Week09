@@ -825,16 +825,54 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetDeltaTimeManager", & UWorld::GetDeltaTimeManager
     );
 
-    // DeltaTimeManager 클래스 등록
-    Lua.new_usertype<UDeltaTimeManager>("UDeltaTimeManager",
+    // TimeDilationPriority enum 바인딩
+    Lua.new_enum<ETimeDilationPriority>("TimeDilationPriority",
+        {
+            {"Low", ETimeDilationPriority::Low},
+            {"Normal", ETimeDilationPriority::Normal},
+            {"High", ETimeDilationPriority::High},
+            {"Critical", ETimeDilationPriority::Critical}
+        });
+
+    // DeltaTimeManager 바인딩
+    Lua.new_usertype<UDeltaTimeManager>("DeltaTimeManager",
         sol::no_constructor,
-        "SetGlobalTimeDilation", &UDeltaTimeManager::SetGlobalTimeDilation,
-        "GetGlobalTimeDilation", &UDeltaTimeManager::GetGlobalTimeDilation,
-        "ApplyHitStop", &UDeltaTimeManager::ApplyHitStop,
-        "ApplySlomoEffect", &UDeltaTimeManager::ApplySlomoEffect,
-        "CancelTimeDilation", &UDeltaTimeManager::CancelTimeDilation,
-        "IsTimeDilationActive", &UDeltaTimeManager::IsTimeDilationActive,
-        "GetRemainingTimeDilationTime", &UDeltaTimeManager::GetRemainingTimeDilationTime
+
+        // 효과 적용
+        // 효과 적용 - sol::overload로 기본 인자 처리
+        "ApplyHitStop", sol::overload(
+            // Priority를 지정하는 오버로드
+            [](UDeltaTimeManager* self, float Duration, ETimeDilationPriority Priority) {
+                return self->ApplyHitStop(Duration, Priority);
+            },
+            // Priority를 생략하는 오버로드 (기본값 High 사용)
+            [](UDeltaTimeManager* self, float Duration) {
+                return self->ApplyHitStop(Duration, ETimeDilationPriority::High);
+            }
+        ),
+        "ApplySlomoEffect", sol::overload(
+            // 모든 인자 지정
+            [](UDeltaTimeManager* self, float Duration, float TimeDilation, ETimeDilationPriority Priority) {
+                return self->ApplySlomoEffect(Duration, TimeDilation, Priority);
+            },
+            // Priority 생략
+            [](UDeltaTimeManager* self, float Duration, float TimeDilation) {
+                return self->ApplySlomoEffect(Duration, TimeDilation, ETimeDilationPriority::Normal);
+            }
+        ),
+        "CancelEffect", & UDeltaTimeManager::CancelEffect,
+        "CancelAllEffects", & UDeltaTimeManager::CancelAllEffects,
+
+        // 기본 배율
+        "SetBaseTimeDilation", & UDeltaTimeManager::SetBaseTimeDilation,
+        "GetBaseTimeDilation", & UDeltaTimeManager::GetBaseTimeDilation,
+        "GetCurrentTimeDilation", & UDeltaTimeManager::GetCurrentTimeDilation,
+
+        // 상태 쿼리
+        "HasActiveEffects", & UDeltaTimeManager::HasActiveEffects,
+        "GetActiveEffectCount", & UDeltaTimeManager::GetActiveEffectCount,
+        "GetRemainingTime", & UDeltaTimeManager::GetRemainingTime,
+        "PrintDebugInfo", & UDeltaTimeManager::PrintDebugInfo
     );
 
     // UEditorEngine 클래스 등록
