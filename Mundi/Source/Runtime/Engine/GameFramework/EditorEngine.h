@@ -54,7 +54,6 @@ private:
     void Render();
 
     void HandleUVInput(float DeltaSeconds);
-    void HandleSoundTestInput(float DeltaSeconds); // FMOD 사운드 테스트용
 
 private:
     //윈도우 핸들
