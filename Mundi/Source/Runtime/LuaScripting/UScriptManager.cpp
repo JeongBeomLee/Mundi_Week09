@@ -28,6 +28,7 @@
 #include "HeightFogActor.h"
 #include "HeightFogComponent.h"
 #include"SpringArmComponent.h"
+#include"CollisionComponent/CapsuleComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -511,7 +512,7 @@ void UScriptManager::RegisterUserTypeToLua()
             LuaLocalValue.GameMode = self->World ? self->World->GetGameMode() : nullptr;
             UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, scriptName);
 		}
-		"Destroy", &AActor::Destroy
+		
     );
 
     // APawn 클래스 등록 (AActor 상속)

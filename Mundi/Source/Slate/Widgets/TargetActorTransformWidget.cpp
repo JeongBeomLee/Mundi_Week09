@@ -9,6 +9,7 @@
 #include "SelectionManager.h"
 #include "WorldPartitionManager.h"
 #include "PropertyRenderer.h"
+#include "USlateManager.h"
 
 #include "Actor.h"
 #include "Grid/GridActor.h"
@@ -371,9 +372,21 @@ void UTargetActorTransformWidget::RenderHeader(AActor* SelectedActor, UActorComp
 
 	const float ButtonWidth = 60.0f;
 	const float ButtonHeight = 25.0f;
+	const float Spacing = 5.0f;
 	float Avail = ImGui::GetContentRegionAvail().x;
-	float NewX = ImGui::GetCursorPosX() + std::max(0.0f, Avail - ButtonWidth);
+
+	// Edit Blueprint 버튼과 + 추가 버튼을 나란히 배치
+	float TotalButtonWidth = ButtonWidth * 2 + Spacing;
+	float NewX = ImGui::GetCursorPosX() + std::max(0.0f, Avail - TotalButtonWidth);
 	ImGui::SetCursorPosX(NewX);
+
+	// Edit Blueprint 버튼
+	if (ImGui::Button("Edit", ImVec2(ButtonWidth, ButtonHeight)))
+	{
+		USlateManager::GetInstance().OpenActorBlueprintEditor(SelectedActor);
+	}
+
+	ImGui::SameLine(0, Spacing);
 
 	if (ImGui::Button("+ 추가", ImVec2(ButtonWidth, ButtonHeight)))
 	{

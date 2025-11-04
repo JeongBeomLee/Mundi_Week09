@@ -11,6 +11,8 @@ class UMainToolbarWidget;
 class UConsoleWindow; // 오버레이 콘솔 윈도우
 class UGameHUDWidget; // 게임 HUD 오버레이
 class UGameControlWindow; // 게임 컨트롤 윈도우
+class SActorBlueprintEditor; // 액터 블루프린트 에디터
+class AActor; // 전방 선언
 
 // 중앙 레이아웃/입력 라우팅/뷰포트 관리 매니저 (위젯 아님)
 class USlateManager : public UObject
@@ -73,6 +75,11 @@ public:
     // Piloting 관리: 특정 액터를 piloting 중인 모든 뷰포트의 piloting 해제
     void StopPilotingActor(AActor* TargetActor);
 
+    // 블루프린트 에디터 관리
+    void OpenActorBlueprintEditor(AActor* Actor);
+    void CloseActorBlueprintEditor();
+    bool IsActorBlueprintEditorOpen() const;
+
 private:
     FRect Rect; // 이전엔 SWindow로부터 상속받던 영역 정보
 
@@ -120,4 +127,7 @@ private:
     const float ConsoleAnimationDuration = 0.25f; // 초 단위
     const float ConsoleHeightRatio = 0.3f; // 화면 높이의 30%
     const float ConsoleHorizontalMargin = 10.0f; // 좌/우 여백 (픽셀 단위)
+
+    // 블루프린트 에디터
+    SActorBlueprintEditor* ActorBlueprintEditor = nullptr;
 };

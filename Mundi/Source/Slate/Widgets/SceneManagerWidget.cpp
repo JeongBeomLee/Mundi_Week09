@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <string>
 #include <EditorEngine.h>
+#include "USlateManager.h"
 
 //// UE_LOG 대체 매크로
 //#define UE_LOG(fmt, ...)
@@ -169,11 +170,8 @@ void USceneManagerWidget::RenderWidget()
 	ImGui::Dummy(ImVec2(0, 1.0f));
 	ImGui::Text("%zu개 액터", World->GetActors().size());
 
-	// Context menu
-	if (bShowContextMenu)
-	{
-		RenderContextMenu();
-	}
+	// Context menu - OpenPopup 호출 후 바로 BeginPopup 호출해야 함
+	RenderContextMenu();
 
 	// Status bar
 	ImGui::SameLine();
@@ -341,7 +339,6 @@ void USceneManagerWidget::RenderActorNode(FActorTreeNode* Node, int32 Depth)
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 	{
 		ContextMenuTarget = Actor;
-		bShowContextMenu = true;
 		ImGui::OpenPopup("ActorContextMenu");
 	}
 
@@ -460,6 +457,7 @@ void USceneManagerWidget::HandleActorDuplicate(AActor* Actor)
 
 void USceneManagerWidget::RenderContextMenu()
 {
+	// OpenPopup이 호출된 후 매 프레임 BeginPopup을 시도함
 	if (ImGui::BeginPopup("ActorContextMenu"))
 	{
 		if (ContextMenuTarget)
@@ -503,6 +501,12 @@ void USceneManagerWidget::RenderContextMenu()
 			ImGui::Separator();
 
 			// Edit actions
+			if (ImGui::MenuItem("Edit Blueprint"))
+			{
+				// 블루프린트 에디터 열기
+				USlateManager::GetInstance().OpenActorBlueprintEditor(ContextMenuTarget);
+			}
+
 			if (ImGui::MenuItem("Rename"))
 			{
 				HandleActorRename(ContextMenuTarget);
@@ -526,11 +530,7 @@ void USceneManagerWidget::RenderContextMenu()
 
 		ImGui::EndPopup();
 	}
-	else
-	{
-		bShowContextMenu = false;
-		ContextMenuTarget = nullptr;
-	}
+	// BeginPopup이 false를 반환하면 팝업이 닫힌 것
 }
 
 void USceneManagerWidget::RenderToolbar()

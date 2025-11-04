@@ -7,6 +7,7 @@
 #include "Windows/ControlPanelWindow.h"
 #include "Windows/SViewportWindow.h"
 #include "Windows/ConsoleWindow.h"
+#include "Windows/SActorBlueprintEditor.h"
 #include "Widgets/MainToolbarWidget.h"
 #include "Widgets/GameHUDWidget.h"
 #include "Widgets/GameControlWindow.h"
@@ -14,6 +15,7 @@
 #include "UIManager.h"
 #include "GlobalConsole.h"
 #include "GameModeBase.h"
+#include "Actor.h"
 
 IMPLEMENT_CLASS(USlateManager)
 
@@ -162,6 +164,9 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
     {
         UE_LOG("ERROR: Failed to create ConsoleWindow");
     }
+
+    // === Blueprint Editor 생성 ===
+    ActorBlueprintEditor = NewObject<SActorBlueprintEditor>();
 }
 
 void USlateManager::SwitchLayout(EViewportLayoutMode NewMode)
@@ -301,6 +306,12 @@ void USlateManager::Render()
         ImGui::PopStyleColor(1);
         ImGui::PopStyleVar(3);
     }
+
+    // 블루프린트 에디터 렌더링 (팝업 윈도우)
+    if (ActorBlueprintEditor && ActorBlueprintEditor->IsOpen())
+    {
+        ActorBlueprintEditor->Render();
+    }
 }
 
 void USlateManager::Update(float DeltaSeconds)
@@ -346,6 +357,12 @@ void USlateManager::Update(float DeltaSeconds)
     if (ConsoleWindow && ConsoleAnimationProgress > 0.0f)
     {
         ConsoleWindow->Update();
+    }
+
+    // 블루프린트 에디터 업데이트
+    if (ActorBlueprintEditor && ActorBlueprintEditor->IsOpen())
+    {
+        ActorBlueprintEditor->Update(DeltaSeconds);
     }
 }
 
@@ -585,4 +602,31 @@ void USlateManager::StopPilotingActor(AActor* TargetActor)
             Client->StopPiloting();
         }
     }
+}
+
+// ───────────────────────────────────────────
+// 블루프린트 에디터 관리
+// ───────────────────────────────────────────
+
+void USlateManager::OpenActorBlueprintEditor(AActor* Actor)
+{
+    if (!Actor || !ActorBlueprintEditor)
+    {
+        return;
+    }
+
+    ActorBlueprintEditor->OpenWindow(Actor);
+}
+
+void USlateManager::CloseActorBlueprintEditor()
+{
+    if (ActorBlueprintEditor)
+    {
+        ActorBlueprintEditor->CloseWindow();
+    }
+}
+
+bool USlateManager::IsActorBlueprintEditorOpen() const
+{
+    return ActorBlueprintEditor && ActorBlueprintEditor->IsOpen();
 }
