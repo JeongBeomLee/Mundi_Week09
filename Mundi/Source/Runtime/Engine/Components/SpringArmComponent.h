@@ -99,6 +99,10 @@ protected:
     bool bDoCollisionTest;
     float ProbeSize;
 
+    // Socket Transform (자식 컴포넌트가 배치될 위치)
+    FVector SocketLocation;
+    FQuat SocketRotation;
+
 private:
     void UpdateDesiredArmLocation(float DeltaTime, FVector& OutDesiredLocation, FQuat& OutDesiredRotation);
     bool DoCollisionTest(const FVector& DesiredLocation, FVector& OutLocation);

@@ -2,6 +2,7 @@
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
+#include "CollisionComponent/CapsuleComponent.h"
 #include "CameraActor.h"
 #include "CameraComponent.h"
 #include "SceneComponent.h"
@@ -19,6 +20,7 @@
 #include "StaticMeshActor.h"
 #include "StaticMeshComponent.h"
 #include "GravityWall.h"
+#include "CoinActor.h"
 #include "ProjectileActor.h"
 #include "ProjectileMovementComponent.h"
 #include "DecalActor.h"
@@ -27,8 +29,6 @@
 #include "BillboardComponent.h"
 #include "HeightFogActor.h"
 #include "HeightFogComponent.h"
-#include"SpringArmComponent.h"
-#include"CollisionComponent/CapsuleComponent.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -46,7 +46,7 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString&
 {
     if (GWorld->bPie)
     {
-		LuaLocalValue.GameMode = GWorld->GetGameMode();
+        LuaLocalValue.GameMode = GWorld->GetGameMode();
     }
 
     // 이미 같은 스크립트가 부착되어 있으면 return
@@ -74,6 +74,7 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString&
             LuaLocalValue.MyActor,
             Script->LuaTemplateFunctions.OnOverlap
         );
+        LinkRestartToDeligate(Script->LuaTemplateFunctions.Restart);
     }
     catch (std::exception& e)
     {
@@ -140,8 +141,8 @@ void UScriptManager::DetachAllScriptFrom(AActor* InActor)
 
 void UScriptManager::ModifyGameModeValueInScript(AActor* InActor, class AGameModeBase* InNewGameMode)
 {
-	assert(InActor);
-	assert(InNewGameMode);
+    assert(InActor);
+    assert(InNewGameMode);
 
     for (TPair<AActor* const, TArray<FScript*>>& Script : ScriptsByOwner)
     {
@@ -154,7 +155,7 @@ void UScriptManager::ModifyGameModeValueInScript(AActor* InActor, class AGameMod
                     // 기존 GameMode 값을 새로운 GameMode로 변경
                     sol::environment& Env = ScriptData->Env;
                     assert(Env);
-					assert(Env.valid());
+                    assert(Env.valid());
                     if (ARunnerGameMode* RunnerGameMode = Cast<ARunnerGameMode>(InNewGameMode))
                     {
                         Env["GameMode"] = RunnerGameMode;
@@ -168,7 +169,7 @@ void UScriptManager::ModifyGameModeValueInScript(AActor* InActor, class AGameMod
                 }
             }
         }
-	}
+    }
 }
 
 TMap<AActor*, TArray<FScript*>>& UScriptManager::GetScriptsByOwner()
@@ -281,7 +282,7 @@ void UScriptManager::RegisterUserTypeToLua()
         "FName",
         sol::no_constructor);
     NameType["ToString"] = &FName::ToString;
-    
+
     // UActorComponent 등록
     Lua.new_usertype<UActorComponent>("UActorComponent",
         sol::constructors<UActorComponent()>(),
@@ -298,12 +299,19 @@ void UScriptManager::RegisterUserTypeToLua()
     // USceneComponent 등록
     sol::usertype<USceneComponent> SceneComponentType = Lua.new_usertype<USceneComponent>(
         "USceneComponent",
-        sol::constructors<USceneComponent()>());
+        sol::constructors<USceneComponent()>(),
+        "SetRelativeLocation", &USceneComponent::SetRelativeLocation,
+        "GetRelativeLocation", &USceneComponent::GetRelativeLocation);
     SceneComponentType["GetSceneId"] = &USceneComponent::GetSceneId;
 
     // UShapeComponent 등록 (충돌 컴포넌트)
     Lua.new_usertype<UShapeComponent>("UShapeComponent",
-        sol::base_classes, sol::bases<USceneComponent, UActorComponent>()
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>()//,
+        // OnOverlap 델리게이트 바인딩
+        // "BindOnOverlap", [](UShapeComponent* self, sol::function callback) {
+        //     if (!self) return;
+        //     self->OnComponentBeginOverlap.Add(callback);
+        // }
     );
 
     // UBoxComponent 등록 (박스 충돌 컴포넌트)
@@ -325,38 +333,26 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetUp", &UCameraComponent::GetUp
     );
 
-    // USpringArmComponent 등록 (스프링 암 컴포넌트)
-    Lua.new_usertype<USpringArmComponent>("USpringArmComponent",
-        sol::base_classes, sol::bases<USceneComponent, UActorComponent>(),
-        "SetTargetArmLength", &USpringArmComponent::SetTargetArmLength,
-        "GetTargetArmLength", &USpringArmComponent::GetTargetArmLength,
-        "SetSocketOffset", &USpringArmComponent::SetSocketOffset,
-        "GetSocketOffset", &USpringArmComponent::GetSocketOffset,
-        "SetTargetOffset", &USpringArmComponent::SetTargetOffset,
-        "GetTargetOffset", &USpringArmComponent::GetTargetOffset,
-        "SetEnableCameraLag", &USpringArmComponent::SetEnableCameraLag,
-        "GetEnableCameraLag", &USpringArmComponent::GetEnableCameraLag,
-        "SetCameraLagSpeed", &USpringArmComponent::SetCameraLagSpeed,
-        "GetCameraLagSpeed", &USpringArmComponent::GetCameraLagSpeed,
-        "SetCameraLagMaxDistance", &USpringArmComponent::SetCameraLagMaxDistance,
-        "GetCameraLagMaxDistance", &USpringArmComponent::GetCameraLagMaxDistance,
-        "SetEnableCameraRotationLag", &USpringArmComponent::SetEnableCameraRotationLag,
-        "GetEnableCameraRotationLag", &USpringArmComponent::GetEnableCameraRotationLag,
-        "SetCameraRotationLagSpeed", &USpringArmComponent::SetCameraRotationLagSpeed,
-        "GetCameraRotationLagSpeed", &USpringArmComponent::GetCameraRotationLagSpeed,
-        "SetDoCollisionTest", &USpringArmComponent::SetDoCollisionTest,
-        "GetDoCollisionTest", &USpringArmComponent::GetDoCollisionTest,
-        "GetSocketLocation", &USpringArmComponent::GetSocketLocation,
-        "GetSocketRotation", &USpringArmComponent::GetSocketRotation
+    // UCapsuleComponent 등록 (캡슐 충돌 컴포넌트)
+    Lua.new_usertype<UCapsuleComponent>("UCapsuleComponent",
+        sol::base_classes, sol::bases<UShapeComponent, USceneComponent, UActorComponent>(),
+        "SetCapsuleSize", &UCapsuleComponent::SetCapsuleSize,
+        "GetCapsuleRadius", &UCapsuleComponent::GetCapsuleRadius,
+        "GetCapsuleHalfHeight", &UCapsuleComponent::GetCapsuleHalfHeight,
+        "GetScaledCapsuleRadius", &UCapsuleComponent::GetScaledCapsuleRadius,
+        "GetScaledCapsuleHalfHeight", &UCapsuleComponent::GetScaledCapsuleHalfHeight,
+        "GetCapsuleCenter", &UCapsuleComponent::GetCapsuleCenter,
+        "CapsuleRadius", &UCapsuleComponent::CapsuleRadius,
+        "CapsuleHalfHeight", &UCapsuleComponent::CapsuleHalfHeight
     );
 
-	// UTextRenderComponent 등록
+    // UTextRenderComponent 등록
     Lua.new_usertype<UTextRenderComponent>("UTextRenderComponent",
         sol::base_classes, sol::bases<UPrimitiveComponent, USceneComponent, UActorComponent>(),
         "GetStaticMesh", &UTextRenderComponent::GetStaticMesh,
         "GetMaterial", &UTextRenderComponent::GetMaterial,
         "SetMaterial", &UTextRenderComponent::SetMaterial,
-		"CreateVerticesForString", &UTextRenderComponent::CreateVerticesForString
+        "CreateVerticesForString", &UTextRenderComponent::CreateVerticesForString
     );
 
     // UBillboardComponent 등록
@@ -397,15 +393,21 @@ void UScriptManager::RegisterUserTypeToLua()
     // FQuat 타입을 Lua에 등록
     Lua.new_usertype<FQuat>("FQuat",
         sol::call_constructor, sol::factories(
-            []() { return FQuat(); }
+            []() { return FQuat(); },
+            [](float x, float y, float z, float w) { return FQuat(x, y, z, w); }
         ),
+        // 멤버 변수 접근
+        "X", &FQuat::X,
+        "Y", &FQuat::Y,
+        "Z", &FQuat::Z,
+        "W", &FQuat::W,
         // 곱셈 연산자 (회전 결합)
         sol::meta_function::multiplication, [](const FQuat& a, const FQuat& b) { return a * b; }
     );
     // Static 함수는 별도로 등록
     Lua["FQuat"]["MakeFromEuler"] = [](float pitch, float yaw, float roll) {
         return FQuat::MakeFromEulerZYX(FVector(pitch, yaw, roll));
-    };
+        };
     Lua["FQuat"]["Slerp"] = &FQuat::Slerp;
     Lua["FQuat"]["Mul"] = [](const FQuat& a, const FQuat& b) { return a * b; };
     // FromToRotation: 두 벡터 사이의 회전 Quaternion 계산
@@ -427,7 +429,7 @@ void UScriptManager::RegisterUserTypeToLua()
 
         float w = std::sqrt(fromNorm.SizeSquared() * toNorm.SizeSquared()) + dot;
         return FQuat(axis.X, axis.Y, axis.Z, w).GetNormalized();
-    };
+        };
 
     // FMatrix 타입을 Lua에 등록 (카메라 행렬용)
     Lua.new_usertype<FMatrix>("FMatrix",
@@ -452,10 +454,11 @@ void UScriptManager::RegisterUserTypeToLua()
         "AddWorldRotation", sol::overload(
             static_cast<void(AActor::*)(const FQuat&)>(&AActor::AddActorWorldRotation)
         ),
+        "GetRootComponent", &AActor::GetRootComponent,
         "GetName", &AActor::GetName,
-		"SetActorHiddenInGame", &AActor::SetActorHiddenInGame,
-		"DestroyAllComponents", &AActor::DestroyAllComponents,
-		"Destroy", &AActor::Destroy,
+        "SetActorHiddenInGame", &AActor::SetActorHiddenInGame,
+        "DestroyAllComponents", &AActor::DestroyAllComponents,
+        "Destroy", &AActor::Destroy,
         "AddOwnedComponent", &AActor::AddOwnedComponent,
         // CapsuleComponent 생성 및 부착 헬퍼
         "CreateCapsuleComponent", [](AActor* self, sol::optional<FString> name) -> UCapsuleComponent* {
@@ -485,7 +488,7 @@ void UScriptManager::RegisterUserTypeToLua()
                 }
             }
             return TextRender;
-		},
+        },
         "CreateBillboardComponent", [](AActor* self, sol::optional<FString> name) -> UBillboardComponent* {
             if (!self) return nullptr;
             FName componentName = name.value_or("BillboardComponent");
@@ -503,16 +506,15 @@ void UScriptManager::RegisterUserTypeToLua()
                 Billboard->SetHiddenInGame(false);
             }
 
-			return Billboard;
-		},
+            return Billboard;
+        },
         "AttachScript", [](AActor* self, const FString& scriptName) -> void {
             if (!self) return;
             FLuaLocalValue LuaLocalValue;
             LuaLocalValue.MyActor = self;
             LuaLocalValue.GameMode = self->World ? self->World->GetGameMode() : nullptr;
             UScriptManager::GetInstance().AttachScriptTo(LuaLocalValue, scriptName);
-		}
-		
+        }
     );
 
     // APawn 클래스 등록 (AActor 상속)
@@ -530,16 +532,25 @@ void UScriptManager::RegisterUserTypeToLua()
             [](UInputComponent* self, const FString& AxisName, int32 KeyCode, float Scale, sol::function callback) {
                 self->BindAxis(AxisName, KeyCode, Scale, [callback](float value) {
                     callback(value);
-                });
+                    });
             }
         ),
         "BindAction", sol::overload(
             // Pressed와 Released를 모두 받는 버전
             [](UInputComponent* self, const FString& ActionName, int32 KeyCode,
-               sol::function pressedCallback, sol::function releasedCallback) {
-                auto pressed = pressedCallback.valid() ? [pressedCallback]() { pressedCallback(); } : std::function<void()>();
-                auto released = releasedCallback.valid() ? [releasedCallback]() { releasedCallback(); } : std::function<void()>();
-                self->BindAction(ActionName, KeyCode, pressed, released);
+                sol::function pressedCallback, sol::function releasedCallback) {
+                    std::function<void()> pressed;
+                    std::function<void()> released;
+
+                    if (pressedCallback.valid()) {
+                        pressed = [pressedCallback]() { pressedCallback(); };
+                    }
+
+                    if (releasedCallback.valid()) {
+                        released = [releasedCallback]() { releasedCallback(); };
+                    }
+
+                    self->BindAction(ActionName, KeyCode, pressed, released);
             },
             // Pressed만 받는 버전 (간단한 경우)
             [](UInputComponent* self, const FString& ActionName, int32 KeyCode, sol::function callback) {
@@ -561,7 +572,8 @@ void UScriptManager::RegisterUserTypeToLua()
         "MoveRight", &ACharacter::MoveRight,
         "Turn", &ACharacter::Turn,
         "LookUp", &ACharacter::LookUp,
-        "GetCharacterMovement", &ACharacter::GetCharacterMovement
+        "GetCharacterMovement", &ACharacter::GetCharacterMovement,
+        "GetStaticMesh", &ACharacter::GetStaticMesh
     );
 
     // UCharacterMovementComponent 클래스 등록
@@ -573,7 +585,9 @@ void UScriptManager::RegisterUserTypeToLua()
         "AirControl", &UCharacterMovementComponent::AirControl,
         "SetGravityDirection", &UCharacterMovementComponent::SetGravityDirection,
         "GetGravityDirection", &UCharacterMovementComponent::GetGravityDirection,
-        "SetOnWallCollisionCallback", &UCharacterMovementComponent::SetOnWallCollisionCallback
+        "SetOnWallCollisionCallback", &UCharacterMovementComponent::SetOnWallCollisionCallback,
+        "SetIsRotating", &UCharacterMovementComponent::SetIsRotating,
+        "IsRotating", &UCharacterMovementComponent::IsRotating
     );
 
     // ARunnerCharacter 클래스 등록 (ACharacter 상속)
@@ -606,6 +620,12 @@ void UScriptManager::RegisterUserTypeToLua()
         "Scale3D", &FTransform::Scale3D
     );
 
+    // UStaticMesh 클래스 등록
+    Lua.new_usertype<UStaticMesh>("UStaticMesh",
+        sol::base_classes, sol::bases<UResourceBase>(),
+        "GetCacheFilePath", &UStaticMesh::GetCacheFilePath
+    );
+
     // UStaticMeshComponent 클래스 등록
     Lua.new_usertype<UStaticMeshComponent>("UStaticMeshComponent",
         sol::base_classes, sol::bases<USceneComponent, UActorComponent>(),
@@ -618,6 +638,92 @@ void UScriptManager::RegisterUserTypeToLua()
         sol::base_classes, sol::bases<AActor>(),
         "GetStaticMeshComponent", &AStaticMeshActor::GetStaticMeshComponent,
         "SetStaticMeshComponent", &AStaticMeshActor::SetStaticMeshComponent
+    );
+
+    // UProjectileMovementComponent 클래스 등록
+    Lua.new_usertype<UProjectileMovementComponent>("UProjectileMovementComponent",
+        sol::no_constructor,
+        "FireInDirection", &UProjectileMovementComponent::FireInDirection,
+        "SetInitialSpeed", &UProjectileMovementComponent::SetInitialSpeed,
+        "GetInitialSpeed", &UProjectileMovementComponent::GetInitialSpeed,
+        "SetGravity", &UProjectileMovementComponent::SetGravity,
+        "GetGravity", &UProjectileMovementComponent::GetGravity,
+        "SetGravityDirection", &UProjectileMovementComponent::SetGravityDirection,
+        "GetGravityDirection", &UProjectileMovementComponent::GetGravityDirection,
+        "SetMaxSpeed", &UProjectileMovementComponent::SetMaxSpeed,
+        "GetMaxSpeed", &UProjectileMovementComponent::GetMaxSpeed,
+        "SetRotationFollowsVelocity", &UProjectileMovementComponent::SetRotationFollowsVelocity,
+        "GetRotationFollowsVelocity", &UProjectileMovementComponent::GetRotationFollowsVelocity,
+        "SetProjectileLifespan", &UProjectileMovementComponent::SetProjectileLifespan,
+        "GetProjectileLifespan", &UProjectileMovementComponent::GetProjectileLifespan
+    );
+
+    // AProjectileActor 클래스 등록
+    Lua.new_usertype<AProjectileActor>("AProjectileActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetMeshComponent", &AProjectileActor::GetMeshComponent,
+        "GetProjectileMovement", &AProjectileActor::GetProjectileMovement,
+        "GetCollisionComponent", &AProjectileActor::GetCollisionComponent,
+        "FireInDirection", &AProjectileActor::FireInDirection,
+        "SetInitialSpeed", &AProjectileActor::SetInitialSpeed,
+        "SetGravityScale", &AProjectileActor::SetGravityScale,
+        "SetLifespan", &AProjectileActor::SetLifespan
+    );
+
+    // UDecalComponent 클래스 등록
+    Lua.new_usertype<UDecalComponent>("UDecalComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>()
+    );
+
+    // ADecalActor 클래스 등록
+    Lua.new_usertype<ADecalActor>("ADecalActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetDecalComponent", &ADecalActor::GetDecalComponent
+    );
+
+    // UHeightFogComponent 클래스 등록
+    Lua.new_usertype<UHeightFogComponent>("UHeightFogComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>(),
+        "GetFogDensity", &UHeightFogComponent::GetFogDensity,
+        "SetFogDensity", &UHeightFogComponent::SetFogDensity,
+        "GetFogHeightFalloff", &UHeightFogComponent::GetFogHeightFalloff,
+        "SetFogHeightFalloff", &UHeightFogComponent::SetFogHeightFalloff,
+        "GetStartDistance", &UHeightFogComponent::GetStartDistance,
+        "SetStartDistance", &UHeightFogComponent::SetStartDistance,
+        "GetFogCutoffDistance", &UHeightFogComponent::GetFogCutoffDistance,
+        "SetFogCutoffDistance", &UHeightFogComponent::SetFogCutoffDistance,
+        "GetFogMaxOpacity", &UHeightFogComponent::GetFogMaxOpacity,
+        "SetFogMaxOpacity", &UHeightFogComponent::SetFogMaxOpacity,
+        "GetFogInscatteringColor", &UHeightFogComponent::GetFogInscatteringColor,
+        "SetFogInscatteringColor", &UHeightFogComponent::SetFogInscatteringColor,
+        "GetFogHeight", &UHeightFogComponent::GetFogHeight
+    );
+
+    // AHeightFogActor 클래스 등록
+    Lua.new_usertype<AHeightFogActor>("AHeightFogActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetHeightFogComponent", [](AHeightFogActor* Actor)-> UHeightFogComponent*
+        {
+            return Cast<UHeightFogComponent>(Actor->GetRootComponent());
+        }
+    );
+
+    // ACameraActor 클래스 등록
+    Lua.new_usertype<ACameraActor>("ACameraActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetCameraComponent", &ACameraActor::GetCameraComponent,
+        "GetForward", &ACameraActor::GetForward,
+        "GetRight", &ACameraActor::GetRight,
+        "GetUp", &ACameraActor::GetUp,
+        "GetRotation", &ACameraActor::GetActorRotation,
+        "SetRotation", sol::overload(
+            static_cast<void(ACameraActor::*)(const FVector&)>(&ACameraActor::SetActorRotation),
+            static_cast<void(ACameraActor::*)(const FQuat&)>(&ACameraActor::SetActorRotation)
+        ),
+        "GetViewMatrix", &ACameraActor::GetViewMatrix,
+        "GetProjectionMatrix", sol::overload(
+            static_cast<FMatrix(ACameraActor::*)() const>(&ACameraActor::GetProjectionMatrix)
+        )
     );
 
     // AGravityWall 클래스 등록 (AActor 상속)
@@ -639,16 +745,11 @@ void UScriptManager::RegisterUserTypeToLua()
         "Direction", &FRay::Direction
     );
 
-    // ACameraActor 클래스 등록
-    Lua.new_usertype<ACameraActor>("ACameraActor",
+    Lua.new_usertype<ACoinActor>("ACoinActor",
         sol::base_classes, sol::bases<AActor>(),
-        "GetForward", &ACameraActor::GetForward,
-        "GetRight", &ACameraActor::GetRight,
-        "GetUp", &ACameraActor::GetUp,
-        "GetViewMatrix", &ACameraActor::GetViewMatrix,
-        "GetProjectionMatrix", sol::overload(
-            static_cast<FMatrix(ACameraActor::*)() const>(&ACameraActor::GetProjectionMatrix)
-        )
+        "GetStaticMeshComponent", &ACoinActor::GetStaticMeshComponent,
+        "GetBoxComponent", &ACoinActor::GetBoxComponent,
+        "SetMeshPath", &ACoinActor::SetMeshPath
     );
 
     // UWorld 클래스 등록
@@ -659,30 +760,62 @@ void UScriptManager::RegisterUserTypeToLua()
             [](UWorld* World, const FTransform& Transform) -> AStaticMeshActor* {
                 return World->SpawnActor<AStaticMeshActor>(Transform);
             },
-            // ProjectileActor 생성 (타입 문자열 받기)
-            [](UWorld* World, const std::string& ActorType, const FTransform& Transform) -> AActor* {
-                if (ActorType == "ProjectileActor") {
-                    return World->SpawnActor<AProjectileActor>(Transform);
-                }
-                else if (ActorType == "StaticMeshActor") {
-                    return World->SpawnActor<AStaticMeshActor>(Transform);
-                }
-                return nullptr;
-            },
-            [](UWorld* World, const FTransform& Transform, const FString& ActorType) -> AGravityWall* {
+            // 타입 문자열로 Actor 생성 (Lua에게 정확한 타입 반환)
+            [](UWorld* World, const FTransform& Transform, const FString& ActorType, sol::this_state s) -> sol::object {
+                sol::state_view lua(s);
+
                 if (ActorType == "AGravityWall")
                 {
-                    return World->SpawnActor<AGravityWall>(Transform);
+                    AGravityWall* wall = World->SpawnActor<AGravityWall>(Transform);
+                    return sol::make_object(lua, wall);
+                }
+                else if (ActorType == "ACoinActor")
+                {
+                    ACoinActor* coin = World->SpawnActor<ACoinActor>(Transform);
+                    if (coin && World->bPie)
+                    {
+                        coin->BeginPlay();
+                    }
+                    return sol::make_object(lua, coin);
+                }
+                else if (ActorType == "AProjectileActor")
+                {
+                    AProjectileActor* projectile = World->SpawnActor<AProjectileActor>(Transform);
+                    if (projectile && World->bPie)
+                    {
+                        projectile->BeginPlay();
+                    }
+                    return sol::make_object(lua, projectile);
+                }
+                else if (ActorType == "ADecalActor")
+                {
+                    ADecalActor* decal = World->SpawnActor<ADecalActor>(Transform);
+                    return sol::make_object(lua, decal);
+                }
+                else if (ActorType == "AHeightFogActor")
+                {
+                    AHeightFogActor* fog = World->SpawnActor<AHeightFogActor>(Transform);
+                    return sol::make_object(lua, fog);
                 }
                 else
                 {
-                    // 기본값은 nullptr 반환
-                    return nullptr;
+                    return sol::nil;
                 }
             }
         ),
+        "SpawnGravityWall", [](UWorld* World, const FTransform& Transform) -> AGravityWall* {
+            return World->SpawnActor<AGravityWall>(Transform);
+        },
+        "SpawnCoinActor", [](UWorld* World, const FTransform& Transform) -> ACoinActor* {
+            return World->SpawnActor<ACoinActor>(Transform);
+        },
         "SpawnProjectileActor", [](UWorld* World, const FTransform& Transform) -> AProjectileActor* {
-            return World->SpawnActor<AProjectileActor>(Transform);
+            AProjectileActor* NewProjectile = World->SpawnActor<AProjectileActor>(Transform);
+            if (NewProjectile && World->bPie)
+            {
+                NewProjectile->BeginPlay();
+            }
+            return NewProjectile;
         },
 
         "DestroyActor", &UWorld::DestroyActor,
@@ -730,10 +863,22 @@ void UScriptManager::RegisterGlobalValueToLua()
 void UScriptManager::RegisterGlobalFuncToLua()
 {
     Lua["PrintToConsole"] = PrintToConsole;
-	CoroutineScheduler.RegisterCoroutineTo(Lua);
+    CoroutineScheduler.RegisterCoroutineTo(Lua);
 
     // 마우스에서 Ray 생성 함수 (마우스 방향 계산용)
     Lua["MakeRayFromMouse"] = &MakeRayFromMouse;
+
+    Lua["GetRunnerGameMode"] = GetRunnerGameMode;
+    Lua["IsGamePlaying"] = IsGamePlaying;
+
+    // Cast 헬퍼 함수: AActor를 AStaticMeshActor로 캐스팅
+    // 캐스팅 실패 시 nullptr 반환 (Lua에서는 nil)
+    Lua["CastToStaticMeshActor"] = [](AActor* Actor) -> AStaticMeshActor* {
+        if (!Actor) return nullptr;
+        return Cast<AStaticMeshActor>(Actor);
+        };
+
+    CoroutineScheduler.RegisterCoroutineTo(Lua);
 }
 
 void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalValue LuaLocalValue)
@@ -766,7 +911,7 @@ void UScriptManager::RegisterLocalValueToLua(sol::environment& InEnv, FLuaLocalV
     // GameMode 등록
     if (LuaLocalValue.GameMode)
     {
-        if(ARunnerGameMode* RunnerGameMode = Cast<ARunnerGameMode>(LuaLocalValue.GameMode))
+        if (ARunnerGameMode* RunnerGameMode = Cast<ARunnerGameMode>(LuaLocalValue.GameMode))
         {
             InEnv["GameMode"] = RunnerGameMode;
         }
@@ -793,34 +938,41 @@ void UScriptManager::LinkOnOverlapWithShapeComponent(AActor* MyActor, sol::funct
         if (ShapeComponent)
         {
             auto DelegateHandle = ShapeComponent->OnComponentBeginOverlap.Add(
-            OnOverlap
+                OnOverlap
             );
         }
     }
+}
+
+void UScriptManager::LinkRestartToDeligate(sol::function Restart)
+{
+    ARunnerGameMode* GameMode = Cast<ARunnerGameMode>(GEngine.GetPIEWorld()->GetGameMode());
+    GameMode->GetOnGameRestarted().Add(Restart);
 }
 
 // Lua로부터 Template 함수를 가져온다.
 // 해당 함수가 없으면 Throw한다.
 FLuaTemplateFunctions UScriptManager::GetTemplateFunctionFromScript(
     sol::environment& InEnv
-    )
+)
 {
     FLuaTemplateFunctions LuaTemplateFunctions;
 
     auto AssignFunction = [&InEnv](
         sol::function& Target,
         const char* FunctionName
-    )
-    {
-        Target = InEnv[FunctionName];
-        if (!Target.valid())
-            throw std::runtime_error(FString("Missing Lua function: ") + FunctionName);
-    };
+        )
+        {
+            Target = InEnv[FunctionName];
+            if (!Target.valid())
+                throw std::runtime_error(FString("Missing Lua function: ") + FunctionName);
+        };
 
     AssignFunction(LuaTemplateFunctions.BeginPlay, "BeginPlay");
     AssignFunction(LuaTemplateFunctions.EndPlay, "EndPlay");
     AssignFunction(LuaTemplateFunctions.OnOverlap, "OnOverlap");
     AssignFunction(LuaTemplateFunctions.Tick, "Tick");
+    AssignFunction(LuaTemplateFunctions.Restart, "Restart");
 
     return LuaTemplateFunctions;
 }
@@ -833,7 +985,7 @@ void UScriptManager::SetLuaScriptField(
 )
 {
     // 새 environment 생성 (globals 기반)
-    InEnv = sol::environment (Lua, sol::create, Lua.globals());
+    InEnv = sol::environment(Lua, sol::create, Lua.globals());
 
     // 스크립트 로드 및 컴파일 (문법 오류 체크)
     sol::load_result scriptLoad = Lua.load_file(Path.string());
@@ -848,7 +1000,7 @@ void UScriptManager::SetLuaScriptField(
         sol::error Err = result;
         throw Err;  // 런타임 오류 발생 시 throw
     }
-    
+
     // 혹은 스크립트가 return table이면 result 반환값 사용 가능
     sol::object returned = InEnv["_G"];
     if (returned.is<sol::table>()) {
@@ -869,13 +1021,13 @@ FScript* UScriptManager::GetOrCreate(FString InScriptName)
     if (!fs::exists(Path))
     {
         throw std::runtime_error(FString("Script file not found: ") + ScriptName +
-                                 ". Please create the script file first.");
+            ". Please create the script file first.");
     }
 
     sol::environment Env;
     sol::table Table;
     FLuaTemplateFunctions LuaTemplateFunctions;
-    
+
     SetLuaScriptField(Path, Env, Table, LuaTemplateFunctions);
 
     FScript* NewScript = new FScript;
@@ -924,7 +1076,7 @@ bool UScriptManager::CreateScriptFile(const FString& ScriptName)
     catch (const std::exception& e)
     {
         UE_LOG("[Script Manager] Failed to create script file: %s - Error: %s",
-               ScriptName.c_str(), e.what());
+            ScriptName.c_str(), e.what());
         return false;
     }
 }
@@ -979,7 +1131,7 @@ bool UScriptManager::OpenScriptInEditor(const FString& ScriptName)
     catch (const std::exception& e)
     {
         UE_LOG("[Script Manager] Exception while opening script: %s - Error: %s",
-               ScriptName.c_str(), e.what());
+            ScriptName.c_str(), e.what());
         return false;
     }
 }

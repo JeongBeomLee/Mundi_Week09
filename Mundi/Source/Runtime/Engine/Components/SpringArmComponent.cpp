@@ -34,7 +34,11 @@ USpringArmComponent::USpringArmComponent()
     , PreviousDesiredRotation(FQuat::Identity())
     , bDoCollisionTest(true)
     , ProbeSize(12.0f)
+    , SocketLocation(FVector())
+    , SocketRotation(FQuat::Identity())
 {
+    bCanEverTick = true;  // 틱 지원 활성화
+    bTickEnabled = true;  // 틱 시작 시 켜짐
 }
 
 USpringArmComponent::~USpringArmComponent()
@@ -45,21 +49,31 @@ void USpringArmComponent::TickComponent(float DeltaSeconds)
 {
     USceneComponent::TickComponent(DeltaSeconds);
 
-    FVector DesiredLocation;
-    FQuat DesiredRotation;
+    FVector DesiredSocketLocation;
+    FQuat DesiredSocketRotation;
 
-    UpdateDesiredArmLocation(DeltaSeconds, DesiredLocation, DesiredRotation);
+    UpdateDesiredArmLocation(DeltaSeconds, DesiredSocketLocation, DesiredSocketRotation);
 
     // Collision Test
-    FVector FinalLocation = DesiredLocation;
+    FVector FinalSocketLocation = DesiredSocketLocation;
     if (bDoCollisionTest)
     {
-        DoCollisionTest(DesiredLocation, FinalLocation);
+        DoCollisionTest(DesiredSocketLocation, FinalSocketLocation);
     }
 
-    // 위치 업데이트
-    SetWorldLocation(FinalLocation);
-    SetWorldRotation(DesiredRotation);
+    // Socket 위치/회전 저장 (GetSocketLocation/Rotation에서 사용)
+    SocketLocation = FinalSocketLocation;
+    SocketRotation = DesiredSocketRotation;
+
+    // 자식 컴포넌트(카메라)를 Socket 위치로 이동
+    for (USceneComponent* Child : GetAttachChildren())
+    {
+        if (Child)
+        {
+            Child->SetWorldLocation(SocketLocation);
+            Child->SetWorldRotation(SocketRotation);
+        }
+    }
 }
 
 // ───────────────────────────────────────────
@@ -68,17 +82,17 @@ void USpringArmComponent::TickComponent(float DeltaSeconds)
 
 FVector USpringArmComponent::GetSocketLocation() const
 {
-    return GetWorldLocation();
+    return SocketLocation;
 }
 
 FRotator USpringArmComponent::GetSocketRotation() const
 {
-    return GetWorldRotation().ToRotator();
+    return SocketRotation.ToRotator();
 }
 
 FTransform USpringArmComponent::GetSocketTransform() const
 {
-    return GetWorldTransform();
+    return FTransform(SocketLocation, SocketRotation, FVector(1, 1, 1));
 }
 
 // ───────────────────────────────────────────

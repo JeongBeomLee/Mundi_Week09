@@ -11,6 +11,7 @@
 #include "GameModeBase.h"
 #include "CollisionComponent/BoxComponent.h"
 #include "ObjectFactory.h"
+#include "SpringArmComponent.h"
 
 IMPLEMENT_CLASS(ARunnerCharacter)
 
@@ -45,16 +46,33 @@ ARunnerCharacter::ARunnerCharacter()
 
 		CollisionBox->SetBoxExtent(FVector(0.50f, 0.50f, 0.50f));
 	}
+	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArm");
+	if (SpringArmComponent)
+	{
+		SpringArmComponent->SetOwner(this);
+		SpringArmComponent->SetupAttachment(GetRootComponent());
+
+		// 기본 설정값
+		SpringArmComponent->SetTargetArmLength(3.0f);     // 캐릭터로부터 5m 떨어짐
+		SpringArmComponent->SetSocketOffset(FVector(0, 0, 1))  ;  // 캐릭터 머리 위
+		SpringArmComponent->SetEnableCameraLag(true) ;
+		SpringArmComponent->SetCameraLagSpeed(10.0f);
+		SpringArmComponent->SetDoCollisionTest(true);
+		SpringArmComponent->SetProbeSize(12.0f);
+	}
 
 	// CameraComponent 생성 및 설정
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	if (CameraComponent)
 	{
 		CameraComponent->SetOwner(this);
-		CameraComponent->SetupAttachment(GetRootComponent());
+		if (SpringArmComponent)
+			CameraComponent->SetupAttachment(SpringArmComponent);
+		else
+			CameraComponent->SetupAttachment(GetRootComponent());
 		CameraComponent->SetFOV(60.0f);
 	}
-
+	//bTickInEditor = true;
 	// 모든 이동 설정은 Lua에서 관리 (RunnerCharacter.lua의 Config)
 }
 
@@ -99,8 +117,9 @@ void ARunnerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	//SpringArmComponent->TickComponent(DeltaSeconds);
 	// 카메라 위치 업데이트
-	UpdateCameraPosition();
+	//UpdateCameraPosition();
 }
 
 // ────────────────────────────────────────────────────────────────────────────

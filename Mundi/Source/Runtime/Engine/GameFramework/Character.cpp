@@ -53,6 +53,7 @@ ACharacter::ACharacter()
 		StaticMeshComponent->SetupAttachment(MeshComponent);
 		UE_LOG("[Character] StaticMeshComponent created!");
 	}
+	
 }
 
 ACharacter::~ACharacter()

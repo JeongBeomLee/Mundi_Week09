@@ -9,6 +9,7 @@
 // 전방 선언
 class UBoxComponent;
 class UCameraComponent;
+class USpringArmComponent;
 
 /**
  * ARunnerCharacter
@@ -117,7 +118,7 @@ protected:
 
 	/** 카메라 컴포넌트 */
 	UCameraComponent* CameraComponent;
-
+	USpringArmComponent* SpringArmComponent;
 	// ────────────────────────────────────────────────
 	// 카메라 설정
 	// ────────────────────────────────────────────────
