@@ -28,6 +28,7 @@
 #include "CollisionManager.h"
 #include"Pawn.h"
 #include"PlayerController.h"
+#include "DeltaTimeManager.h"
 
 IMPLEMENT_CLASS(UWorld)
 
@@ -42,6 +43,7 @@ UWorld::UWorld()
 	CollisionManager = std::make_unique<UCollisionManager>();
 	CollisionManager->SetWorld(this);
 
+	DeltaTimeManager = std::make_unique<UDeltaTimeManager>();
 }
 
 UWorld::~UWorld()
@@ -102,7 +104,15 @@ void UWorld::InitializeGizmo()
 
 void UWorld::Tick(float DeltaSeconds)
 {
-	Partition->Update(DeltaSeconds, /*budget*/256);
+	//DeltaSeconds *= 0.1f; //시간 느리게 흐르도록 조정
+
+	if (DeltaTimeManager)
+	{
+		DeltaTimeManager->Update(DeltaSeconds);
+	}
+	float ScaledDeltaTime = GetScaledDeltaTime(DeltaSeconds);
+
+	Partition->Update(ScaledDeltaTime, /*budget*/256);
 
 	//순서 바꾸면 안댐
 	if (Level)
@@ -115,10 +125,12 @@ void UWorld::Tick(float DeltaSeconds)
 			// PendingKill 상태인 Actor는 Tick하지 않음
 			if (Actor && !Actor->IsPendingKill() && (Actor->CanTickInEditor() || bPie))
 			{
-				Actor->Tick(DeltaSeconds);
+				Actor->Tick(ScaledDeltaTime);
 			}
 		}
 	}
+
+	UScriptManager::GetInstance().UpdateCoroutineState(ScaledDeltaTime);
 
 	// EditorActors도 인덱스 기반 순회로 변경
 	for (size_t i = 0; i < EditorActors.size(); ++i)
@@ -126,7 +138,7 @@ void UWorld::Tick(float DeltaSeconds)
 		AActor* EditorActor = EditorActors[i];
 		if (EditorActor && !EditorActor->IsPendingKill() && !bPie)
 		{
-			EditorActor->Tick(DeltaSeconds);
+			EditorActor->Tick(DeltaSeconds); // ⭐ 실제 시간 사용
 		}
 	}
 
@@ -368,6 +380,11 @@ void UWorld::SetLevel(std::unique_ptr<ULevel> InLevel)
 
     // Clean any dangling selection references just in case
     if (SelectionMgr) SelectionMgr->CleanupInvalidActors();
+}
+
+float UWorld::GetScaledDeltaTime(float RealDeltaTime) const
+{
+	return DeltaTimeManager ? DeltaTimeManager->GetScaledDeltaTime(RealDeltaTime) : RealDeltaTime;
 }
 
 void UWorld::AddActorToLevel(AActor* Actor)

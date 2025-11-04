@@ -24,6 +24,15 @@ function OnOverlap(
     if actorName == "DefaultActor" then
         -- PrintToConsole("[coin_collision] Coin collected!")
         GameMode:OnCoinCollected(1)
+        PrintToConsole("In lua [coin_collision] Coin collected!")
+        if not World then
+            PrintToConsole("In lua [coin_collision] ERROR: World is nil!")
+            return
+        end
+        local dtManager = World:GetDeltaTimeManager()
+        dtManager:ApplySlomoEffect(10.0, 0.05)
+        -- Slomo (2초간 30% 속도)
+        -- dtManager:ApplyHitStop(2.0)
         -- MyActor:SetActorHiddenInGame(true)
         -- MyActor:DestroyAllComponents()
         MyActor:Destroy()
