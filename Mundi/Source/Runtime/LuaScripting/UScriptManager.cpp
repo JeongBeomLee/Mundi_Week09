@@ -5,6 +5,7 @@
 #include "CollisionComponent/CapsuleComponent.h"
 #include "CameraActor.h"
 #include "CameraComponent.h"
+#include "SpringArmComponent.h"
 #include "SceneComponent.h"
 #include "Source/Runtime/LuaScripting/ScriptGlobalFunction.h"
 #include "Pawn.h"
@@ -334,6 +335,23 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetUp", &UCameraComponent::GetUp
     );
 
+    // USpringArmComponent 등록 (스프링암 컴포넌트)
+    Lua.new_usertype<USpringArmComponent>("USpringArmComponent",
+        sol::base_classes, sol::bases<USceneComponent, UActorComponent>(),
+        "SetTargetArmLength", &USpringArmComponent::SetTargetArmLength,
+        "GetTargetArmLength", &USpringArmComponent::GetTargetArmLength,
+        "SetSocketOffset", &USpringArmComponent::SetSocketOffset,
+        "GetSocketOffset", &USpringArmComponent::GetSocketOffset,
+        "SetTargetOffset", &USpringArmComponent::SetTargetOffset,
+        "GetTargetOffset", &USpringArmComponent::GetTargetOffset,
+        "SetEnableCameraLag", &USpringArmComponent::SetEnableCameraLag,
+        "GetEnableCameraLag", &USpringArmComponent::GetEnableCameraLag,
+        "SetCameraLagSpeed", &USpringArmComponent::SetCameraLagSpeed,
+        "GetCameraLagSpeed", &USpringArmComponent::GetCameraLagSpeed,
+        "SetDoCollisionTest", &USpringArmComponent::SetDoCollisionTest,
+        "GetDoCollisionTest", &USpringArmComponent::GetDoCollisionTest
+    );
+
     // UCapsuleComponent 등록 (캡슐 충돌 컴포넌트)
     Lua.new_usertype<UCapsuleComponent>("UCapsuleComponent",
         sol::base_classes, sol::bases<UShapeComponent, USceneComponent, UActorComponent>(),
@@ -384,7 +402,12 @@ void UScriptManager::RegisterUserTypeToLua()
         "Add", [](const FVector& a, const FVector& b) { return a + b; },
         "Sub", [](const FVector& a, const FVector& b) { return a - b; },
         "Mul", [](const FVector& v, float scalar) { return v * scalar; },
-        "New", [](float x, float y, float z) { return FVector(x, y, z); }
+        "New", [](float x, float y, float z) { return FVector(x, y, z); },
+        // 인스턴스 메서드
+        "Size", &FVector::Size,
+        "SizeSquared", &FVector::SizeSquared,
+        "GetNormalized", &FVector::GetNormalized,
+        "IsZero", &FVector::IsZero
     );
     // FVector 정적 함수 등록
     Lua["FVector"]["Cross"] = &FVector::Cross;
@@ -411,6 +434,32 @@ void UScriptManager::RegisterUserTypeToLua()
         };
     Lua["FQuat"]["Slerp"] = &FQuat::Slerp;
     Lua["FQuat"]["Mul"] = [](const FQuat& a, const FQuat& b) { return a * b; };
+
+    // GetForwardVector: Quaternion의 Forward 방향 벡터
+    Lua["FQuat"]["GetForwardVector"] = [](const FQuat& q) {
+        return q.GetForwardVector();
+        };
+
+    // GetRightVector: Quaternion의 Right 방향 벡터
+    Lua["FQuat"]["GetRightVector"] = [](const FQuat& q) {
+        return q.GetRightVector();
+        };
+
+    // GetUpVector: Quaternion의 Up 방향 벡터
+    Lua["FQuat"]["GetUpVector"] = [](const FQuat& q) {
+        return q.GetUpVector();
+        };
+
+    // RotateVector: Quaternion으로 벡터 회전
+    Lua["FQuat"]["RotateVector"] = [](const FQuat& q, const FVector& v) {
+        return q.RotateVector(v);
+        };
+
+    // LookRotation: Forward와 Up 벡터로 회전 생성
+    Lua["FQuat"]["LookRotation"] = [](const FVector& forward, const FVector& up) {
+        return FQuat::LookRotation(forward, up);
+        };
+
     // FromToRotation: 두 벡터 사이의 회전 Quaternion 계산
     Lua["FQuat"]["FromToRotation"] = [](const FVector& from, const FVector& to) {
         FVector fromNorm = from.GetNormalized();

@@ -108,18 +108,22 @@ void USpringArmComponent::UpdateDesiredArmLocation(float DeltaTime, FVector& Out
         return;
     }
 
-    // 기본 위치: Owner의 위치 + TargetOffset
-    FVector OwnerLocation = GetOwner()->GetActorLocation();
-    FVector TargetLocation = OwnerLocation + TargetOffset;
+    // 회전 - Owner(캐릭터)의 월드 회전을 따라감
+    FQuat OwnerRotation = GetOwner()->GetActorRotation();
 
-    // 회전
-    FQuat OwnerRotation = GetRelativeRotation();
+    // 기본 위치: Owner의 위치 + TargetOffset (Owner의 로컬 좌표계 기준)
+    FVector OwnerLocation = GetOwner()->GetActorLocation();
+    FVector RotatedTargetOffset = OwnerRotation.RotateVector(TargetOffset);
+    FVector TargetLocation = OwnerLocation + RotatedTargetOffset;
 
     // Spring Arm 방향 계산 (뒤쪽)
     FVector ArmDirection = OwnerRotation.GetForwardVector() * -1.0f; // Backward direction
 
+    // SocketOffset도 Owner 회전 적용
+    FVector RotatedSocketOffset = OwnerRotation.RotateVector(SocketOffset);
+
     // Desired Location
-    FVector UnlaggedDesiredLocation = TargetLocation + ArmDirection * TargetArmLength + SocketOffset;
+    FVector UnlaggedDesiredLocation = TargetLocation + ArmDirection * TargetArmLength + RotatedSocketOffset;
 
     // Camera Lag 적용
     if (bEnableCameraLag)

@@ -72,7 +72,7 @@ ARunnerCharacter::ARunnerCharacter()
 			CameraComponent->SetupAttachment(GetRootComponent());
 		CameraComponent->SetFOV(60.0f);
 	}
-	//bTickInEditor = true;
+	bTickInEditor = true;
 	// 모든 이동 설정은 Lua에서 관리 (RunnerCharacter.lua의 Config)
 }
 
@@ -117,7 +117,7 @@ void ARunnerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	//SpringArmComponent->TickComponent(DeltaSeconds);
+	SpringArmComponent->TickComponent(DeltaSeconds);
 	// 카메라 위치 업데이트
 	//UpdateCameraPosition();
 }

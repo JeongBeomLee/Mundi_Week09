@@ -750,6 +750,65 @@ struct FQuat
 			std::fabs(W - 1.0f) < KINDA_SMALL_NUMBER;
 	}
 
+	// LookRotation: Forward와 Up 벡터로 회전 생성
+	// Forward가 가리키는 방향을 보고, Up이 위쪽이 되도록 회전 생성
+	static FQuat LookRotation(const FVector& forward, const FVector& up)
+	{
+		FVector forwardNorm = forward.GetNormalized();
+		FVector upNorm = up.GetNormalized();
+
+		// Right = Forward x Up
+		FVector right = FVector::Cross(upNorm, forwardNorm).GetNormalized();
+
+		// 재계산: Up = Right x Forward (직교성 보장)
+		FVector newUp = FVector::Cross(forwardNorm, right).GetNormalized();
+
+		// 회전 행렬을 쿼터니온으로 변환
+		// 행렬:
+		// | right.X    right.Y    right.Z    0 |
+		// | newUp.X    newUp.Y    newUp.Z    0 |
+		// | forward.X  forward.Y  forward.Z  0 |
+		// | 0          0          0          1 |
+
+		float trace = right.X + newUp.Y + forwardNorm.Z;
+
+		FQuat q;
+		if (trace > 0.0f)
+		{
+			float s = std::sqrt(trace + 1.0f) * 2.0f; // s = 4 * w
+			q.W = 0.25f * s;
+			q.X = (newUp.Z - forwardNorm.Y) / s;
+			q.Y = (forwardNorm.X - right.Z) / s;
+			q.Z = (right.Y - newUp.X) / s;
+		}
+		else if ((right.X > newUp.Y) && (right.X > forwardNorm.Z))
+		{
+			float s = std::sqrt(1.0f + right.X - newUp.Y - forwardNorm.Z) * 2.0f; // s = 4 * x
+			q.W = (newUp.Z - forwardNorm.Y) / s;
+			q.X = 0.25f * s;
+			q.Y = (newUp.X + right.Y) / s;
+			q.Z = (forwardNorm.X + right.Z) / s;
+		}
+		else if (newUp.Y > forwardNorm.Z)
+		{
+			float s = std::sqrt(1.0f + newUp.Y - right.X - forwardNorm.Z) * 2.0f; // s = 4 * y
+			q.W = (forwardNorm.X - right.Z) / s;
+			q.X = (newUp.X + right.Y) / s;
+			q.Y = 0.25f * s;
+			q.Z = (forwardNorm.Y + newUp.Z) / s;
+		}
+		else
+		{
+			float s = std::sqrt(1.0f + forwardNorm.Z - right.X - newUp.Y) * 2.0f; // s = 4 * z
+			q.W = (right.Y - newUp.X) / s;
+			q.X = (forwardNorm.X + right.Z) / s;
+			q.Y = (forwardNorm.Y + newUp.Z) / s;
+			q.Z = 0.25f * s;
+		}
+
+		return q.GetNormalized();
+	}
+
 	// 선언: 행렬 변환
 	FMatrix ToMatrix() const;
 
