@@ -34,6 +34,7 @@ class FShadowManager;
 class UCollisionManager;
 class AGameModeBase;
 class AGameStateBase;
+class UDeltaTimeManager;
 
 class UWorld final : public UObject
 {
@@ -130,6 +131,21 @@ public:
     FVector GetPlayerSpawnLocation() const { return PlayerSpawnLocation; }
     void SetPlayerSpawnLocation(const FVector& InLocation) { PlayerSpawnLocation = InLocation; }
 
+    /** === DeltaTime 관리 === */
+
+    /**
+     * DeltaTime 매니저를 반환합니다.
+     */
+    UDeltaTimeManager* GetDeltaTimeManager() const { return DeltaTimeManager.get(); }
+
+    /**
+     * 조정된 DeltaTime을 반환합니다 (편의 함수)
+     * @param RealDeltaTime - 실제 프레임 시간
+     * @return TimeDilation이 적용된 DeltaTime
+     */
+    float GetScaledDeltaTime(float RealDeltaTime) const;
+
+
     /** === 게임 프레임워크 (PIE 전용) === */
     AGameModeBase* GameMode = nullptr;
     AGameStateBase* GameState = nullptr;
@@ -173,6 +189,9 @@ private:
 
     // Per-world selection manager
     std::unique_ptr<USelectionManager> SelectionMgr;
+
+    /** DeltaTime 및 Time Dilation 관리자 */
+    std::unique_ptr<UDeltaTimeManager> DeltaTimeManager;
 
     // 지연 삭제 큐
     TArray<AActor*> PendingDestroyActors;

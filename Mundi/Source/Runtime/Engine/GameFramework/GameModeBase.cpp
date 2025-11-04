@@ -4,6 +4,7 @@
 #include "PlayerController.h"
 #include "Pawn.h"
 #include "World.h"
+#include "DeltaTimeManager.h"
 
 // AGameModeBase를 ObjectFactory에 등록
 IMPLEMENT_CLASS(AGameModeBase)
@@ -90,6 +91,9 @@ void AGameModeBase::StartGame()
 		UE_LOG("GameMode: 게임이 이미 시작되었습니다.");
 		return;
 	}
+
+	// 이전 게임에서 적용되었던 모든 델타타임 효과 취소
+	GWorld->GetDeltaTimeManager()->CancelAllEffects();
 
 	bGameStarted = true;
 

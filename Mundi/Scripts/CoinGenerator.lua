@@ -152,6 +152,11 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         -- 점수 추가
         _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
         PrintToConsole("[CoinGenerator] Coin collected!");
+        
+        -- 슬로우 모션 효과 테스트
+        -- local dtManager = World:GetDeltaTimeManager()
+        -- dtManager:ApplySlomoEffect(2.0, 0.05, TimeDilationPriority.Low)
+        -- dtManager:ApplyHitStop(1.0)
 
         -- 코인을 Pool로 회수
         OtherActor:SetTransform(STORAGE_POSITION);

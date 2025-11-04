@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Info.h"
 
 // 게임 상태 열거형
@@ -70,4 +70,7 @@ protected:
 
 	// 타이머 일시정지 플래그
 	bool bTimerPaused;
+
+	// 일시정지 효과 ID (DeltaTimeManager용)
+	uint32 PauseEffectID;
 };
