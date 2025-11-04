@@ -74,6 +74,7 @@ inline float NormalizeAngleDeg(float angleDeg)
 // ─────────────────────────────
 struct FVector;
 struct FVector4;
+struct FRotator;
 struct FQuat;
 struct FMatrix;
 struct FTransform;
@@ -308,6 +309,87 @@ struct FVector
 };
 
 // ─────────────────────────────
+// FRotator (Rotation in Euler Angles)
+// ─────────────────────────────
+struct FRotator
+{
+	float Pitch; // Y-axis rotation (degrees)
+	float Yaw;   // Z-axis rotation (degrees)
+	float Roll;  // X-axis rotation (degrees)
+
+	FRotator(float InPitch = 0.0f, float InYaw = 0.0f, float InRoll = 0.0f)
+		: Pitch(InPitch), Yaw(InYaw), Roll(InRoll)
+	{
+	}
+
+	// Static constructors
+	static FRotator Zero() { return FRotator(0.0f, 0.0f, 0.0f); }
+
+	// Basic operations
+	FRotator operator+(const FRotator& R) const { return FRotator(Pitch + R.Pitch, Yaw + R.Yaw, Roll + R.Roll); }
+	FRotator operator-(const FRotator& R) const { return FRotator(Pitch - R.Pitch, Yaw - R.Yaw, Roll - R.Roll); }
+	FRotator operator*(float S) const { return FRotator(Pitch * S, Yaw * S, Roll * S); }
+	FRotator operator/(float S) const { return FRotator(Pitch / S, Yaw / S, Roll / S); }
+	FRotator operator-() const { return FRotator(-Pitch, -Yaw, -Roll); }
+
+	FRotator& operator+=(const FRotator& R) { Pitch += R.Pitch; Yaw += R.Yaw; Roll += R.Roll; return *this; }
+	FRotator& operator-=(const FRotator& R) { Pitch -= R.Pitch; Yaw -= R.Yaw; Roll -= R.Roll; return *this; }
+	FRotator& operator*=(float S) { Pitch *= S; Yaw *= S; Roll *= S; return *this; }
+	FRotator& operator/=(float S) { Pitch /= S; Yaw /= S; Roll /= S; return *this; }
+
+	// Comparison
+	bool operator==(const FRotator& R) const
+	{
+		return std::fabs(Pitch - R.Pitch) < KINDA_SMALL_NUMBER &&
+			std::fabs(Yaw - R.Yaw) < KINDA_SMALL_NUMBER &&
+			std::fabs(Roll - R.Roll) < KINDA_SMALL_NUMBER;
+	}
+	bool operator!=(const FRotator& R) const { return !(*this == R); }
+
+	// Check if nearly zero
+	bool IsNearlyZero(float Tolerance = KINDA_SMALL_NUMBER) const
+	{
+		return std::fabs(Pitch) < Tolerance &&
+			std::fabs(Yaw) < Tolerance &&
+			std::fabs(Roll) < Tolerance;
+	}
+
+	// Normalize angles to -180 ~ 180 range
+	FRotator GetNormalized() const
+	{
+		return FRotator(
+			NormalizeAngleDeg(Pitch),
+			NormalizeAngleDeg(Yaw),
+			NormalizeAngleDeg(Roll)
+		);
+	}
+
+	void Normalize()
+	{
+		Pitch = NormalizeAngleDeg(Pitch);
+		Yaw = NormalizeAngleDeg(Yaw);
+		Roll = NormalizeAngleDeg(Roll);
+	}
+
+	// Convert to Quaternion
+	FQuat ToQuaternion() const;
+
+	// Convert to FVector (for backward compatibility with existing code)
+	FVector ToVector() const { return FVector(Roll, Pitch, Yaw); }
+
+	// Create from FVector (Roll=X, Pitch=Y, Yaw=Z)
+	static FRotator FromVector(const FVector& V) { return FRotator(V.Y, V.Z, V.X); }
+
+	// Interpolation
+	static FRotator Lerp(const FRotator& A, const FRotator& B, float T)
+	{
+		FRotator Delta = B - A;
+		Delta.Normalize();
+		return (A + Delta * T).GetNormalized();
+	}
+};
+
+// ─────────────────────────────
 // FVector4 (4D Vector)
 // ─────────────────────────────
 struct alignas(16) FVector4
@@ -459,6 +541,9 @@ struct FQuat
 		//  부동 소수점 오차 보정 외에는 수학적으로 불필요합니다.)
 		return Quat;
 	}
+
+	// Convert to FRotator
+	FRotator ToRotator() const;
 
 	/**
 	 * @brief 쿼터니언을 ZYX 회전 순서의 오일러 각(디그리)으로 변환합니다.
@@ -1275,5 +1360,25 @@ inline FTransform FTransform::Inverse() const
 	Out.Scale3D = InvScale;
 	Out.Translation = InvTrans;
 	return Out;
+}
+
+// ─────────────────────────────
+// FRotator ↔ FQuat Conversion
+// ─────────────────────────────
+
+// FRotator → FQuat
+inline FQuat FRotator::ToQuaternion() const
+{
+	// FRotator stores: Pitch (Y), Yaw (Z), Roll (X)
+	// FQuat::MakeFromEulerZYX expects: FVector(Roll, Pitch, Yaw)
+	return FQuat::MakeFromEulerZYX(FVector(Roll, Pitch, Yaw));
+}
+
+// FQuat → FRotator
+inline FRotator FQuat::ToRotator() const
+{
+	FVector EulerAngles = ToEulerZYXDeg();
+	// ToEulerZYXDeg returns FVector(Roll, Pitch, Yaw)
+	return FRotator(EulerAngles.Y, EulerAngles.Z, EulerAngles.X);
 }
 
