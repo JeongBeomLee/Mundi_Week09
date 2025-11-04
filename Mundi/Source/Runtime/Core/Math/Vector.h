@@ -56,6 +56,66 @@ namespace FMath
 	{
 		return std::sqrt(Value);
 	}
+
+	template<typename T>
+	static T InterpTo(
+		T Current,
+		T Target,
+		float DeltaTime,
+		float InterpSpeed
+	)
+	{
+		T CurrentToTarget = Target - Current;
+		T DeltaMove = Clamp(
+			DeltaTime * InterpSpeed,
+			0.f,
+			1.f
+		);
+		return Current + CurrentToTarget;
+	}
+
+	template<typename T>
+	static T InterpEaseIn(
+		T Current,
+		T Target,
+		float Alpha,
+		float Exp
+	)
+	{
+		float const ModifiedAlpha = std::pow(Alpha, Exp);
+		return Lerp(Current, Target, ModifiedAlpha);
+	}
+
+	template<typename T>
+	static T InterpEaseOut(
+		T Current,
+		T Target,
+		float Alpha,
+		float Exp
+	)
+	{
+		float const ModifiedAlpha = 1.f - std::pow(Alpha, Exp);
+		return Lerp(Current, Target, ModifiedAlpha);
+	}
+
+	template<typename T>
+	static T InterpEaseInOut(
+		T Current,
+		T Target,
+		float Alpha,
+		float Exp
+	)
+	{
+		return Lerp<T>(Current, Target, (Alpha < 0.5f) ?
+			InterpEaseIn(0.f, 1.f, Alpha * 2.f, Exp) * 0.5f :
+			InterpEaseOut(
+				0.f,
+				1.f,
+				Alpha * 2.f - 1.f,
+				Exp
+			) * 0.5f + 0.5f
+		);
+	}
 }
 // 각도를 -180 ~ 180 범위로 정규화 (모듈러 연산)
 inline float NormalizeAngleDeg(float angleDeg)
