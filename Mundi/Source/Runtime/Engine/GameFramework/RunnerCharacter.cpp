@@ -189,6 +189,7 @@ void ARunnerCharacter::UpdateCameraPosition()
 	if (!CameraComponent)
 		return;
 
+	// TODO: SpringArm
 	// 캐릭터의 로컬 좌표계 기준으로 카메라 오프셋 적용
 	FQuat CharacterRotation = GetActorRotation();
 	FVector WorldOffset = CharacterRotation.RotateVector(CameraOffset);
