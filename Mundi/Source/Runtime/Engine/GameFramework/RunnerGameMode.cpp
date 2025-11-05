@@ -124,10 +124,10 @@ void ARunnerGameMode::OnCameraBlendComplete()
 	HeadBobModifier = NewObject<UCameraModifier_CustomBlend>();
 	CameraManager->AddCameraModifier(HeadBobModifier);
 
-	// 위아래 흔들림 (Z축 0.2m + Pitch 13.5도)
+	// 리듬타
 	FVector UpDownOffset(0.0f, 0.0f, 0.2f);
 	FQuat PitchRotation = FQuat::MakeFromEulerZYX(FVector(0.0f, 15.0f, 0.0f));
-	float NoFOVChange = 0.0f;
+	float NoFOVChange = -20.0f;
 
 	HeadBobModifier->SetLooping(true);
 	HeadBobModifier->ApplyBlendPreset("BounceCurve", UpDownOffset, PitchRotation, NoFOVChange);
