@@ -240,6 +240,7 @@ end
 
 -- 부활 작업
 function Restart()
+    Config.Health = 3
     MyActor:SetLocation(FVector(0.0, 0.0, 3.0));
 end
 
@@ -576,7 +577,6 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     dtManager:ApplyHitStop(0.2);
 
     if Config.Health <= 0 then
-        Config.Health = 3;
         GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
 
         -- 카메라 셰이크 추가 (기본 파라미터 사용)
