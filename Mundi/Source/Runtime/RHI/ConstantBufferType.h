@@ -62,6 +62,12 @@ struct GammaCorrectionBufferType // b2
     float InvGamma;        // 1.0 / Gamma (미리 계산해서 넘겨주면 성능 향상)
     float Brightness;      // 추가 밝기 조정 (1.0 = 변화 없음)
     float Saturation;      // 채도 조정 (1.0 = 변화 없음)
+}
+
+struct FFadeBufferType // b2
+{
+    float FadeAlpha; // 0 ~ 1 범위, 0 = 완전 Fade 색상, 1 = 원본 씬 색상
+    FVector FadeColor; // Fade 목표 색상 (RGB)
 };
 
 // b0 in PS
@@ -188,6 +194,7 @@ MACRO(PostProcessBufferType)        \
 MACRO(FogBufferType)                \
 MACRO(FXAABufferType)               \
 MACRO(GammaCorrectionBufferType)    \
+MACRO(FFadeBufferType)              \
 MACRO(FPixelConstBufferType)        \
 MACRO(ViewProjBufferType)           \
 MACRO(ColorBufferType)              \
@@ -210,6 +217,7 @@ CONSTANT_BUFFER_INFO(ViewProjBufferType, 1, true, true) // b1 카메라 행렬 �
 CONSTANT_BUFFER_INFO(FogBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(FXAABufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(GammaCorrectionBufferType, 2, false, true)
+CONSTANT_BUFFER_INFO(FFadeBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(ColorBufferType, 3, true, true)   // b3 color
 CONSTANT_BUFFER_INFO(FPixelConstBufferType, 4, true, true) // GOURAUD에도 사용되므로 VS도 true
 CONSTANT_BUFFER_INFO(DecalBufferType, 6, true, true)

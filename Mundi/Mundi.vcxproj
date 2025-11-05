@@ -733,6 +733,7 @@ if "$(Configuration)"=="Debug" (
     <None Include="Scripts\template.lua" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Scripts\CameraUtility.lua" />
     <Content Include="Scripts\CoinGenerator.lua" />
     <Content Include="Scripts\GlobalObjectManager.lua" />
     <Content Include="Scripts\GlobalVariable.lua" />

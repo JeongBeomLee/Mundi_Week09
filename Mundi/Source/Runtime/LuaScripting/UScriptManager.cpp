@@ -35,6 +35,7 @@
 #include "UCameraModifier_CameraShake.h"
 #include "HeightFogComponent.h"
 #include "DeltaTimeManager.h"
+#include "Color.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -484,6 +485,19 @@ void UScriptManager::RegisterUserTypeToLua()
         float w = std::sqrt(fromNorm.SizeSquared() * toNorm.SizeSquared()) + dot;
         return FQuat(axis.X, axis.Y, axis.Z, w).GetNormalized();
         };
+
+    // FLinearColor 타입을 Lua에 등록
+    Lua.new_usertype<FLinearColor>("FLinearColor",
+        sol::call_constructor, sol::factories(
+            []() { return FLinearColor(); },
+            [](float r, float g, float b) { return FLinearColor(r, g, b, 1.0f); },
+            [](float r, float g, float b, float a) { return FLinearColor(r, g, b, a); }
+        ),
+        "R", &FLinearColor::R,
+        "G", &FLinearColor::G,
+        "B", &FLinearColor::B,
+        "A", &FLinearColor::A
+    );
 
     // FMatrix 타입을 Lua에 등록 (카메라 행렬용)
     Lua.new_usertype<FMatrix>("FMatrix",
@@ -986,7 +1000,12 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetViewTarget", &APlayerCameraManager::GetViewTarget,
         "GetCameraLocation", &APlayerCameraManager::GetCameraLocation,
         "GetCameraRotation", &APlayerCameraManager::GetCameraRotation,
-        "GetCameraFOV", &APlayerCameraManager::GetCameraFOV
+        "GetCameraFOV", &APlayerCameraManager::GetCameraFOV,
+        "StartCameraFade", &APlayerCameraManager::StartCameraFade,
+        "StopCameraFade", &APlayerCameraManager::StopCameraFade,
+        "AddCameraModifier", &APlayerCameraManager::AddCameraModifier,
+        "RemoveCameraModifier", &APlayerCameraManager::RemoveCameraModifier,
+        "RemoveDisabledCameraModifiers", &APlayerCameraManager::RemoveDisabledCameraModifiers
     );
 
     // UCameraModifier 클래스 등록
