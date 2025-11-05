@@ -570,8 +570,8 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnDecreasePlayerHealth(MyActor, Config.Health);
     CameraUtility.AddVignetting(
             FVector4(1.0, 0.0, 0.0, 1.0),
-            0.5,
-            0.2,
+            1.0,
+            0.4,
             3.0
     );
     local dtManager = World:GetDeltaTimeManager()
