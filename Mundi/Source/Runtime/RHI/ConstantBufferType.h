@@ -56,6 +56,12 @@ struct FXAABufferType // b2
     int32_t QualityIterations; // 엣지 탐색 반복 횟수 (12 권장)
 };
 
+struct FFadeBufferType // b2
+{
+    float FadeAlpha; // 0 ~ 1 범위, 0 = 완전 Fade 색상, 1 = 원본 씬 색상
+    FVector FadeColor; // Fade 목표 색상 (RGB)
+};
+
 // b0 in PS
 struct FMaterialInPs
 {
@@ -179,6 +185,7 @@ MACRO(DecalBufferType)              \
 MACRO(PostProcessBufferType)        \
 MACRO(FogBufferType)                \
 MACRO(FXAABufferType)               \
+MACRO(FFadeBufferType)              \
 MACRO(FPixelConstBufferType)        \
 MACRO(ViewProjBufferType)           \
 MACRO(ColorBufferType)              \
@@ -200,6 +207,7 @@ CONSTANT_BUFFER_INFO(PostProcessBufferType, 0, false, true)
 CONSTANT_BUFFER_INFO(ViewProjBufferType, 1, true, true) // b1 카메라 행렬 고정
 CONSTANT_BUFFER_INFO(FogBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(FXAABufferType, 2, false, true)
+CONSTANT_BUFFER_INFO(FFadeBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(ColorBufferType, 3, true, true)   // b3 color
 CONSTANT_BUFFER_INFO(FPixelConstBufferType, 4, true, true) // GOURAUD에도 사용되므로 VS도 true
 CONSTANT_BUFFER_INFO(DecalBufferType, 6, true, true)

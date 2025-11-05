@@ -7,7 +7,8 @@ local _ENV = ...
 -- 외부 모듈
 -- ════════════════════════════════════════════════════════════════════════════
 
-local GravitySystem = require("GravitySystem")
+local GravitySystem = require("GravitySystem");
+local CameraUtility = require("CameraUtility");
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 설정 (에디터에서 조정 가능)
@@ -74,6 +75,9 @@ local CharacterMovement = nil
 -- ════════════════════════════════════════════════════════════════════════════
 
 function BeginPlay()
+    -- CameraUtility 초기화
+    CameraUtility.Initialize(GlobalObjectManager.GetPIEWorld());
+    
     -- 캐릭터 메시 변경
     if MyActor.GetStaticMesh then
         local StaticMeshComponent = MyActor:GetStaticMesh()
@@ -148,6 +152,9 @@ function BeginPlay()
 end
 
 function Tick(deltaTime)
+    -- 카메라 업데이트
+    CameraUtility.UpdateCamera(deltaTime);
+    
     -- 회전 중에는 모든 입력 무시
     if GravitySystem and GravitySystem.IsCurrentlyRotating and GravitySystem.IsCurrentlyRotating() then
         return
