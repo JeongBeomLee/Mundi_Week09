@@ -33,9 +33,9 @@ local Config = {
     RightInput = 0.0,           -- D 키 입력
 
     -- 프로젝타일 설정
-    ProjectileSpeed = 1500.0,    -- 발사체 속도 (cm/s)
+    ProjectileSpeed = 800.0,    -- 발사체 속도 (cm/s)
     ProjectileSpawnOffset = FVector(0, 0, 0), -- 발사 위치 오프셋 (캐릭터 위치에서 시작)
-    ProjectileGravityScale = 1.0, -- 발사체 중력 스케일
+    ProjectileGravityScale = -0.5, -- 발사체 중력 스케일
     ProjectileLifespan = 5.0,   -- 발사체 생명 시간 (초)
 
     -- SpringArm 카메라 설정
@@ -220,7 +220,7 @@ end
 --         CameraUtility.AddCameraShake(15.0, 3.0, 8)
         
 --         -- 비활성화된 모디파이어 정리 (메모리 관리)
---         CameraUtility.RemoveDisabledCameraShakes()
+   --         CameraUtility.RemoveDisabledCameraShakes()
 --     end
 -- end
 
@@ -566,12 +566,15 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     --    PrintToConsole("[RunnerCharacter] Overlapped: " .. OtherActor:GetName():ToString())
     --end
 
+    PrintToConsole("[RunnerCharacter] OnOverlap called with actor: ")
     -- TODO: 벽면 감지 및 중력 방향 전환 로직
     -- 예: OtherActor의 태그를 확인해서 "WallTrigger"면 중력 방향 변경
     if not CollisionUtility.IsObstacleActor(OtherActor) then
         --PrintToConsole("[ObstacleGenerator] Not an obstacle actor, returning");
         return;
     end
+
+    PrintToConsole("[RunnerCharacter] OnOverlap Obstacle detected, processing player hit");
 
     -- 플레이어 사망 처리
     -- PrintToConsole("[ObstacleGenerator] Player hit an obstacle! Processing death sound...");
@@ -582,6 +585,7 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     -- end);
 
     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/PlayerHitFX.mp3", false, SoundChannelType.SFX);
+    PrintToConsole("[RunnerCharacter] OnOverlap Sound played for player hit");
     DecreaseHealth(1);
     GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnDecreasePlayerHealth(MyActor, Config.Health);
     CameraUtility.AddVignetting(

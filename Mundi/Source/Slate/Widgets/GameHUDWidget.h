@@ -69,10 +69,16 @@ private:
 	int HeartIconWidth;
 	int HeartIconHeight;
 
+	// UI 렌더링 함수
+	void RenderNotStartedState(); // NotStarted 상태 렌더링 (타이틀 화면 + 입력)
+	void RenderGameOverState(bool bIsVictory); // GameOver/Victory 상태 렌더링 (팝업 + 입력)
+	void RenderPlayingState(); // Playing/Paused 상태 렌더링 (HUD + 입력)
+
 	// UI 헬퍼 함수
 	FString FormatTime(float Seconds) const;
 	FString GetGameStateText() const;
 	ImVec4 GetGameStateColor() const;
 	void LoadHeartIcon();
 	void RenderHeartIcons();
+	void RenderTitleScreen(); // 타이틀 화면 렌더링
 };
