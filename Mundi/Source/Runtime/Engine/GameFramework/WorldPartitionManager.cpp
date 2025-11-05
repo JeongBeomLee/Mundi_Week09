@@ -18,8 +18,9 @@ UWorldPartitionManager::UWorldPartitionManager()
 	FAABB WorldBounds(FVector(-50, -50, -50), FVector(50, 50, 50));
 	SceneOctree = new FOctree(WorldBounds, 0, 8, 10);
 	// BVH도 동일 월드 바운드로 초기화 (더 깊고 작은 리프 설정)
-	//BVH = new FBVHierachy(FBound(), 0, 5, 1); 
-	BVH = new FBVHierarchy(FAABB(), 0, 8, 1); 
+	//BVH = new FBVHierachy(FBound(), 0, 5, 1);
+	BVHShared = std::make_shared<FBVHierarchy>(FAABB(), 0, 8, 1);
+	BVH = BVHShared; // weak_ptr에 shared_ptr 할당
 	//BVH = new FBVHierachy(FBound(), 0, 10, 3);
 }
 
@@ -30,11 +31,9 @@ UWorldPartitionManager::~UWorldPartitionManager()
 		delete SceneOctree;
 		SceneOctree = nullptr;
 	}
-	if (BVH)
-	{
-		delete BVH;
-		BVH = nullptr;
-	}
+	// BVH는 shared_ptr로 자동 관리되므로 명시적 삭제 불필요
+	BVHShared.reset();
+	BVH.reset();
 }
 
 void UWorldPartitionManager::Clear()
@@ -83,7 +82,7 @@ void UWorldPartitionManager::BulkRegister(const TArray<AActor*>& Actors)
 		}
 	}
 	
-	if (BVH) BVH->BulkUpdate(StaticMeshComponents);
+	if (BVHShared) BVHShared->BulkUpdate(StaticMeshComponents);
 }
 
 void UWorldPartitionManager::Unregister(AActor* Actor)
@@ -99,9 +98,16 @@ void UWorldPartitionManager::Unregister(AActor* Actor)
 
 void UWorldPartitionManager::Unregister(USceneComponent* Component)
 {
+	if (!Component)
+		return;
+
+	// 종료 시 안전: BVH가 이미 삭제되었을 수 있음
 	if (UStaticMeshComponent* Smc = Cast<UStaticMeshComponent>(Component))
 	{
-		if (BVH) BVH->Remove(Smc);
+		if (BVHShared.get())
+		{
+			BVHShared->Remove(Smc);
+		}
 
 		ComponentDirtySet.erase(Smc);
 	}
@@ -166,14 +172,14 @@ void UWorldPartitionManager::Update(float DeltaTime, const uint32 BudgetCount)
 		}
 
 		if (!Component) continue;
-		if (BVH) BVH->Update(Component);
+		if (BVHShared) BVHShared->Update(Component);
 
 		++processed;
 	}
 
-	if (BVH)
+	if (BVHShared)
 	{
-		BVH->FlushRebuild();
+		BVHShared->FlushRebuild();
 	}
 }
 
@@ -192,17 +198,17 @@ void UWorldPartitionManager::RayQueryClosest(FRay InRay, OUT AActor*& OutActor, 
     //{
     //    SceneOctree->QueryRayClosest(InRay, OutActor, OutBestT);
     //}
-	if (BVH)
+	if (BVHShared)
 	{
-		BVH->QueryRayClosest(InRay, OutActor, OutBestT);
+		BVHShared->QueryRayClosest(InRay, OutActor, OutBestT);
 	}
 }
 
 void UWorldPartitionManager::FrustumQuery(FFrustum InFrustum)
 {
-	if (BVH)
+	if (BVHShared)
 	{
-		BVH->QueryFrustum(InFrustum);
+		BVHShared->QueryFrustum(InFrustum);
 	}
 }
 
@@ -216,8 +222,8 @@ void UWorldPartitionManager::ClearSceneOctree()
 
 void UWorldPartitionManager::ClearBVHierarchy()
 {
-	if (BVH)
+	if (BVHShared)
 	{
-		BVH->Clear();
+		BVHShared->Clear();
 	}
 }

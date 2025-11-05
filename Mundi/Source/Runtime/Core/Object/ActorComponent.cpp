@@ -81,17 +81,17 @@ void UActorComponent::DestroyComponent()
     if (bPendingDestroy) return;
     bPendingDestroy = true;
 
-    // Owner에서 이 컴포넌트 제거 (댕글링 포인터 방지)
-    if (Owner)
-    {
-        Owner->RemoveOwnedComponent(this);
-    }
-
     // 등록 중이면 우선 해제(EndPlay 포함)
     if (bRegistered) UnregisterComponent();
 
-    // Owner 참조 끊기
-    Owner = nullptr;
+    // Owner에서 이 컴포넌트 제거 (댕글링 포인터 방지)
+    // 소멸자에서 호출될 때는 Owner가 이미 제거했을 수 있으므로 확인
+    if (Owner)
+    {
+        AActor* TempOwner = Owner;
+        Owner = nullptr; // 먼저 Owner를 끊어 RemoveOwnedComponent에서 재귀 방지
+        TempOwner->RemoveOwnedComponent(this);
+    }
 
     DeleteObject(this);
 }

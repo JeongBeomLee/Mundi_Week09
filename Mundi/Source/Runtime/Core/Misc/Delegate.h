@@ -122,14 +122,24 @@ public:
 	// 핸들로 제거
 	void RemoveDynamic(DelegateHandle Handle)
 	{
-		Functions.erase(
-			std::remove_if(Functions.begin(), Functions.end(),
-				[Handle](const std::pair<DelegateHandle, HandlerType>& Pair)
-				{
-					return Pair.first == Handle;
-				}),
-			Functions.end()
-		);
+		// 빈 컨테이너 또는 유효하지 않은 핸들 체크
+		if (Functions.empty() || Handle == static_cast<DelegateHandle>(-1))
+		{
+			return;
+		}
+
+		// remove-erase idiom
+		auto newEnd = std::remove_if(Functions.begin(), Functions.end(),
+			[Handle](const std::pair<DelegateHandle, HandlerType>& Pair)
+			{
+				return Pair.first == Handle;
+			});
+
+		// 실제로 제거할 요소가 있을 때만 erase 호출
+		if (newEnd != Functions.end())
+		{
+			Functions.erase(newEnd, Functions.end());
+		}
 	}
 
 	// 모두 제거

@@ -6,6 +6,7 @@
 #include "Gizmo/GizmoActor.h"
 #include "LightManager.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
+#include "WorldPartitionManager.h"
 
 // Forward Declarations
 class UResourceManager;
@@ -103,6 +104,7 @@ public:
     AGizmoActor* GetGizmoActor() { return GizmoActor; }
     AGridActor* GetGridActor() { return GridActor; }
     UWorldPartitionManager* GetPartitionManager() { return Partition.get(); }
+    void ClearPartitionManager() { if (Partition) { Partition->Clear(); Partition.reset(); } }
 
     // Per-world render settings
     URenderSettings& GetRenderSettings() { return RenderSettings; }

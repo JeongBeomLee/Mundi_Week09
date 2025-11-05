@@ -77,9 +77,10 @@ public:
 
 public:
     static UScriptManager& GetInstance();
+    void Shutdown();
 private:
     void Initialize();
-    void Shutdown();
+  
 
     void RegisterUserTypeToLua();
     void RegisterGlobalValueToLua();

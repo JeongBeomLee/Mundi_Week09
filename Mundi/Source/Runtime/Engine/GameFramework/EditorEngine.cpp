@@ -336,6 +336,18 @@ void UEditorEngine::Shutdown()
     // Release ImGui first (it may hold D3D11 resources)
     UUIManager::GetInstance().Release();
 
+    // Lua 스크립트 정리 (Actor 삭제 전에)
+   // UScriptManager::GetInstance().Shutdown();
+
+    // PartitionManager를 명시적으로 정리 및 해제 (Actor 삭제 전에)
+    for (auto& WorldContext : WorldContexts)
+    {
+        if (WorldContext.World)
+        {
+            WorldContext.World->ClearPartitionManager();
+        }
+    }
+
     // Delete all UObjects (Components, Actors, Resources)
     // Resource destructors will properly release D3D resources
     ObjectFactory::DeleteAll(true);

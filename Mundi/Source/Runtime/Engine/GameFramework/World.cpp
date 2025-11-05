@@ -240,7 +240,8 @@ void UWorld::OnActorSpawned(AActor* Actor)
 
 void UWorld::OnActorDestroyed(AActor* Actor)
 {
-	if (Actor)
+	// 종료 시 안전: Partition이 이미 삭제되었을 수 있음
+	if (Actor && Partition)
 	{
 		Partition->Unregister(Actor);
 	}

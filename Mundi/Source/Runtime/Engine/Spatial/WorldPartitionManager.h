@@ -43,8 +43,15 @@ public:
 
 	/** 옥트리 게터 */
 	FOctree* GetSceneOctree() const { return SceneOctree; }
-	/** BVH 게터 */
-	FBVHierarchy* GetBVH() const { return BVH; }
+	/** BVH 게터 (raw pointer) - weak_ptr에서 lock하여 반환 */
+	FBVHierarchy* GetBVH() const
+	{
+		if (auto SharedBVH = BVH.lock())
+			return SharedBVH.get();
+		return nullptr;
+	}
+	/** BVH weak_ptr 게터 */
+	std::weak_ptr<FBVHierarchy> GetBVHWeak() const { return BVH; }
 
 private:
 
@@ -59,5 +66,6 @@ private:
 	TQueue<UStaticMeshComponent*> ComponentDirtyQueue; // 추가 혹은 갱신이 필요한 요소의 대기 큐
 	TSet<UStaticMeshComponent*> ComponentDirtySet;     // 더티 큐 중복 추가를 막기 위한 Set
 	FOctree* SceneOctree = nullptr;
-	FBVHierarchy* BVH = nullptr;
+	std::shared_ptr<FBVHierarchy> BVHShared = nullptr; // 실제 소유권
+	std::weak_ptr<FBVHierarchy> BVH; // 외부 참조용
 };

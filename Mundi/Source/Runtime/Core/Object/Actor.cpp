@@ -41,11 +41,21 @@ AActor::~AActor()
 	}
 
 	// UE처럼 역순/안전 소멸: 모든 컴포넌트 DestroyComponent
-	// DestroyComponent 내부에서 RemoveOwnedComponent를 호출하므로 복사본으로 순회
-	TSet<UActorComponent*> ComponentsCopy = OwnedComponents;
+	// DestroyComponent 내부에서 RemoveOwnedComponent를 호출하므로 벡터로 복사 후 순회
+	TArray<UActorComponent*> ComponentsCopy;
+	ComponentsCopy.reserve(OwnedComponents.size());
+	for (UActorComponent* Comp : OwnedComponents)
+		ComponentsCopy.push_back(Comp);
+
+	// 복사한 벡터를 순회하며 안전하게 파괴
 	for (UActorComponent* Comp : ComponentsCopy)
+	{
+		// 이미 다른 경로로 파괴되었는지 확인
 		if (Comp && !Comp->IsPendingDestroy())
+		{
 			Comp->DestroyComponent();  // 안에서 Unregister/Detach/Remove 처리
+		}
+	}
 
 	OwnedComponents.clear();
 	SceneComponents.Empty();
@@ -252,15 +262,28 @@ void AActor::RemoveOwnedComponent(UActorComponent* Component)
 		}
 
 		SceneComponents.Remove(SceneComponent);
-		GWorld->GetPartitionManager()->Unregister(SceneComponent);
+
+		// World와 PartitionManager가 유효한지 확인 (종료 시 안전)
+		// World가 nullptr이거나, Actor의 World가 nullptr이면 스킵
+		// (소멸자 경로에서는 World가 이미 정리되었을 수 있음)
+		if (World && World->GetPartitionManager())
+		{
+			World->GetPartitionManager()->Unregister(SceneComponent);
+		}
+
 		SceneComponent->DetachFromParent(true);
 	}
 
 	// OwnedComponents에서 제거
 	OwnedComponents.erase(Component);
 
-	Component->UnregisterComponent();
-	Component->DestroyComponent();
+	// DestroyComponent 내부에서 다시 RemoveOwnedComponent를 호출하므로
+	// 여기서는 Unregister만 하고 DestroyComponent는 호출하지 않음
+	// (호출자가 필요시 DestroyComponent를 직접 호출해야 함)
+	if (!Component->IsPendingDestroy())
+	{
+		Component->UnregisterComponent();
+	}
 }
 
 void AActor::RegisterAllComponents(UWorld* InWorld)
