@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "SceneRenderer.h"
 
 // FSceneRenderer가 사용하는 모든 헤더 포함
@@ -45,6 +45,15 @@
 #include "ShadowViewProjection.h"
 #include "CollisionComponent/ShapeComponent.h"
 #include "GravityWall.h"
+#include "GameModeBase.h"
+#include "PlayerController.h"
+#include "PlayerCameraManager.h"
+
+// RenderLetterBoxPass 관련
+#include "PlayerController.h"
+#include "PlayerCameraManager.h"
+#include "ViewTarget.h"
+#include "GameModeBase.h"
 
 FSceneRenderer::FSceneRenderer(UWorld* InWorld, FSceneView* InView, URenderer* InOwnerRenderer)
 	: World(InWorld)
@@ -125,6 +134,11 @@ void FSceneRenderer::Render()
 	// 오버레이(Overlay) Primitive 렌더링
 	RenderOverayEditorPrimitivesPass();	// 기즈모 출력
 
+	// 레터박스 렌더링 (PIE 모드에서만)
+	RenderLetterBoxPass();
+
+	RenderFadeInOutPass();	// FadeInOut 처리
+	
 	// FXAA 등 화면에서 최종 이미지 품질을 위해 적용되는 효과를 적용
 	ApplyScreenEffectsPass();
 
@@ -1205,6 +1219,93 @@ void FSceneRenderer::RenderTileCullingDebug()
 	SwapGuard.Commit();
 }
 
+void FSceneRenderer::RenderFadeInOutPass()
+{
+	// World가 없거나 PIE 모드가 아니면 Early Return
+	if (!World || !World->bPie)
+	{
+		return;
+	}
+
+	// GameMode가 없으면 Early Return
+	AGameModeBase* GameMode = World->GetGameMode();
+	if (!GameMode)
+	{
+		return;
+	}
+
+	// PlayerController가 없으면 Early Return
+	APlayerController* PlayerController = GameMode->GetPlayerController();
+	if (!PlayerController)
+	{
+		return;
+	}
+
+	// PlayerCameraManager가 없으면 Early Return
+	APlayerCameraManager* CameraManager = PlayerController->GetPlayerCameraManager();
+	if (!CameraManager)
+	{
+		return;
+	}
+
+	// bFading이 false면 Early Return
+	if (!CameraManager->IsFading())
+	{
+		return;
+	}
+
+	// Fade 파라미터 가져오기
+	float FadeAlpha = CameraManager->GetFadeAmount();
+	FLinearColor FadeColorLinear = CameraManager->GetFadeColor();
+	FVector FadeColor(FadeColorLinear.R, FadeColorLinear.G, FadeColorLinear.B);
+
+	// Swap 가드 객체 생성: 스왑을 수행하고, 소멸 시 0번 슬롯의 SRV를 자동 해제하도록 설정
+	FSwapGuard SwapGuard(RHIDevice, 0, 1);
+
+	// 렌더 타겟 설정 (Depth 없이 SceneColor에 그리기)
+	RHIDevice->OMSetRenderTargets(ERTVMode::SceneColorTargetWithoutDepth);
+
+	// Depth State: Depth Test/Write 모두 OFF
+	RHIDevice->OMSetDepthStencilState(EComparisonFunc::Always);
+	RHIDevice->OMSetBlendState(false);
+
+	// 셰이더 설정
+	UShader* FullScreenTriangleVS = UResourceManager::GetInstance().Load<UShader>("Shaders/Utility/FullScreenTriangle_VS.hlsl");
+	UShader* FadeInOutPS = UResourceManager::GetInstance().Load<UShader>("Shaders/PostProcess/FadeInOut_PS.hlsl");
+	if (!FullScreenTriangleVS || !FullScreenTriangleVS->GetVertexShader() || !FadeInOutPS || !FadeInOutPS->GetPixelShader())
+	{
+		UE_LOG("FadeInOut용 셰이더 없음!\n");
+		return;
+	}
+
+	RHIDevice->PrepareShader(FullScreenTriangleVS, FadeInOutPS);
+
+	// 텍스처 관련 설정
+	ID3D11ShaderResourceView* SceneSRV = RHIDevice->GetSRV(RHI_SRV_Index::SceneColorSource);
+	ID3D11SamplerState* SamplerState = RHIDevice->GetSamplerState(RHI_Sampler_Index::LinearClamp);
+	if (!SceneSRV || !SamplerState)
+	{
+		UE_LOG("FadeInOut: Scene SRV or Sampler is null!\n");
+		return;
+	}
+
+	// Shader Resource 바인딩 (t0)
+	RHIDevice->GetDeviceContext()->PSSetShaderResources(0, 1, &SceneSRV);
+	RHIDevice->GetDeviceContext()->PSSetSamplers(0, 1, &SamplerState);
+
+	// Fade 상수 버퍼 업데이트
+	FFadeBufferType FadeBuffer;
+	FadeBuffer.FadeAlpha = FadeAlpha;
+	FadeBuffer.FadeColor = FadeColor;
+	RHIDevice->SetAndUpdateConstantBuffer(FadeBuffer);
+
+	// Draw
+	RHIDevice->DrawFullScreenQuad();
+
+	// 모든 작업이 성공적으로 끝났으므로 Commit 호출
+	SwapGuard.Commit();
+}
+
 // 빌보드, 에디터 화살표 그리기 (상호 작용, 피킹 O)
 void FSceneRenderer::RenderEditorPrimitivesPass()
 {
@@ -1303,6 +1404,80 @@ void FSceneRenderer::RenderDebugPass()
 
 	// 수집된 라인을 출력하고 정리
 	OwnerRenderer->EndLineBatch(FMatrix::Identity());
+}
+
+void FSceneRenderer::RenderLetterBoxPass()
+{
+	// PIE 모드가 아니거나 GameMode가 없으면 레터박스 렌더링 스킵
+	if (!World->bPie || !World->GetGameMode())
+		return;
+
+	APlayerController* PlayerController = World->GetGameMode()->GetPlayerController();
+	if (!PlayerController)
+		return;
+
+	APlayerCameraManager* CameraManager = PlayerController->GetPlayerCameraManager();
+	if (!CameraManager)
+		return;
+
+	// ViewTarget에서 PostProcessSettings 가져오기
+	const FViewTarget& ViewTarget = CameraManager->GetViewTarget_Internal();
+	const FPostProcessSettings& PostProcessSettings = ViewTarget.PostProcessSettings;
+
+	// LetterBoxSize가 0이면 렌더링 스킵
+	if (PostProcessSettings.LetterBoxSize <= 0.0f)
+		return;
+
+	// Swap 가드 객체 생성 (리소스 정리용)
+	FSwapGuard SwapGuard(RHIDevice, 0, 1);
+
+	// 렌더 타겟 설정 (Depth 없이 SceneColor에 덮어쓰기)
+	RHIDevice->OMSetRenderTargets(ERTVMode::SceneColorTargetWithoutDepth);
+
+	// Depth State: Depth Test/Write 모두 OFF
+	RHIDevice->OMSetDepthStencilState(EComparisonFunc::Always);
+
+	// 블렌드 상태: 비활성화 (덮어쓰기)
+	RHIDevice->OMSetBlendState(false);
+
+	// 셰이더 로드
+	UShader* FullScreenTriangleVS = UResourceManager::GetInstance().Load<UShader>("Shaders/Utility/FullScreenTriangle_VS.hlsl");
+	UShader* LetterBoxPS = UResourceManager::GetInstance().Load<UShader>("Shaders/PostProcess/LetterBox_PS.hlsl");
+	if (!FullScreenTriangleVS || !FullScreenTriangleVS->GetVertexShader() ||
+		!LetterBoxPS || !LetterBoxPS->GetPixelShader())
+	{
+		UE_LOG("LetterBox 셰이더를 로드할 수 없습니다!");
+		return;
+	}
+
+	RHIDevice->PrepareShader(FullScreenTriangleVS, LetterBoxPS);
+
+	// 텍스처 설정 (현재 씬 컬러)
+	ID3D11ShaderResourceView* SceneSRV = RHIDevice->GetSRV(RHI_SRV_Index::SceneColorSource);
+	ID3D11SamplerState* SamplerState = RHIDevice->GetSamplerState(RHI_Sampler_Index::LinearClamp);
+	if (!SceneSRV || !SamplerState)
+	{
+		UE_LOG("LetterBox 렌더링에 필요한 리소스가 없습니다!");
+		return;
+	}
+
+	RHIDevice->GetDeviceContext()->PSSetShaderResources(0, 1, &SceneSRV);
+	RHIDevice->GetDeviceContext()->PSSetSamplers(0, 1, &SamplerState);
+
+	// LetterBox 상수 버퍼 설정
+	LetterBoxBufferType LetterBoxBuffer;
+	LetterBoxBuffer.LetterBoxSize = PostProcessSettings.LetterBoxSize;
+	LetterBoxBuffer.LetterBoxOpacity = PostProcessSettings.LetterBoxOpacity;
+	LetterBoxBuffer.Padding = FVector2D(0.0f, 0.0f);
+	RHIDevice->SetAndUpdateConstantBuffer(LetterBoxBuffer);
+
+	// 전체 화면 쿼드 그리기
+	RHIDevice->DrawFullScreenQuad();
+
+	// 블렌드 상태는 이미 false이므로 복구 불필요
+
+	// Commit (리소스 정리)
+	SwapGuard.Commit();
 }
 
 void FSceneRenderer::RenderOverayEditorPrimitivesPass()

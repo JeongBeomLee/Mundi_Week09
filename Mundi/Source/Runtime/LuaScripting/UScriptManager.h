@@ -14,6 +14,7 @@ struct FLuaTemplateFunctions
     sol::function Restart;
 
     TMulticastDelegate<>::DelegateHandle OnOverlapDelegateHandle;
+    TMulticastDelegate<>::DelegateHandle OnRestartDelegateHandle;
 };
 
 struct FLuaLocalValue
@@ -49,6 +50,10 @@ public:
     ~UScriptManager() override;
 
     void AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString& ScriptName);
+    void RemoveSelfOnDelegate(
+        AActor* InActor,
+        FLuaTemplateFunctions& LuaTemplateFunctions
+    );
     void DetachScriptFrom(AActor* InActor, const FString& ScriptName);
     void DetachAllScriptFrom(AActor* InActor);
 
@@ -91,7 +96,7 @@ private:
 
     // 스크립트를 Actor에 부착할 때 Actor의 ShapeComponent에 Lua의 OnOverlap 함수를 연결한다
     void LinkOnOverlapWithShapeComponent(AActor* MyActor, sol::function OnOverlap);
-    void LinkRestartToDeligate(sol::function Restart);
+    void LinkRestartToDeligate(FLuaTemplateFunctions& LuaTemplateFunctions);
     
     // Lua로부터 Template 함수를 가져온다.
     // 해당 함수가 없으면 Throw한다.

@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "PlayerCameraManager.h"
 #include "ObjectFactory.h"
 #include "CameraComponent.h"
@@ -171,6 +171,11 @@ void APlayerCameraManager::StopCameraFade()
 	FadeAmount = 0.0f;
 }
 
+float APlayerCameraManager::GetFadeAmount() const
+{
+	return FadeAmount;
+}
+
 void APlayerCameraManager::UpdateFade(float DeltaTime)
 {
 	if (!bFading)
@@ -182,10 +187,10 @@ void APlayerCameraManager::UpdateFade(float DeltaTime)
 
 	if (FadeTimeRemaining <= 0.0f)
 	{
-		// Fade 완료
+		// Fade 완료 - 최종 알파값 유지, StopCameraFade() 호출 전까지 bFading은 true 유지
 		FadeAmount = FadeAlphaTo;
-		bFading = false;
 		FadeTimeRemaining = 0.0f;
+		// bFading은 true로 유지하여 페이드 효과 계속 렌더링
 	}
 	else
 	{
@@ -230,6 +235,23 @@ void APlayerCameraManager::RemoveCameraModifier(UCameraModifier* ModifierToRemov
 		{
 			ModifierList.RemoveAt(i);
 			return;
+		}
+	}
+}
+
+void APlayerCameraManager::ResetPostProcessSettings()
+{
+	ViewTarget.PostProcessSettings = FPostProcessSettings();
+}
+
+void APlayerCameraManager::RemoveDisabledCameraModifiers()
+{
+	// 역순으로 순회하면서 비활성화된 모디파이어 제거
+	for (int32 i = ModifierList.size() - 1; i >= 0; --i)
+	{
+		if (ModifierList[i] && ModifierList[i]->IsDisabled())
+		{
+			ModifierList.RemoveAt(i);
 		}
 	}
 }
