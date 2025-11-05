@@ -33,18 +33,17 @@ float4 mainPS(PS_INPUT input) : SV_TARGET
     
     // 상단 레터박스 영역: v < LetterBoxSize
     // 하단 레터박스 영역: v > (1.0 - LetterBoxSize)
-    float topMask = smoothstep(0.0, LetterBoxSize, v);
-    float bottomMask = smoothstep(1.0, 1.0 - LetterBoxSize, v);
+    bool isInLetterBoxArea = (v < LetterBoxSize) || (v > (1.0 - LetterBoxSize));
     
-    // 두 마스크를 곱하면 레터박스 영역에서 0, 중앙 영역에서 1
-    float letterBoxMask = topMask * bottomMask;
-    
-    // 레터박스 불투명도 적용
-    letterBoxMask = lerp(0.0, letterBoxMask, LetterBoxOpacity);
-    
-    // 검은색 레터박스와 씬 컬러 블렌딩
-    float3 letterBoxColor = float3(0.0, 0.0, 0.0);
-    float3 finalColor = lerp(letterBoxColor, sceneColor.rgb, letterBoxMask);
-    
-    return float4(finalColor, sceneColor.a);
+    // 레터박스 영역이면 검은색과 블렌딩, 아니면 원본 씬 컬러 유지
+    if (isInLetterBoxArea)
+    {
+        float3 letterBoxColor = float3(0.0, 0.0, 0.0);
+        float3 finalColor = lerp(sceneColor.rgb, letterBoxColor, LetterBoxOpacity);
+        return float4(finalColor, sceneColor.a);
+    }
+    else
+    {
+        return sceneColor;
+    }
 }

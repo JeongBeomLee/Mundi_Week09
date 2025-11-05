@@ -168,8 +168,8 @@ local function AddCameraShake()
     local letterBox = UCameraModifier_LetterBox()
     -- PlayerCameraManager에 추가
     local cameraManager = GameMode:GetPlayerController():GetPlayerCameraManager()
-    -- 레터박스 시작 (크기: 0.15, 불투명도: 1.0, 페이드인 시간: 1초)
-    letterBox:StartLetterBox(0.15, 1.0, 1.0)
+    -- 레터박스 시작 (크기, 불투명도, 페이드인 시간)
+    letterBox:StartLetterBox(0.15, 1.0, 1000.0)
     cameraManager:AddCameraModifier(letterBox)
     PrintToConsole("[RunnerCharacter] LetterBox camera modifier added")
 
