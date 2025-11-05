@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
@@ -1029,6 +1029,7 @@ void UScriptManager::RegisterUserTypeToLua()
         "OnCoinCollected", &ARunnerGameMode::OnCoinCollected,
         "OnObstacleAvoided", &ARunnerGameMode::OnObstacleAvoided,
         "OnPlayerJump", &ARunnerGameMode::OnPlayerJump,
+		"OnDecreasePlayerHealth", &ARunnerGameMode::OnDecreasePlayerHealth,
         "RestartGame", &ARunnerGameMode::RestartGame
         //// 난이도 설정
         //"BaseDifficulty", &ARunnerGameMode::BaseDifficulty,

@@ -68,8 +68,34 @@
   </ItemGroup>
   <!-- Root Files -->
   <ItemGroup>
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
+    <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
+    <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\SpringArmComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
+    <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.cpp">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.cpp">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.cpp">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Slate\Windows\CameraBlendEditorWindow.cpp">
+      <Filter>Source\Slate\Windows</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp">
       <Filter>Source\Runtime\AssetManagement</Filter>
     </ClCompile>
@@ -553,19 +579,6 @@
     <ClCompile Include="ThirdParty\ImGui\imgui_widgets.cpp">
       <Filter>ThirdParty\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
-      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
-    <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
-    <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\Components\SpringArmComponent.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
-    <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp" />
-    <ClCompile Include="Source\Slate\Windows\CameraBlendEditorWindow.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -595,7 +608,34 @@
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
       <Filter>Source\Runtime\Core\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
+    <ClInclude Include="Source\Runtime\Core\Math\UCurveFloat.h" />
+    <ClInclude Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.h" />
+    <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\SpringArmComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
+    <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.h">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.h">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.h">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Slate\Windows\CameraBlendEditorWindow.h">
+      <Filter>Source\Slate\Windows</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\AssetManagement\Sound.h">
       <Filter>Source\Runtime\AssetManagement</Filter>
     </ClInclude>
@@ -1157,26 +1197,21 @@
     <ClInclude Include="ThirdParty\ImGui\imstb_truetype.h">
       <Filter>ThirdParty\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
-      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
-    <ClInclude Include="Source\Runtime\Core\Math\UCurveFloat.h" />
-    <ClInclude Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.h" />
-    <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
-    <ClInclude Include="Source\Runtime\Engine\Components\SpringArmComponent.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
-    <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h" />
-    <ClInclude Include="Source\Slate\Windows\CameraBlendEditorWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\coin_collision.lua">
       <Filter>Scripts</Filter>
     </None>
+    <None Include="Shaders\PostProcess\FadeInOut_PS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </None>
+    <None Include="Shaders\PostProcess\Vignetting_PS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </None>
     <None Include="Scripts\actor_transform.lua">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="Scripts\CameraUtility.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\CoinGenerator.lua">
@@ -1224,133 +1259,130 @@
     <None Include="Scripts\template.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\CameraUtility.lua">
-      <Filter>Scripts</Filter>
-    </None>
     <None Include="Scripts\test_coroutine.lua">
       <Filter>Scripts</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
-      <UniqueIdentifier>{bc3aaf59-9d56-4a9c-9039-c806292db08c}</UniqueIdentifier>
+      <UniqueIdentifier>{42612427-3407-4f57-b805-1ab6cfd4e504}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime">
-      <UniqueIdentifier>{4b1117b3-71e1-408e-8824-b6abe55d300c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\AssetManagement">
-      <UniqueIdentifier>{d25234eb-b572-41bc-a0fd-309e74e02d98}</UniqueIdentifier>
+      <UniqueIdentifier>{514ac766-3970-4d57-b610-85e2742fd001}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine">
-      <UniqueIdentifier>{5311a55f-f76f-4a63-ad3d-fe07371b9707}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Audio">
-      <UniqueIdentifier>{aa43242b-e62e-4ee3-a5df-1dd603b79363}</UniqueIdentifier>
+      <UniqueIdentifier>{8ab20b69-af6a-4f80-9d81-7a2a380f959f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Runtime\Engine\CameraManagement">
-      <UniqueIdentifier>{21713bb2-8c00-4cfa-b82a-c263a7c0ed9f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components">
-      <UniqueIdentifier>{c1e0329d-cd54-4115-9e37-64e4e17591a1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
-      <UniqueIdentifier>{8e26c345-b985-4e96-bf55-f59cc8ee68e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\GameFramework">
-      <UniqueIdentifier>{a4fdbd6f-2055-406f-8c80-1b2d49bcd1de}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Collision">
-      <UniqueIdentifier>{4d8624ba-5428-4255-a3d0-941d2353559e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Engine\Spatial">
-      <UniqueIdentifier>{4ad85a62-3683-4880-91cb-dc3d2b803012}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core">
-      <UniqueIdentifier>{4ae173e2-99e3-43d1-bc63-6d6e565fc792}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Math">
-      <UniqueIdentifier>{1156780e-299f-4373-952b-b812c6c31408}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Misc">
-      <UniqueIdentifier>{88c5d885-c78a-4d45-b003-ce2517e9c7a9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Object">
-      <UniqueIdentifier>{01e6489d-8902-4be3-850c-bd07fa2487a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Containers">
-      <UniqueIdentifier>{b2875a89-0ab8-482a-8205-c70f563770a5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Core\Memory">
-      <UniqueIdentifier>{c85f1be0-f52e-4f9f-b62b-fddd9019ba20}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\LuaScripting">
-      <UniqueIdentifier>{725eedd9-cfa7-4ec7-b93b-b9328934b5e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\Renderer">
-      <UniqueIdentifier>{03ef43ae-cf17-4195-926b-0001b7383b69}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\RHI">
-      <UniqueIdentifier>{b95e41e3-170b-4ac4-a7ea-3e20914ee361}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Runtime\InputCore">
-      <UniqueIdentifier>{3e989440-2719-41fa-ae50-0741032f09ce}</UniqueIdentifier>
+      <UniqueIdentifier>{d5f42d34-6a03-4302-98b9-1176c8e49b54}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate">
-      <UniqueIdentifier>{a63da7c6-b367-42c4-9240-a83f4724b7f8}</UniqueIdentifier>
+      <UniqueIdentifier>{6f456536-e8ed-4f3e-a891-0880142412b0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\Slate\Windows">
-      <UniqueIdentifier>{1f450c90-f6b2-4b56-9c0f-1a301ea42141}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Widgets">
-      <UniqueIdentifier>{b3bb84a3-7ffe-48ec-8283-5316b0b4d4a6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\Factory">
-      <UniqueIdentifier>{82db924d-3e73-449a-9b84-ad7cb703d140}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Slate\ImGui">
-      <UniqueIdentifier>{bb9b9393-9b6c-465e-b2db-2dcb4b819ee9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor">
-      <UniqueIdentifier>{da9d8623-2605-431d-87a6-639c48d3cf16}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Clipboard">
-      <UniqueIdentifier>{6717c7d9-98cb-49ef-9c48-5979ded093ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Gizmo">
-      <UniqueIdentifier>{2cce502e-ad98-45c2-828c-3532ce215dee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Editor\Grid">
-      <UniqueIdentifier>{a60bdebb-b564-48f2-a616-93aef170c0c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts">
-      <UniqueIdentifier>{80e01f9a-8b2d-410e-bc2d-0dedc6a141b2}</UniqueIdentifier>
+      <UniqueIdentifier>{35aa397a-66c3-43c0-9595-e91cc1088e93}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders">
-      <UniqueIdentifier>{4f47df65-96e5-4c3e-8da8-3fa1152c1531}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders\Effects">
-      <UniqueIdentifier>{b1ac050e-b3c0-484d-b8d3-6c21d5d126ca}</UniqueIdentifier>
+      <UniqueIdentifier>{b140ce26-f49c-4417-b03f-c9944c7fe75a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\PostProcess">
-      <UniqueIdentifier>{278333b7-b907-43c6-a23c-c7d4f9147d7e}</UniqueIdentifier>
+      <UniqueIdentifier>{dc8ad6c9-8a3f-4128-ab0b-bf760f077123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\AssetManagement">
+      <UniqueIdentifier>{c7c2c406-e8ba-4686-a74d-c66d0c4ddd0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Audio">
+      <UniqueIdentifier>{4c44011f-050b-4512-895c-16974285f09f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components">
+      <UniqueIdentifier>{1b33b06a-23c8-49f2-b920-92f47f105af6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Components\CollisionComponent">
+      <UniqueIdentifier>{7c6bc2fa-f2d0-4c15-8fc8-3bbcdbb69bb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\GameFramework">
+      <UniqueIdentifier>{c131b562-2362-468b-aec2-4d5b5763eca9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Collision">
+      <UniqueIdentifier>{961beb7b-e599-42d0-b3bd-932fefd7b016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Engine\Spatial">
+      <UniqueIdentifier>{8a4bb306-c96d-4ad1-9396-a2946ab10e44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core">
+      <UniqueIdentifier>{1d3bd825-d05f-4b1c-a6ed-ef676456e097}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Math">
+      <UniqueIdentifier>{d71916a9-cfe0-4333-bc6b-87d3bc1d2e67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Misc">
+      <UniqueIdentifier>{7dfa73e3-9a11-4e72-bd7d-4ad03c833a69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Object">
+      <UniqueIdentifier>{4d140516-1cb0-4db5-a082-837eed0aa34a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Containers">
+      <UniqueIdentifier>{78dad58e-897b-4338-8819-922753ad00a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Core\Memory">
+      <UniqueIdentifier>{7f5c077a-46dc-455c-8cfb-8298ef74696d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\LuaScripting">
+      <UniqueIdentifier>{8f394113-f28f-4cf7-bcc1-727c792b6994}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\Renderer">
+      <UniqueIdentifier>{a72c1891-5c5a-4e19-80ed-9186cd01aeb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\RHI">
+      <UniqueIdentifier>{94d23fcf-7b20-4393-b9af-ccc397b36381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Runtime\InputCore">
+      <UniqueIdentifier>{7c75ccc4-f173-4af3-8490-25a1f7eeba5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Widgets">
+      <UniqueIdentifier>{9760b38d-9901-4206-bbc6-70ce822227a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\Factory">
+      <UniqueIdentifier>{03381006-392f-45cb-9b5e-13fe213a79ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Slate\ImGui">
+      <UniqueIdentifier>{af6fd2e0-2770-4b0f-aaff-5841fef13eb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor">
+      <UniqueIdentifier>{a1a371bf-6615-485b-9858-2bb2ad2e0d5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Clipboard">
+      <UniqueIdentifier>{969cc463-b584-476b-a352-a9ce0f8ce313}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Gizmo">
+      <UniqueIdentifier>{c0224c7c-b12a-4bc0-b20e-851d4b8fef1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Editor\Grid">
+      <UniqueIdentifier>{89f0c148-b232-4b91-b83c-517a09c56020}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{1ecc1af9-4ffc-4818-8edc-cf4095d8e3ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Effects">
+      <UniqueIdentifier>{ab11d4f7-081e-43f6-b27f-b83a0b6b8a7a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Utility">
-      <UniqueIdentifier>{311b0e37-c6c4-4694-8cd6-5831ebd5cc98}</UniqueIdentifier>
+      <UniqueIdentifier>{11c04de8-6f46-4a88-a457-96c6b3d2e9e2}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\UI">
-      <UniqueIdentifier>{a3faab1e-7ab1-4a4a-a5c9-bcfb7a44bedd}</UniqueIdentifier>
+      <UniqueIdentifier>{2f65765c-2a91-45c2-a9f2-ceae44056aaf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Materials">
-      <UniqueIdentifier>{fb42cd50-2cf4-4000-9a18-64c12cd0f5f6}</UniqueIdentifier>
+      <UniqueIdentifier>{5aa83383-0ad1-49eb-8e93-622a4800f8c1}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shaders\Common">
-      <UniqueIdentifier>{cf4d4cb4-f695-475b-a3ea-1381a1c444f3}</UniqueIdentifier>
+      <UniqueIdentifier>{3d5d3ffb-a4e7-4fa9-9dcb-fd3cc3b0382b}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{d37cb6ae-5966-43b6-a800-9758b45ff712}</UniqueIdentifier>
+      <UniqueIdentifier>{1ede841a-9dab-4de0-9de1-bc31f7879a76}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty\ImGui">
-      <UniqueIdentifier>{4461a44d-51bd-4a57-b7a1-74d3c7672e10}</UniqueIdentifier>
+      <UniqueIdentifier>{382bee15-ee0b-4c68-a8a1-5d07728afe7d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -567,6 +567,7 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
 
     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/PlayerHitFX.mp3", false, SoundChannelType.SFX);
     DecreaseHealth(1);
+    GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnDecreasePlayerHealth(MyActor, Config.Health);
     CameraUtility.AddVignetting(
             FVector4(1.0, 0.0, 0.0, 1.0),
             0.5,

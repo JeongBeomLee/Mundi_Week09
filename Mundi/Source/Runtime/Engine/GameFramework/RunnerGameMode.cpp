@@ -83,6 +83,8 @@ void ARunnerGameMode::BeginPlay()
 			CameraManager->SetViewTargetWithBlendPreset(PlayerPawn, "Cinematic");
 		}
 	}
+
+	OnPlayerHealthDecreased.Broadcast(PLAYER_HEALTH);
 }
 
 void ARunnerGameMode::Tick(float DeltaSeconds)
@@ -107,11 +109,25 @@ void ARunnerGameMode::Tick(float DeltaSeconds)
 void ARunnerGameMode::RestartGame()
 {
 	Super::RestartGame();
+
+	OnPlayerHealthDecreased.Broadcast(PLAYER_HEALTH);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
 // 게임 이벤트 (나중에 구현)
 // ────────────────────────────────────────────────────────────────────────────
+
+void ARunnerGameMode::OnDecreasePlayerHealth(ACharacter* Player, uint32 DamageAmount)
+{
+	// 현재 체력은 Lua의 RunnerCharacter.lua에서 관리되므로,
+	// Lua에서 직접 현재 체력을 파라미터로 전달받음
+	int32 CurrentHealth = static_cast<int32>(DamageAmount); // 여기서는 DamageAmount를 현재 체력으로 사용
+	
+	// 델리게이트 브로드캐스트 (현재 남은 체력을 전달)
+	OnPlayerHealthDecreased.Broadcast(CurrentHealth);
+	
+	UE_LOG("[RunnerGameMode] Player health decreased to %d!", CurrentHealth);
+}
 
 void ARunnerGameMode::OnPlayerDeath(ACharacter* Player)
 {
