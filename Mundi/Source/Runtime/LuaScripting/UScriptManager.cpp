@@ -33,6 +33,7 @@
 #include "PlayerController.h"
 #include "UCameraModifier.h"
 #include "UCameraModifier_CameraShake.h"
+#include "UCameraModifier_LetterBox.h"
 #include "HeightFogComponent.h"
 #include "DeltaTimeManager.h"
 
@@ -1017,6 +1018,20 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetRotationAmplitude", &UCameraModifier_CameraShake::SetRotationAmplitude,
         "GetNewShake", &UCameraModifier_CameraShake::GetNewShake,
         "SetNumSamples", &UCameraModifier_CameraShake::SetNumSamples
+    );
+
+    // UCameraModifier_LetterBox 클래스 등록
+    Lua.new_usertype<UCameraModifier_LetterBox>("UCameraModifier_LetterBox",
+        sol::call_constructor, sol::factories(
+            []() { return new UCameraModifier_LetterBox(); }
+        ),
+        sol::base_classes, sol::bases<UCameraModifier, UObject>(),
+        "StartLetterBox", &UCameraModifier_LetterBox::StartLetterBox,
+        "StopLetterBox", &UCameraModifier_LetterBox::StopLetterBox,
+        "GetLetterBoxSize", &UCameraModifier_LetterBox::GetLetterBoxSize,
+        "SetLetterBoxSize", &UCameraModifier_LetterBox::SetLetterBoxSize,
+        "GetLetterBoxOpacity", &UCameraModifier_LetterBox::GetLetterBoxOpacity,
+        "SetLetterBoxOpacity", &UCameraModifier_LetterBox::SetLetterBoxOpacity
     );
 
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;

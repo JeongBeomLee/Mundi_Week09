@@ -46,6 +46,12 @@
 #include "CollisionComponent/ShapeComponent.h"
 #include "GravityWall.h"
 
+// RenderLetterBoxPass 관련
+#include "PlayerController.h"
+#include "PlayerCameraManager.h"
+#include "ViewTarget.h"
+#include "GameModeBase.h"
+
 FSceneRenderer::FSceneRenderer(UWorld* InWorld, FSceneView* InView, URenderer* InOwnerRenderer)
 	: World(InWorld)
 	, View(InView) // 전달받은 FSceneView 저장
@@ -124,6 +130,9 @@ void FSceneRenderer::Render()
 
 	// 오버레이(Overlay) Primitive 렌더링
 	RenderOverayEditorPrimitivesPass();	// 기즈모 출력
+
+	// 레터박스 렌더링 (PIE 모드에서만)
+	RenderLetterBoxPass();
 
 	// FXAA 등 화면에서 최종 이미지 품질을 위해 적용되는 효과를 적용
 	ApplyScreenEffectsPass();
@@ -1303,6 +1312,80 @@ void FSceneRenderer::RenderDebugPass()
 
 	// 수집된 라인을 출력하고 정리
 	OwnerRenderer->EndLineBatch(FMatrix::Identity());
+}
+
+void FSceneRenderer::RenderLetterBoxPass()
+{
+	// PIE 모드가 아니거나 GameMode가 없으면 레터박스 렌더링 스킵
+	if (!World->bPie || !World->GetGameMode())
+		return;
+
+	APlayerController* PlayerController = World->GetGameMode()->GetPlayerController();
+	if (!PlayerController)
+		return;
+
+	APlayerCameraManager* CameraManager = PlayerController->GetPlayerCameraManager();
+	if (!CameraManager)
+		return;
+
+	// ViewTarget에서 PostProcessSettings 가져오기
+	const FViewTarget& ViewTarget = CameraManager->GetViewTarget_Internal();
+	const FPostProcessSettings& PostProcessSettings = ViewTarget.PostProcessSettings;
+
+	// LetterBoxSize가 0이면 렌더링 스킵
+	if (PostProcessSettings.LetterBoxSize <= 0.0f)
+		return;
+
+	// Swap 가드 객체 생성 (리소스 정리용)
+	FSwapGuard SwapGuard(RHIDevice, 0, 1);
+
+	// 렌더 타겟 설정 (Depth 없이 SceneColor에 덮어쓰기)
+	RHIDevice->OMSetRenderTargets(ERTVMode::SceneColorTargetWithoutDepth);
+
+	// Depth State: Depth Test/Write 모두 OFF
+	RHIDevice->OMSetDepthStencilState(EComparisonFunc::Always);
+
+	// 블렌드 상태: 비활성화 (덮어쓰기)
+	RHIDevice->OMSetBlendState(false);
+
+	// 셰이더 로드
+	UShader* FullScreenTriangleVS = UResourceManager::GetInstance().Load<UShader>("Shaders/Utility/FullScreenTriangle_VS.hlsl");
+	UShader* LetterBoxPS = UResourceManager::GetInstance().Load<UShader>("Shaders/PostProcess/LetterBox_PS.hlsl");
+	if (!FullScreenTriangleVS || !FullScreenTriangleVS->GetVertexShader() ||
+		!LetterBoxPS || !LetterBoxPS->GetPixelShader())
+	{
+		UE_LOG("LetterBox 셰이더를 로드할 수 없습니다!");
+		return;
+	}
+
+	RHIDevice->PrepareShader(FullScreenTriangleVS, LetterBoxPS);
+
+	// 텍스처 설정 (현재 씬 컬러)
+	ID3D11ShaderResourceView* SceneSRV = RHIDevice->GetSRV(RHI_SRV_Index::SceneColorSource);
+	ID3D11SamplerState* SamplerState = RHIDevice->GetSamplerState(RHI_Sampler_Index::LinearClamp);
+	if (!SceneSRV || !SamplerState)
+	{
+		UE_LOG("LetterBox 렌더링에 필요한 리소스가 없습니다!");
+		return;
+	}
+
+	RHIDevice->GetDeviceContext()->PSSetShaderResources(0, 1, &SceneSRV);
+	RHIDevice->GetDeviceContext()->PSSetSamplers(0, 1, &SamplerState);
+
+	// LetterBox 상수 버퍼 설정
+	LetterBoxBufferType LetterBoxBuffer;
+	LetterBoxBuffer.LetterBoxSize = PostProcessSettings.LetterBoxSize;
+	LetterBoxBuffer.LetterBoxOpacity = PostProcessSettings.LetterBoxOpacity;
+	LetterBoxBuffer.Padding = FVector2D(0.0f, 0.0f);
+	RHIDevice->SetAndUpdateConstantBuffer(LetterBoxBuffer);
+
+	// 전체 화면 쿼드 그리기
+	RHIDevice->DrawFullScreenQuad();
+
+	// 블렌드 상태는 이미 false이므로 복구 불필요
+
+	// Commit (리소스 정리)
+	SwapGuard.Commit();
 }
 
 void FSceneRenderer::RenderOverayEditorPrimitivesPass()

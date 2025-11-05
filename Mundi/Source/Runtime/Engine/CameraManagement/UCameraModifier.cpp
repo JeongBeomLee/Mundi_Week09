@@ -33,11 +33,11 @@ void UCameraModifier::ModifyCamera(
         // InOutPOV struct.
         {
             float PPBlendWeight = 0.f;
-            //FPostProcessSettings PPSettings;
+            FPostProcessSettings PPSettings;
 			
             //  Let native code modify the post process settings.
-            ModifyPostProcess(DeltaTime, PPBlendWeight/*, PPSettings*/);
-			
+            ModifyPostProcess(DeltaTime, PPBlendWeight, PPSettings);
+
             if (PPBlendWeight > 0.f)
             {
                 // CameraOwner->AddCachedPPBlend(PPSettings, PPBlendWeight);
@@ -48,8 +48,8 @@ void UCameraModifier::ModifyCamera(
 
 void UCameraModifier::ModifyPostProcess(
     float DeltaTime,
-    float& PostProcessBlendWeight//,
-    //FPostProcessSettings& PostProcessSettings
+    float& PostProcessBlendWeight,
+    FPostProcessSettings& PostProcessSettings
 ) {}
 
 float UCameraModifier::GetTargetAlpha()

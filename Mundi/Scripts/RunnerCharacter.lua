@@ -145,6 +145,7 @@ function BeginPlay()
     -- -- Slomo (2초간 30% 속도)
     -- dtManager:ApplySlomoEffect(10.0, 0.05)
     -- PrintToConsole("[RunnerCharacter] Slomo effect applied")
+
 end
 
 function Tick(deltaTime)
