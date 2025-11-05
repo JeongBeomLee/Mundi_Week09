@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "PlayerCameraManager.h"
 #include "ObjectFactory.h"
 #include "CameraComponent.h"
@@ -144,6 +144,17 @@ void APlayerCameraManager::ApplyCameraModifiers(float DeltaTime, FVector& InOutL
 	{
 	    if (Modifier && !Modifier->IsDisabled())
 	    {
+			if(Modifier->IsUsingRealDeltaTime())
+			{
+				// 실제 델타타임 사용
+				Modifier->UpdateAlpha(World->GetRealDeltaTime());
+			}
+			else
+			{
+				// 고정 델타타임 사용
+				Modifier->UpdateAlpha(DeltaTime);
+			}
+
 	        Modifier->ModifyCamera(
 	        	DeltaTime,
 	        	InOutLocation,

@@ -146,7 +146,7 @@ public:
     float GetScaledDeltaTime(float RealDeltaTime) const;
 
 
-	float GetCurrentRealDeltaTime() const { return CurrentRealDeltaTime; }
+	float GetRealDeltaTime() const { return CurrentRealDeltaTime; }
 
     /** === 게임 프레임워크 (PIE 전용) === */
     AGameModeBase* GameMode = nullptr;

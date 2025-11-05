@@ -78,6 +78,7 @@ function CameraUtility.AddLetterBox(FadeSize, Opacity, FadeTime, bFadeIn)
     letterBox = UCameraModifier_LetterBox()
     -- 레터박스 시작 (크기, 불투명도, 페이드인 시간)
     if bFadeIn == true then
+        CurLetterBoxSize = 0.0
         letterBox:SetFadeIn(FadeSize, Opacity, FadeTime, CurLetterBoxSize)
         CurLetterBoxSize = FadeSize
     else

@@ -265,8 +265,9 @@ end
 local slomoEffectId = nil
 
 function OnSlomoPressed()
+    SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/Slomo.mp3", false, SoundChannelType.SFX);
     local dtManager = World:GetDeltaTimeManager()
-    CameraUtility.AddLetterBox(0.2, 1.0, 0.2, true)  -- Height, Duration
+    CameraUtility.AddLetterBox(0.2, 1.0, 1.0, true)  -- Height, Duration
     slomoEffectId = dtManager:ApplySlomoEffect(1000.0, 0.2)
     PrintToConsole("[RunnerCharacter] Slomo effect applied")
 end

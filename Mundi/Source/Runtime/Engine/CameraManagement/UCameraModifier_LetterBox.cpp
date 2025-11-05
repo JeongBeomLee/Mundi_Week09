@@ -19,6 +19,7 @@ UCameraModifier_LetterBox::UCameraModifier_LetterBox()
     AlphaInTime = 1.0f;
     AlphaOutTime = 1.0f;
     bDisabled = true;
+	bUseRealDeltaTime = true;
 }
 
 void UCameraModifier_LetterBox::ModifyPostProcess(
