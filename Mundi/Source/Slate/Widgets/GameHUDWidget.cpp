@@ -879,7 +879,7 @@ void UGameHUDWidget::RenderGameOverState(bool bIsVictory)
 		ImGui::Dummy(ImVec2(0, 25));
 
 		// 재시작 안내 메시지 (깜빡임 효과)
-		const char* restartText = "Press SPACE to Play Again";
+		const char* restartText = "Press R to Play Again";
 		float blinkAlpha = 0.5f + 0.5f * sinf(time * 4.0f);
 
 		font->Scale = 1.2f;
@@ -913,14 +913,13 @@ void UGameHUDWidget::RenderGameOverState(bool bIsVictory)
 	ImGui::End();
 	ImGui::PopStyleColor(); // 배경색 복원
 
-	// 게임 오버/승리 상태에서 SPACE 키 입력 체크
-	if (ImGui::IsKeyPressed(ImGuiKey_Space))
+	// 게임 오버/승리 상태에서 R 키 입력 체크
+	if (ImGui::IsKeyPressed(ImGuiKey_R))
 	{
 		if (GameMode.IsValid())
 		{
 			ARunnerGameMode* Mode = GameMode.Get();
 			Mode->RestartGame();
-			UE_LOG("GameHUDWidget: Game restarted via Space key");
 		}
 	}
 }
@@ -1035,58 +1034,87 @@ void UGameHUDWidget::RenderPlayingState()
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoCollapse |
 		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoScrollbar |
 		ImGuiWindowFlags_NoBackground; // 배경 및 테두리 제거
 
 	if (ImGui::Begin("##GameHUD", nullptr, windowFlags))
 	{
 		ImFont* font = ImGui::GetFont();
 		float originalScale = font->Scale;
-		ImVec4 textColor = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // 검은색
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-		// 스코어 표시 (크게, 굵게)
-		font->Scale = 2.1f;
+		// 스코어 표시 (크게, 글로우 효과)
+		font->Scale = 2.3f;
 		ImGui::PushFont(font);
 		FString scoreText = "Score: " + std::to_string(CachedScore);
 
-		// 텍스트를 여러 번 겹쳐서 굵게 표시
 		ImVec2 scorePos = ImGui::GetCursorScreenPos();
-		ImDrawList* drawList = ImGui::GetWindowDrawList();
-		ImU32 col = ImGui::ColorConvertFloat4ToU32(textColor);
 		float fontSize = ImGui::GetFontSize();
 
-		for (float offsetX = -0.5f; offsetX <= 0.5f; offsetX += 0.5f)
+		// 무지개색 + 반짝임 효과
+		float hue = fmodf(time * 0.3f, 1.0f);
+		float pulse = 0.85f + 0.15f * sinf(time * 2.0f);
+		ImVec4 scoreColor;
+		ImGui::ColorConvertHSVtoRGB(hue, 0.6f, pulse, scoreColor.x, scoreColor.y, scoreColor.z);
+		scoreColor.w = 1.0f;
+
+		// 강한 글로우 효과 (3단계)
+		for (float radius = 4.0f; radius > 0.0f; radius -= 1.5f)
 		{
-			for (float offsetY = -0.5f; offsetY <= 0.5f; offsetY += 0.5f)
+			for (float angle = 0.0f; angle < 6.28f; angle += 0.785f)
 			{
+				float offsetX = cosf(angle) * radius;
+				float offsetY = sinf(angle) * radius;
+				ImVec4 glowColor = ImVec4(scoreColor.x * 0.7f, scoreColor.y * 0.7f, scoreColor.z * 0.7f, 0.3f / radius);
+				ImU32 glowCol = ImGui::ColorConvertFloat4ToU32(glowColor);
 				drawList->AddText(font, fontSize,
 					ImVec2(scorePos.x + offsetX, scorePos.y + offsetY),
-					col, scoreText.c_str(), nullptr);
+					glowCol, scoreText.c_str(), nullptr);
 			}
 		}
 
+		// 메인 텍스트
+		ImU32 scoreCol = ImGui::ColorConvertFloat4ToU32(scoreColor);
+		drawList->AddText(font, fontSize, scorePos, scoreCol, scoreText.c_str(), nullptr);
 		ImGui::Dummy(ImGui::CalcTextSize(scoreText.c_str()));
 		ImGui::PopFont();
 		font->Scale = originalScale;
 
-		// 타이머 표시 (크게, 굵게, MM:SS 형식)
-		font->Scale = 2.1f;
+		ImGui::Dummy(ImVec2(0, 5)); // 간격
+
+		// 타이머 표시 (크게, 글로우 효과, MM:SS 형식)
+		font->Scale = 2.3f;
 		ImGui::PushFont(font);
 		FString timeText = "Time: " + FormatTime(CachedElapsedTime);
 
-		// 텍스트를 여러 번 겹쳐서 굵게 표시
 		ImVec2 timePos = ImGui::GetCursorScreenPos();
 		fontSize = ImGui::GetFontSize();
 
-		for (float offsetX = -0.5f; offsetX <= 0.5f; offsetX += 0.5f)
+		// 시안색 + 반짝임 효과
+		float timePulse = 0.8f + 0.2f * sinf(time * 2.5f + 1.0f);
+		ImVec4 timeColor = ImVec4(0.3f, 0.9f, 1.0f, 1.0f); // 시안색
+		timeColor.x *= timePulse;
+		timeColor.y *= timePulse;
+		timeColor.z *= timePulse;
+
+		// 강한 글로우 효과
+		for (float radius = 4.0f; radius > 0.0f; radius -= 1.5f)
 		{
-			for (float offsetY = -0.5f; offsetY <= 0.5f; offsetY += 0.5f)
+			for (float angle = 0.0f; angle < 6.28f; angle += 0.785f)
 			{
+				float offsetX = cosf(angle) * radius;
+				float offsetY = sinf(angle) * radius;
+				ImVec4 glowColor = ImVec4(timeColor.x * 0.7f, timeColor.y * 0.7f, timeColor.z * 0.7f, 0.3f / radius);
+				ImU32 glowCol = ImGui::ColorConvertFloat4ToU32(glowColor);
 				drawList->AddText(font, fontSize,
 					ImVec2(timePos.x + offsetX, timePos.y + offsetY),
-					col, timeText.c_str(), nullptr);
+					glowCol, timeText.c_str(), nullptr);
 			}
 		}
 
+		// 메인 텍스트
+		ImU32 timeCol = ImGui::ColorConvertFloat4ToU32(timeColor);
+		drawList->AddText(font, fontSize, timePos, timeCol, timeText.c_str(), nullptr);
 		ImGui::Dummy(ImGui::CalcTextSize(timeText.c_str()));
 		ImGui::PopFont();
 		font->Scale = originalScale;
@@ -1098,8 +1126,8 @@ void UGameHUDWidget::RenderPlayingState()
 
 	// 제작자 정보 표시 (좌하단)
 	const float creditPadding = 20.0f;
-	const float creditWidth = 350.0f;
-	const float creditHeight = 80.0f;
+	const float creditWidth = 400.0f;
+	const float creditHeight = 100.0f;
 
 	ImGui::SetNextWindowPos(ImVec2(ViewportX + creditPadding, ViewportY + ViewportHeight - creditHeight - creditPadding), ImGuiCond_Always);
 	ImGui::SetNextWindowSize(ImVec2(creditWidth, creditHeight), ImGuiCond_Always);
@@ -1118,30 +1146,84 @@ void UGameHUDWidget::RenderPlayingState()
 	{
 		ImFont* font = ImGui::GetFont();
 		float originalScale = font->Scale;
+		ImDrawList* creditDrawList = ImGui::GetWindowDrawList();
 
-		// "제작자" 레이블
-		font->Scale = 1.0f;
+		// "Created by" 레이블 (작게, 글로우)
+		font->Scale = 1.1f;
 		ImGui::PushFont(font);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.7f)); // 반투명 검은색
-		ImGui::TextUnformatted("Created by");
-		ImGui::PopStyleColor();
+
+		const char* labelText = "Created by";
+		ImVec2 labelPos = ImGui::GetCursorScreenPos();
+		float labelFontSize = ImGui::GetFontSize();
+
+		// 은은한 글로우
+		float labelAlpha = 0.6f + 0.2f * sinf(time * 1.5f);
+		ImVec4 labelColor = ImVec4(0.7f, 0.8f, 1.0f, labelAlpha); // 밝은 하늘색
+
+		for (float offsetX = -1.0f; offsetX <= 1.0f; offsetX += 1.0f)
+		{
+			for (float offsetY = -1.0f; offsetY <= 1.0f; offsetY += 1.0f)
+			{
+				if (offsetX == 0.0f && offsetY == 0.0f) continue;
+				ImVec4 glowColor = ImVec4(labelColor.x * 0.5f, labelColor.y * 0.5f, labelColor.z * 0.5f, 0.3f);
+				creditDrawList->AddText(font, labelFontSize,
+					ImVec2(labelPos.x + offsetX, labelPos.y + offsetY),
+					ImGui::ColorConvertFloat4ToU32(glowColor), labelText, nullptr);
+			}
+		}
+
+		creditDrawList->AddText(font, labelFontSize, labelPos,
+			ImGui::ColorConvertFloat4ToU32(labelColor), labelText, nullptr);
+		ImGui::Dummy(ImGui::CalcTextSize(labelText));
 		ImGui::PopFont();
 		font->Scale = originalScale;
 
-		// 제작자 이름들
-		font->Scale = 1.3f;
+		ImGui::Dummy(ImVec2(0, 5));
+
+		// 제작자 이름들 (각각 다른 색상으로 빛나게)
+		font->Scale = 1.5f;
 		ImGui::PushFont(font);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.85f)); // 진한 검은색
 
 		const char* creators[] = { "홍신화", "조창근", "이정범", "김상천" };
+		float xOffset = 0.0f;
+
 		for (int i = 0; i < 4; ++i)
 		{
-			if (i > 0)
-				ImGui::SameLine(0.0f, 10.0f); // 이름 사이 간격
-			ImGui::TextUnformatted(creators[i]);
+			ImVec2 namePos = ImGui::GetCursorScreenPos();
+			namePos.x += xOffset;
+			float nameFontSize = ImGui::GetFontSize();
+
+			// 각 이름마다 다른 색상
+			float hue = (i / 4.0f + time * 0.1f);
+			hue = fmodf(hue, 1.0f);
+			float namePulse = 0.9f + 0.1f * sinf(time * 2.0f + i * 0.5f);
+			ImVec4 nameColor;
+			ImGui::ColorConvertHSVtoRGB(hue, 0.5f, namePulse, nameColor.x, nameColor.y, nameColor.z);
+			nameColor.w = 1.0f;
+
+			// 글로우 효과
+			for (float radius = 2.0f; radius > 0.0f; radius -= 1.0f)
+			{
+				for (float angle = 0.0f; angle < 6.28f; angle += 1.57f)
+				{
+					float offsetX = cosf(angle) * radius;
+					float offsetY = sinf(angle) * radius;
+					ImVec4 glowColor = ImVec4(nameColor.x * 0.6f, nameColor.y * 0.6f, nameColor.z * 0.6f, 0.4f / radius);
+					creditDrawList->AddText(font, nameFontSize,
+						ImVec2(namePos.x + offsetX, namePos.y + offsetY),
+						ImGui::ColorConvertFloat4ToU32(glowColor), creators[i], nullptr);
+				}
+			}
+
+			// 메인 이름
+			creditDrawList->AddText(font, nameFontSize, namePos,
+				ImGui::ColorConvertFloat4ToU32(nameColor), creators[i], nullptr);
+
+			float nameWidth = ImGui::CalcTextSize(creators[i]).x;
+			xOffset += nameWidth + 15.0f; // 이름 사이 간격
 		}
 
-		ImGui::PopStyleColor();
+		ImGui::Dummy(ImVec2(xOffset, ImGui::GetFontSize()));
 		ImGui::PopFont();
 		font->Scale = originalScale;
 	}
