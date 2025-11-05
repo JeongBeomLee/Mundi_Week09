@@ -79,8 +79,39 @@ function CameraUtility.AddLetterBox(FadeSize, Opacity, FadeInTime)
     PlayerCameraManager:AddCameraModifier(letterBox)
 end
 
+function CameraUtility.AddVignetting(Color, Radius, Softness, FadeInTime)
+    if not PlayerCameraManager then
+        return;
+    end
+
+    -- Vignetting 모디파이어 생성
+    local Vignetting = UCameraModifier_Vignetting();
+
+    -- 기본값 설정
+    Color = Color or FVector(1.0, 207.0 / 255.0, 64.0 / 255.0);
+    Radius = Radius or 0.99;
+    Softness = Softness or 0.2;
+    FadeInTime = FadeInTime or 1.0;
+
+    PrintToConsole(string.format("[AddVignetting] Color: (%.2f, %.2f, %.2f)", Color.X, Color.Y, Color.Z));
+    PrintToConsole(string.format("[AddVignetting] Radius: %.2f, Softness: %.2f", Radius, Softness));
+
+    -- Vignetting 파라미터 설정
+    Vignetting:SetRadius(Radius);
+    Vignetting:SetSoftness(Softness);
+    Vignetting:SetVignettingColor(Color);
+
+    -- FadeIn 시작 (AlphaInTime 설정 + 활성화 + FadeIn 플래그)
+    Vignetting:SetAlphaInTime(FadeInTime);
+    Vignetting:EnableModifier();
+    Vignetting:SetIsFadingIn(true);
+
+    -- PlayerCameraManager에 추가
+    PlayerCameraManager:AddCameraModifier(Vignetting);
+end
+
     -- 비활성화된 카메라 셰이크 제거
-function CameraUtility.RemoveDisabledCameraShakes()
+function CameraUtility.RemoveDisabledCameraModifiers()
     if not PlayerCameraManager then
         return;
     end

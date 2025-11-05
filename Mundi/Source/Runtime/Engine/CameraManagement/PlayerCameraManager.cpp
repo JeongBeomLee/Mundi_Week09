@@ -260,6 +260,11 @@ void APlayerCameraManager::RemoveDisabledCameraModifiers()
 	}
 }
 
+TArray<UCameraModifier*>& APlayerCameraManager::GetModifierList()
+{
+	return ModifierList;
+}
+
 void APlayerCameraManager::Serialize(const bool bInIsLoading, JSON& InOutHandle)
 {
 	Super::Serialize(bInIsLoading, InOutHandle);

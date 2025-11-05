@@ -157,6 +157,9 @@ function Tick(deltaTime)
     -- (중복 호출 방지를 위해 주석 처리)
     -- CameraUtility.UpdateCamera(deltaTime);
 
+    -- 모든 비활성 Camera Modifier 제거
+    CameraUtility.RemoveDisabledCameraModifiers();
+    
     -- 회전 중에는 모든 입력 무시
     if GravitySystem and GravitySystem.IsCurrentlyRotating and GravitySystem.IsCurrentlyRotating() then
         return

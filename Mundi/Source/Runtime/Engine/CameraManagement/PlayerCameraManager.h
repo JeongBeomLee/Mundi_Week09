@@ -99,7 +99,7 @@ public:
 	void AddCameraModifier(UCameraModifier* NewModifier);
 	void RemoveCameraModifier(UCameraModifier* ModifierToRemove);
 	void RemoveDisabledCameraModifiers(); // 비활성화된 모디파이어 자동 제거
-
+	TArray<UCameraModifier*>& GetModifierList();
 
 	// 카메라 포스트 프로세싱 관리
 	void SetPostProcessSettings(const FPostProcessSettings& NewSettings)
