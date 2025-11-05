@@ -1,5 +1,7 @@
 local _ENV = ...
 
+local CameraUtility = require("CameraUtility");
+
 local Health = 5;
 
 local BILLBOARD_COUNT = Health;  -- 빌보드 컴포넌트 개수
@@ -71,7 +73,7 @@ function OnOverlap(
         if Health <= 0 then
             -- PrintToConsole("[coin_collision] Coin collected!")
             SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GetScoreFx.mp3", false, SoundChannelType.SFX);
-            GameMode:OnCoinCollected(1)
+            CameraUtility.AddScoreAndShowGoldVignetting();
             MyActor:Destroy()
         else
             -- PrintToConsole("[coin_collision] Health remaining: " .. Health)

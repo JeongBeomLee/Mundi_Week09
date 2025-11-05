@@ -79,12 +79,12 @@ struct FFadeBufferType // b2
 
 struct FVignettingBufferType    // b2
 {
-    FVector VignettingColor;
-    float Radius;
+    FVector4 VignettingColor;
 
+    float Radius;
     float Softness;
     float AspectRatio;
-    FVector2D Padding;
+    float Padding;
 };
 
 // b0 in PS

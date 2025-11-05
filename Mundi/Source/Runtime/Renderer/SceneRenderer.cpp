@@ -975,7 +975,7 @@ void FSceneRenderer::RenderDecalPass()
 	// 데칼 렌더 설정
 	RHIDevice->RSSetState(ERasterizerMode::Decal);
 	RHIDevice->OMSetDepthStencilState(EComparisonFunc::LessEqualReadOnly); // 깊이 쓰기 OFF
-	RHIDevice->OMSetBlendState(true);
+	RHIDevice->OMSetBlendState(false);
 
 	for (UDecalComponent* Decal : Proxies.Decals)
 	{
@@ -1355,7 +1355,7 @@ void FSceneRenderer::RenderVignettingPass()
 	// Vignetting 파라미터 가져오기
 	float VignettingRadius = PostProcessSettings.VignettingRadius;
 	float VignettingSoftness = PostProcessSettings.VignettingSoftness;
-	FVector VignettingColor = PostProcessSettings.VignettingColor;
+	FVector4 VignettingColor = PostProcessSettings.VignettingColor;
 
 	// Swap 가드 객체 생성: 스왑을 수행하고, 소멸 시 0번 슬롯의 SRV를 자동 해제하도록 설정
 	FSwapGuard SwapGuard(RHIDevice, 0, 1);
