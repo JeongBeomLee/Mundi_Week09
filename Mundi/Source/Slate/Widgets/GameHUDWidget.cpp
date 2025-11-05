@@ -320,8 +320,99 @@ void UGameHUDWidget::RenderHeartIcons()
 void UGameHUDWidget::RenderTitleScreen()
 {
 	ImGuiIO& io = ImGui::GetIO();
+	float time = static_cast<float>(ImGui::GetTime());
 
-	// 화면 전체를 덮는 투명 윈도우
+	// 우주 배경 효과 렌더링
+	ImGui::SetNextWindowPos(ImVec2(ViewportX, ViewportY));
+	ImGui::SetNextWindowSize(ImVec2(ViewportWidth, ViewportHeight));
+	ImGui::SetNextWindowBgAlpha(0.0f);
+
+	ImGuiWindowFlags spaceFlags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoInputs |
+		ImGuiWindowFlags_NoBackground;
+
+	if (ImGui::Begin("##TitleSpaceBackground", nullptr, spaceFlags))
+	{
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+		// 별 파티클 효과 (100개의 별)
+		for (int i = 0; i < 100; ++i)
+		{
+			// 각 별마다 고유한 위치와 속도
+			float starSpeed = 0.5f + (i % 5) * 0.3f; // 시차 효과 (가까운 별은 빠르게, 먼 별은 느리게)
+			float x = ViewportX + fmodf(i * 173.7f + time * starSpeed * 20.0f, ViewportWidth);
+			float y = ViewportY + fmodf(i * 271.3f, ViewportHeight);
+
+			// 별 크기 (먼 별은 작게, 가까운 별은 크게)
+			float baseSize = (i % 3 == 0) ? 2.5f : ((i % 2 == 0) ? 1.5f : 1.0f);
+			float twinkle = sinf(time * 3.0f + i * 0.5f); // 반짝임 효과
+			float size = baseSize + twinkle * 0.5f;
+
+			// 별 밝기 (반짝임)
+			float brightness = 0.5f + 0.5f * sinf(time * 2.0f + i * 0.3f);
+
+			// 별 색상 (흰색, 파란색, 약간의 노란색 별)
+			ImVec4 starColor;
+			if (i % 7 == 0)
+			{
+				// 파란 별 (멀리 있는 별)
+				starColor = ImVec4(0.7f, 0.8f, 1.0f, brightness * 0.8f);
+			}
+			else if (i % 11 == 0)
+			{
+				// 노란 별 (가까운 별)
+				starColor = ImVec4(1.0f, 1.0f, 0.8f, brightness * 0.9f);
+			}
+			else
+			{
+				// 흰 별 (일반)
+				starColor = ImVec4(1.0f, 1.0f, 1.0f, brightness * 0.7f);
+			}
+
+			// 별 그리기 (밝은 별은 글로우 효과)
+			if (baseSize > 2.0f && brightness > 0.7f)
+			{
+				// 큰 별에 글로우 추가
+				ImVec4 glowColor = starColor;
+				glowColor.w *= 0.3f;
+				drawList->AddCircleFilled(ImVec2(x, y), size + 2.0f, ImGui::ColorConvertFloat4ToU32(glowColor));
+			}
+
+			drawList->AddCircleFilled(ImVec2(x, y), size, ImGui::ColorConvertFloat4ToU32(starColor));
+		}
+
+		// 희미한 성운 효과 (더 큰 원으로 배경 분위기)
+		for (int i = 0; i < 5; ++i)
+		{
+			float nebulaX = ViewportX + fmodf(i * 457.3f + time * 5.0f, ViewportWidth);
+			float nebulaY = ViewportY + fmodf(i * 689.1f, ViewportHeight);
+			float nebulaSize = 40.0f + sinf(time + i) * 10.0f;
+			float nebulaAlpha = 0.03f + 0.02f * sinf(time * 0.5f + i);
+
+			ImVec4 nebulaColor;
+			if (i % 2 == 0)
+			{
+				// 보라색 성운
+				nebulaColor = ImVec4(0.4f, 0.2f, 0.6f, nebulaAlpha);
+			}
+			else
+			{
+				// 파란색 성운
+				nebulaColor = ImVec4(0.2f, 0.3f, 0.6f, nebulaAlpha);
+			}
+
+			drawList->AddCircleFilled(ImVec2(nebulaX, nebulaY), nebulaSize, ImGui::ColorConvertFloat4ToU32(nebulaColor));
+		}
+	}
+	ImGui::End();
+
+	// 타이틀 텍스트 렌더링 윈도우
 	ImGui::SetNextWindowPos(ImVec2(ViewportX, ViewportY));
 	ImGui::SetNextWindowSize(ImVec2(ViewportWidth, ViewportHeight));
 	ImGui::SetNextWindowBgAlpha(0.0f); // 완전 투명
@@ -343,7 +434,7 @@ void UGameHUDWidget::RenderTitleScreen()
 	const char* titleText = "INFINITY RUNNER";
 	ImFont* font = ImGui::GetFont();
 	float originalScale = font->Scale;
-	float time = static_cast<float>(ImGui::GetTime());
+	time = static_cast<float>(ImGui::GetTime());
 
 	// 큰 폰트 스케일 (3.0배)
 	font->Scale = 3.0f;
@@ -836,6 +927,98 @@ void UGameHUDWidget::RenderGameOverState(bool bIsVictory)
 
 void UGameHUDWidget::RenderPlayingState()
 {
+	float time = static_cast<float>(ImGui::GetTime());
+
+	// 우주 배경 효과 렌더링
+	ImGui::SetNextWindowPos(ImVec2(ViewportX, ViewportY));
+	ImGui::SetNextWindowSize(ImVec2(ViewportWidth, ViewportHeight));
+	ImGui::SetNextWindowBgAlpha(0.0f);
+
+	ImGuiWindowFlags spaceFlags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoInputs |
+		ImGuiWindowFlags_NoBackground;
+
+	if (ImGui::Begin("##SpaceBackground", nullptr, spaceFlags))
+	{
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+		// 별 파티클 효과 (100개의 별)
+		for (int i = 0; i < 100; ++i)
+		{
+			// 각 별마다 고유한 위치와 속도
+			float starSpeed = 0.5f + (i % 5) * 0.3f; // 시차 효과 (가까운 별은 빠르게, 먼 별은 느리게)
+			float x = ViewportX + fmodf(i * 173.7f + time * starSpeed * 20.0f, ViewportWidth);
+			float y = ViewportY + fmodf(i * 271.3f, ViewportHeight);
+
+			// 별 크기 (먼 별은 작게, 가까운 별은 크게)
+			float baseSize = (i % 3 == 0) ? 2.5f : ((i % 2 == 0) ? 1.5f : 1.0f);
+			float twinkle = sinf(time * 3.0f + i * 0.5f); // 반짝임 효과
+			float size = baseSize + twinkle * 0.5f;
+
+			// 별 밝기 (반짝임)
+			float brightness = 0.5f + 0.5f * sinf(time * 2.0f + i * 0.3f);
+
+			// 별 색상 (흰색, 파란색, 약간의 노란색 별)
+			ImVec4 starColor;
+			if (i % 7 == 0)
+			{
+				// 파란 별 (멀리 있는 별)
+				starColor = ImVec4(0.7f, 0.8f, 1.0f, brightness * 0.8f);
+			}
+			else if (i % 11 == 0)
+			{
+				// 노란 별 (가까운 별)
+				starColor = ImVec4(1.0f, 1.0f, 0.8f, brightness * 0.9f);
+			}
+			else
+			{
+				// 흰 별 (일반)
+				starColor = ImVec4(1.0f, 1.0f, 1.0f, brightness * 0.7f);
+			}
+
+			// 별 그리기 (밝은 별은 글로우 효과)
+			if (baseSize > 2.0f && brightness > 0.7f)
+			{
+				// 큰 별에 글로우 추가
+				ImVec4 glowColor = starColor;
+				glowColor.w *= 0.3f;
+				drawList->AddCircleFilled(ImVec2(x, y), size + 2.0f, ImGui::ColorConvertFloat4ToU32(glowColor));
+			}
+
+			drawList->AddCircleFilled(ImVec2(x, y), size, ImGui::ColorConvertFloat4ToU32(starColor));
+		}
+
+		// 희미한 성운 효과 (더 큰 원으로 배경 분위기)
+		for (int i = 0; i < 5; ++i)
+		{
+			float nebulaX = ViewportX + fmodf(i * 457.3f + time * 5.0f, ViewportWidth);
+			float nebulaY = ViewportY + fmodf(i * 689.1f, ViewportHeight);
+			float nebulaSize = 40.0f + sinf(time + i) * 10.0f;
+			float nebulaAlpha = 0.03f + 0.02f * sinf(time * 0.5f + i);
+
+			ImVec4 nebulaColor;
+			if (i % 2 == 0)
+			{
+				// 보라색 성운
+				nebulaColor = ImVec4(0.4f, 0.2f, 0.6f, nebulaAlpha);
+			}
+			else
+			{
+				// 파란색 성운
+				nebulaColor = ImVec4(0.2f, 0.3f, 0.6f, nebulaAlpha);
+			}
+
+			drawList->AddCircleFilled(ImVec2(nebulaX, nebulaY), nebulaSize, ImGui::ColorConvertFloat4ToU32(nebulaColor));
+		}
+	}
+	ImGui::End();
+
 	// 일반 HUD (좌상단, 배경 없음)
 	const float padding = 20.0f;
 	const float windowWidth = 250.0f;
