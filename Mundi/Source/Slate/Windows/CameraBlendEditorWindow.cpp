@@ -159,8 +159,9 @@ void UCameraBlendEditorWindow::RenderCurveEditor()
 {
 	ImGui::Text("Bezier Curve Editor:");
 
-	// 커브 에디터 영역 시작
-	ImVec2 CursorPos = ImGui::GetCursorScreenPos();
+	// 커브 에디터 영역 시작 - 원점 저장
+	CurveEditorOrigin = ImGui::GetCursorScreenPos();
+	ImVec2 CursorPos = CurveEditorOrigin;  // 기존 코드 호환성을 위해 유지
 	ImDrawList* DrawList = ImGui::GetWindowDrawList();
 
 	// 배경 박스
@@ -434,24 +435,20 @@ void UCameraBlendEditorWindow::RenderTimelinePreview()
 
 ImVec2 UCameraBlendEditorWindow::CurveToScreenPos(float Time, float Value) const
 {
-	ImVec2 CursorPos = ImGui::GetCursorScreenPos();
-	CursorPos.y -= CurveEditorSize.y + 10; // InvisibleButton으로 커서가 아래로 이동했으므로 보정
-
-	float X = CursorPos.x + CurveEditorPadding.x + Time * (CurveEditorSize.x - 2 * CurveEditorPadding.x);
+	// 저장된 원점 사용 (GetCursorScreenPos 사용 안 함)
+	float X = CurveEditorOrigin.x + CurveEditorPadding.x + Time * (CurveEditorSize.x - 2 * CurveEditorPadding.x);
 
 	// Y축은 반전 (화면 좌표는 위가 0, 커브는 위가 1)
-	float Y = CursorPos.y + CurveEditorPadding.y + (1.0f - Value) * (CurveEditorSize.y - 2 * CurveEditorPadding.y);
+	float Y = CurveEditorOrigin.y + CurveEditorPadding.y + (1.0f - Value) * (CurveEditorSize.y - 2 * CurveEditorPadding.y);
 
 	return ImVec2(X, Y);
 }
 
 void UCameraBlendEditorWindow::ScreenPosToCurve(ImVec2 ScreenPos, float& OutTime, float& OutValue) const
 {
-	ImVec2 CursorPos = ImGui::GetCursorScreenPos();
-	CursorPos.y -= CurveEditorSize.y + 10;
-
-	float RelativeX = ScreenPos.x - CursorPos.x - CurveEditorPadding.x;
-	float RelativeY = ScreenPos.y - CursorPos.y - CurveEditorPadding.y;
+	// 저장된 원점 사용 (GetCursorScreenPos 사용 안 함)
+	float RelativeX = ScreenPos.x - CurveEditorOrigin.x - CurveEditorPadding.x;
+	float RelativeY = ScreenPos.y - CurveEditorOrigin.y - CurveEditorPadding.y;
 
 	OutTime = RelativeX / (CurveEditorSize.x - 2 * CurveEditorPadding.x);
 	OutValue = 1.0f - (RelativeY / (CurveEditorSize.y - 2 * CurveEditorPadding.y));

@@ -56,6 +56,7 @@ private:
 	// 커브 에디터 설정
 	ImVec2 CurveEditorSize = ImVec2(600, 400);
 	ImVec2 CurveEditorPadding = ImVec2(40, 40);
+	ImVec2 CurveEditorOrigin;  // 커브 에디터 원점 (화면 좌표)
 
 	// 드래그 상태
 	int DraggingControlPointIndex = -1;

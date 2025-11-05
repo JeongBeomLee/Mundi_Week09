@@ -296,7 +296,7 @@ if "$(Configuration)"=="Debug" (
       <AdditionalOptions>/IGNORE:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
-      <Command>if "$(Configuration)"=="Release" (
+      <Command>if "$(Configuration)"=="StandAlone" (
     robocopy "$(ProjectDir)Data" "$(OutDir)Data" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
     robocopy "$(ProjectDir)Shaders" "$(OutDir)Shaders" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
     robocopy "$(ProjectDir)Scripts" "$(OutDir)Scripts" /E /XO /MT:8 /NFL /NDL /NJH /NJS /nc /ns /np
@@ -307,11 +307,6 @@ if "$(Configuration)"=="Debug" (
     if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
     if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\FMOD\bin\x64\Release\fmod.dll" "$(OutDir)"
     if %ERRORLEVEL% LEQ 7 exit 0
-  )
-if "$(Configuration)"=="Debug" (
-    if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
-    if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\lua\bin\lua.dll" "$(OutDir)"
-    if exist "$(ProjectDir)ThirdParty\lua\bin\lua.dll" xcopy /Y /D "$(ProjectDir)ThirdParty\FMOD\bin\x64\Debug\fmodL.dll" "$(OutDir)"
   )</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -654,6 +649,8 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
       <DeploymentContent>false</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='StandAlone|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_StandAlone|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Shaders\PostProcess\TileDebugVisualization_PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -947,56 +944,6 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClInclude Include="Source\Slate\Windows\UIWindow.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Scripts\actor_transform.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\CoinGenerator.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\coin_collision.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\CollisionUtility.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\GlobalObjectManager.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\GlobalVariable.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\GravitySystem.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\MapGenerator.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\Obstacle.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\ObstacleGenerator.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\print_debug_log.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\Projectile.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\Queue.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\RandomManager.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\RunnerCharacter.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-    <None Include="Scripts\template.lua">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Scripts\CameraUtility.lua" />
     <Content Include="Scripts\CoinGenerator.lua" />
     <Content Include="Scripts\GlobalObjectManager.lua" />
@@ -1006,6 +953,26 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <Content Include="Scripts\Queue.lua" />
     <Content Include="Scripts\RandomManager.lua" />
     <Content Include="Scripts\CollisionUtility.lua" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\actor_transform.lua" />
+    <None Include="Scripts\CameraUtility.lua" />
+    <None Include="Scripts\CoinGenerator.lua" />
+    <None Include="Scripts\coin_collision.lua" />
+    <None Include="Scripts\CollisionUtility.lua" />
+    <None Include="Scripts\GlobalObjectManager.lua" />
+    <None Include="Scripts\GlobalVariable.lua" />
+    <None Include="Scripts\GravitySystem.lua" />
+    <None Include="Scripts\MapGenerator.lua" />
+    <None Include="Scripts\Obstacle.lua" />
+    <None Include="Scripts\ObstacleGenerator.lua" />
+    <None Include="Scripts\print_debug_log.lua" />
+    <None Include="Scripts\Projectile.lua" />
+    <None Include="Scripts\Queue.lua" />
+    <None Include="Scripts\RandomManager.lua" />
+    <None Include="Scripts\RunnerCharacter.lua" />
+    <None Include="Scripts\template.lua" />
+    <None Include="Scripts\test_coroutine.lua" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

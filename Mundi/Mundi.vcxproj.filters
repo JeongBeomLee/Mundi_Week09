@@ -561,6 +561,8 @@
     <ClCompile Include="Source\Runtime\Engine\Components\SpringArmComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
     <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp" />
+    <ClCompile Include="Source\Slate\Windows\CameraBlendEditorWindow.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -1161,59 +1163,31 @@
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
     <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h" />
+    <ClInclude Include="Source\Slate\Windows\CameraBlendEditorWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\coin_collision.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Scripts\actor_transform.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\CoinGenerator.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\coin_collision.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\CollisionUtility.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\GlobalObjectManager.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\GlobalVariable.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\GravitySystem.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\MapGenerator.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\Obstacle.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\ObstacleGenerator.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\print_debug_log.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\Projectile.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\Queue.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\RandomManager.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\RunnerCharacter.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\template.lua">
-      <Filter>Scripts</Filter>
-    </None>
+    <None Include="Scripts\test_coroutine.lua" />
+    <None Include="Scripts\actor_transform.lua" />
+    <None Include="Scripts\CameraUtility.lua" />
+    <None Include="Scripts\coin_collision.lua" />
+    <None Include="Scripts\CoinGenerator.lua" />
+    <None Include="Scripts\CollisionUtility.lua" />
+    <None Include="Scripts\GlobalObjectManager.lua" />
+    <None Include="Scripts\GlobalVariable.lua" />
+    <None Include="Scripts\GravitySystem.lua" />
+    <None Include="Scripts\MapGenerator.lua" />
+    <None Include="Scripts\Obstacle.lua" />
+    <None Include="Scripts\ObstacleGenerator.lua" />
+    <None Include="Scripts\print_debug_log.lua" />
+    <None Include="Scripts\Projectile.lua" />
+    <None Include="Scripts\Queue.lua" />
+    <None Include="Scripts\RandomManager.lua" />
+    <None Include="Scripts\RunnerCharacter.lua" />
+    <None Include="Scripts\template.lua" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
