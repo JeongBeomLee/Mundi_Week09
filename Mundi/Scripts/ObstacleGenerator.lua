@@ -10,14 +10,14 @@ local CameraUtility = require("CameraUtility");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
-local DEFAULT_SCALE = 0.4;
+local DEFAULT_SCALE = 0.06;  -- 스케일 10분의 1로 축소 (0.4 -> 0.04)
 
-local DEFAULT_SPAWN_DELAY_MIN = 3.0;
-local DEFAULT_SPAWN_DELAY_MAX = 5.0;
+local DEFAULT_SPAWN_DELAY_MIN = 2.0;
+local DEFAULT_SPAWN_DELAY_MAX = 4.0;
 
 local DEFAULT_POOL_SIZE = 50;
 
-local OBSTACLE_OBJ_FILE_PATH = "Data/Model/smokegrenade.obj";
+local OBSTACLE_OBJ_FILE_PATH = "Data/Model/backup.obj";
 
 local BILLBOARD_COUNT = 5;  -- 빌보드 컴포넌트 개수
 
@@ -49,8 +49,8 @@ local function InitializePool()
         StaticMeshComponent:SetStaticMesh(OBSTACLE_OBJ_FILE_PATH);
 
         local CapsuleComponent = Obstacle:CreateCapsuleComponent("CollisionComponent");
-        CapsuleComponent:SetCapsuleSize(4.0, 5.5, true);
-        CapsuleComponent:SetRelativeLocation(FVector(0.0, 3.0, 0.5));
+        CapsuleComponent:SetCapsuleSize(35.0, 5.5, true);
+        CapsuleComponent:SetRelativeLocation(FVector(-14.4, -24.0, 5.0));
 
         -- PrintToConsole("[ObstacleGenerator] Obstacle CapsuleComponent created.");
 

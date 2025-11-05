@@ -72,7 +72,7 @@ struct FShadowConfiguration
 	uint32 MaxShadowCastingLights = 16;
 
 	// 섀도우 필터링 설정
-	EShadowFilterType FilterType = EShadowFilterType::NONE;   // 필터링 타입
+	EShadowFilterType FilterType = EShadowFilterType::PCF;   // 필터링 타입
 
 	// PCF 설정
 	EPCFSampleCount PCFSampleCount = EPCFSampleCount::PCF_3x3;  // PCF 샘플 수

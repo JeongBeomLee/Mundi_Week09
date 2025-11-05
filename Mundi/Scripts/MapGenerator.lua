@@ -12,7 +12,7 @@ local DEFAULT_HEIGHT = 10;
 local DEFAULT_DEPTH = 1;
 local DEFAULT_MAP_SIZE = 20;
 local DEFAULT_SCALE = 2.0;
-local DEFAULT_FILLRATE = 1.0;
+local DEFAULT_FILLRATE = 0.8;
 local DEFAULT_MAPSTART_OFFSET = -5.0;
 
 local DEFAULT_CURRENT_MAP_ID = 0;
@@ -220,10 +220,10 @@ local function InitializePool()
         Queue.push(ChunkPool, world:SpawnActor(STORAGE_POSITION, "AGravityWall"));
     end
 
-    local coin = world:SpawnActor(STORAGE_POSITION, "ACoinActor");
-    coin:SetLocation(FVector(20.0, 0.0, -9.0));
-    coin:SetRotation(FVector(0.0, 90.0, 0.0));
-    coin:SetScale(FVector(0.05, 0.05, 0.05));
+    -- local coin = world:SpawnActor(STORAGE_POSITION, "ACoinActor");
+    -- coin:SetLocation(FVector(20.0, 0.0, -9.0));
+    -- coin:SetRotation(FVector(0.0, 90.0, 0.0));
+    -- coin:SetScale(FVector(0.05, 0.05, 0.05));
 
     PrintToConsole("[MapGenerator] Pool initialized. Queue size: " .. (ChunkPool.last - ChunkPool.first + 1));
 end

@@ -1,11 +1,11 @@
 {
   "Level" : {
     "Actors" : {
-      "756" : {
+      "766" : {
         "Name" : "Directional Light Actor",
         "OwnedComponents" : [{
             "CSMLambda" : 0.500000,
-            "Id" : 758,
+            "Id" : 768,
             "Intensity" : 1.000000,
             "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
             "NumCascades" : 3,
@@ -25,14 +25,34 @@
             "bIsCastShadows" : true,
             "bIsVisible" : true,
             "bTickEnabled" : true
+          }, {
+            "Acceleration" : [0.000000, 0.000000, 0.000000],
+            "PivotTranslation" : [8.500000, 22.200001, 11.100000],
+            "RotationRate" : [0.000000, 32.700001, 0.000000],
+            "Type" : "URotatingMovementComponent",
+            "Velocity" : [0.000000, 0.000000, 0.000000],
+            "bIsActive" : true,
+            "bRotationInLocalSpace" : true,
+            "bTickEnabled" : true,
+            "bUpdateOnlyIfRendered" : false
           }],
-        "RootComponentId" : 758,
+        "RootComponentId" : 768,
         "Type" : "ADirectionalLightActor"
       },
-      "759" : {
+      "769" : {
         "Name" : "Ambient Light Actor",
         "OwnedComponents" : [{
-            "Id" : 761,
+            "Acceleration" : [0.000000, 0.000000, 0.000000],
+            "PivotTranslation" : [8.400000, 35.700001, 14.800000],
+            "RotationRate" : [15.400000, 38.000000, 16.900000],
+            "Type" : "URotatingMovementComponent",
+            "Velocity" : [0.000000, 0.000000, 0.000000],
+            "bIsActive" : true,
+            "bRotationInLocalSpace" : true,
+            "bTickEnabled" : true,
+            "bUpdateOnlyIfRendered" : false
+          }, {
+            "Id" : 771,
             "Intensity" : 0.100000,
             "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
             "ParentId" : 0,
@@ -50,11 +70,11 @@
             "bIsVisible" : true,
             "bTickEnabled" : true
           }],
-        "RootComponentId" : 761,
+        "RootComponentId" : 771,
         "Type" : "AAmbientLightActor"
       }
     },
-    "NextUUID" : 770,
+    "NextUUID" : 777,
     "PerspectiveCamera" : {
       "FOV" : [60.000000],
       "FarClip" : [1000.000000],
