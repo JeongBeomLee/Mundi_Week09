@@ -3,6 +3,7 @@ local _ENV = ...
 local Queue = require("Queue");
 local GlobalObjectManager = require("GlobalObjectManager");
 local RandomManager = require("RandomManager");
+local CameraUtility = require("CameraUtility");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
@@ -150,7 +151,8 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     -- OtherActor가 코인인지 확인
     if (IsCoinActor(OtherActor)) then
         -- 점수 추가
-        _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
+        SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GetScoreFx.mp3", false, SoundChannelType.SFX);
+        CameraUtility.AddScoreAndShowGoldVignetting();
         PrintToConsole("[CoinGenerator] Coin collected!");
         
         -- 슬로우 모션 효과 테스트

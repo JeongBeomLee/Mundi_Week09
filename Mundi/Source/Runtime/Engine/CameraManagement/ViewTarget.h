@@ -10,8 +10,9 @@ struct FPostProcessSettings
     float LetterBoxOpacity = 1.0f;
 
     // Vignetting
-    float VignettingIntensity = 0.0f;
     float VignettingRadius = 0.5f;
+    float VignettingSoftness = 0.5f;
+	FVector4 VignettingColor{};
 
     //// Color Grading
     //float Saturation = 1.0f;

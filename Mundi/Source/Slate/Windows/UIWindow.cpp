@@ -47,6 +47,22 @@ void UUIWindow::Initialize()
 {
 }
 
+void UUIWindow::SetWindowState(EUIWindowState NewState)
+{
+	CurrentState = NewState;
+
+	// Visible 상태로 변경되면 bIsWindowOpen도 true로 설정
+	if (NewState == EUIWindowState::Visible || NewState == EUIWindowState::Maximized)
+	{
+		bIsWindowOpen = true;
+	}
+	// Hidden 상태로 변경되면 bIsWindowOpen을 false로 설정
+	else if (NewState == EUIWindowState::Hidden)
+	{
+		bIsWindowOpen = false;
+	}
+}
+
 /**
  * @brief 뷰포트가 리사이징 되었을 때 앵커/좌상단 기준 상대 위치 비율을 고정하는 로직
  */
@@ -168,6 +184,9 @@ void UUIWindow::RenderWindow()
 		// 실제 UI 컨텐츠 렌더링
 		RenderWidget();
 
+		// 서브클래스 커스텀 렌더링
+		RenderContent();
+
 		// 윈도우 정보 업데이트
 		UpdateWindowInfo();
 	}
@@ -181,8 +200,8 @@ void UUIWindow::RenderWindow()
 
 	ImGui::End();
 
-	// 윈도우가 닫혔는지 확인
-	if (!bIsWindowOpen && bIsWindowOpen)
+	// 윈도우가 닫혔는지 확인 (X버튼 클릭 시 bIsOpen이 false로 변경됨)
+	if (!bIsOpen && bIsWindowOpen)
 	{
 		if (OnWindowClose())
 		{

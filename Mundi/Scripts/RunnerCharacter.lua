@@ -9,6 +9,7 @@ local _ENV = ...
 
 local GravitySystem = require("GravitySystem");
 local CameraUtility = require("CameraUtility");
+local CollisionUtility = require("CollisionUtility");
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 설정 (에디터에서 조정 가능)
@@ -61,7 +62,21 @@ local Config = {
 
     -- 디버그
     bDebugLog = true,
+
+    Health = 3,                -- 캐릭터 체력
 }
+
+function GetHealth()
+    return Config.Health
+end
+
+function DecreaseHealth(amount)
+    Config.Health = Config.Health - amount
+    if Config.Health < 0 then
+        Config.Health = 0
+    end
+    PrintToConsole("[RunnerCharacter] Health decreased by " .. amount .. ". Current Health: " .. Config.Health)
+end
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 내부 변수
@@ -165,12 +180,57 @@ function BeginPlay()
     -- -- Slomo (2초간 30% 속도)
     -- dtManager:ApplySlomoEffect(10.0, 0.05)
     -- PrintToConsole("[RunnerCharacter] Slomo effect applied")
+    SoundManager:PlayBGM("Data/Sounds/InfinityRunner/Run2BGM.wav");
 
+    -- StartCoroutine(function() CameraIntroSequence() end)
 end
 
+-- function CameraIntroSequence()
+--     PrintToConsole("[Camera Intro] Starting cinematic sequence...")
+    
+--     -- 시네마틱 느낌을 위한 레터박스 추가 (선택사항)
+--     -- CameraUtility.AddLetterBox(0.1, 0.8, 1.5)  -- FadeSize=0.1, Opacity=0.8, FadeInTime=1.5초
+--     -- PrintToConsole("[Camera Intro] Letter box added")
+    
+--     -- -- 카메라 페이드 인 효과
+--     -- CameraUtility.StartCameraFade(1.0, 0.0, 2.0)  -- 완전 불투명 -> 투명 (2초)
+--     -- PrintToConsole("[Camera Intro] Fade in started")
+    
+--     -- 7초 동안 카메라가 궤도를 그리며 플레이어에게 접근
+--     -- (실제 궤도 이동은 SpringArm 설정이나 별도 로직으로 구현)
+--     coroutine.yield(7.0)
+    
+--     -- 7초 시점: 첫 번째 카메라 셰이크 (중간 강도)
+--     PrintToConsole("[Camera Intro] First shake at 7s")
+--     CameraUtility.AddCameraShake(10.0, 2.0, 6)
+--     -- RotationAmplitude=10도, Duration=2초, NumSamples=6
+    
+--     -- 추가 7초 대기 (총 14초)
+--     coroutine.yield(7.0)
+    
+--     -- 14초 시점: 더 큰 카메라 셰이크
+--     PrintToConsole("[Camera Intro] Bigger shake at 14s")
+--     CameraUtility.AddCameraShake(15.0, 3.0, 8)
+--     -- RotationAmplitude=15도, Duration=3초, NumSamples=8
+    
+--     -- 이후 14초마다 큰 셰이크 반복
+--     while true do
+--         coroutine.yield(14.0)
+--         PrintToConsole("[Camera Intro] Repeating shake")
+--         CameraUtility.AddCameraShake(15.0, 3.0, 8)
+        
+--         -- 비활성화된 모디파이어 정리 (메모리 관리)
+--         CameraUtility.RemoveDisabledCameraShakes()
+--     end
+-- end
+
 function Tick(deltaTime)
-    -- 카메라 업데이트
-    CameraUtility.UpdateCamera(deltaTime);
+    -- 카메라 업데이트는 PlayerController::Tick에서 자동으로 수행됨
+    -- (중복 호출 방지를 위해 주석 처리)
+    -- CameraUtility.UpdateCamera(deltaTime);
+
+    -- 모든 비활성 Camera Modifier 제거
+    CameraUtility.RemoveDisabledCameraModifiers();
     
     -- 회전 중에는 모든 입력 무시
     if GravitySystem and GravitySystem.IsCurrentlyRotating and GravitySystem.IsCurrentlyRotating() then
@@ -196,6 +256,7 @@ end
 
 -- 부활 작업
 function Restart()
+    Config.Health = 3
     MyActor:SetLocation(FVector(0.0, 0.0, 3.0));
 end
 
@@ -224,11 +285,34 @@ function SetupInputBindings()
     if InputComponent.BindAction then
         InputComponent:BindAction("ThrowProjectile", string.byte('C'), OnThrowProjectile, nil)
     end
+
+    -- Action 바인딩: V 키 (슬로우모션)
+    if InputComponent.BindAction then
+        InputComponent:BindAction("ToggleSlomo", string.byte('V'), OnSlomoPressed, OnSlomoReleased)
+    end
 end
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 입력 콜백
 -- ════════════════════════════════════════════════════════════════════════════
+
+local slomoEffectId = nil
+
+function OnSlomoPressed()
+    SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/Slomo.mp3", false, SoundChannelType.SFX);
+    local dtManager = World:GetDeltaTimeManager()
+    CameraUtility.AddLetterBox(0.2, 1.0, 1.0, true)  -- Height, Duration
+    slomoEffectId = dtManager:ApplySlomoEffect(1000.0, 0.2)
+    PrintToConsole("[RunnerCharacter] Slomo effect applied")
+end
+
+function OnSlomoReleased()
+    local dtManager = World:GetDeltaTimeManager()
+    dtManager:CancelEffect(slomoEffectId)
+    slomoEffectId = nil
+    CameraUtility.AddLetterBox(0.2, 1.0, 1.0, false)  -- 1초간 원래대로 페이드
+    PrintToConsole("[RunnerCharacter] Slomo effect removed")
+end
 
 function OnMoveLeft(value)
     
@@ -243,6 +327,7 @@ end
 
 function OnJumpPressed()
     if MyActor.Jump then
+        SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/JumpFx.mp3", false, SoundChannelType.SFX);
         MyActor:Jump()
     end
 end
@@ -255,6 +340,7 @@ end
 
 function OnThrowProjectile()
   PrintToConsole("[RunnerCharacter] function OnThrowProjectile()!")
+    SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/LaserShotFx.mp3", false, SoundChannelType.SFX);
     ThrowProjectile()
 end
 
@@ -482,6 +568,44 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
 
     -- TODO: 벽면 감지 및 중력 방향 전환 로직
     -- 예: OtherActor의 태그를 확인해서 "WallTrigger"면 중력 방향 변경
+    if not CollisionUtility.IsObstacleActor(OtherActor) then
+        --PrintToConsole("[ObstacleGenerator] Not an obstacle actor, returning");
+        return;
+    end
+
+    -- 플레이어 사망 처리
+    -- PrintToConsole("[ObstacleGenerator] Player hit an obstacle! Processing death sound...");
+    -- StartCoroutine(function()
+    --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/FailedSoundFx.mp3", false, SoundChannelType.SFX);
+    --     coroutine.yield(1.5);
+    --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GameOverSoundFx.mp3", false, SoundChannelType.SFX);
+    -- end);
+
+    SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/PlayerHitFX.mp3", false, SoundChannelType.SFX);
+    DecreaseHealth(1);
+    GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnDecreasePlayerHealth(MyActor, Config.Health);
+    CameraUtility.AddVignetting(
+            FVector4(1.0, 0.0, 0.0, 1.0),
+            1.0,
+            0.4,
+            3.0
+    );
+    local dtManager = World:GetDeltaTimeManager()
+    dtManager:ApplyHitStop(0.2);
+
+    if Config.Health <= 0 then
+        GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
+
+        -- 카메라 셰이크 추가 (기본 파라미터 사용)
+        CameraUtility.AddCameraShake();
+
+        -- 화면 암전 효과 (5초에 걸쳐 검은색으로 FadeOut)
+        -- FromAlpha: 1.0 (완전 투명, 원본 씬 보임)
+        -- ToAlpha: 0.0 (완전 불투명, 검은색만 보임)
+        -- Duration: 5.0초
+        -- FadeColor: 검은색 (기본값)
+        CameraUtility.StartCameraFade(1.0, 0.0, 5.0);
+    end
 end
 
 -- ════════════════════════════════════════════════════════════════════════════

@@ -67,20 +67,70 @@ function CameraUtility.AddCameraShake(RotationAmplitude, AlphaInTime, NumSamples
     PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
 end
 
-function CameraUtility.AddLetterBox(FadeSize, Opacity, FadeInTime)
+local CurLetterBoxSize = 0.0;
+local letterBox = nil;
+
+function CameraUtility.AddLetterBox(FadeSize, Opacity, FadeTime, bFadeIn)
     if not PlayerCameraManager then
         return;
     end
 
-    -- LetterBox 모디파이어 생성
-    local letterBox = UCameraModifier_LetterBox()
+    letterBox = UCameraModifier_LetterBox()
     -- 레터박스 시작 (크기, 불투명도, 페이드인 시간)
-    letterBox:SetFadeIn(FadeSize, Opacity, FadeInTime)
+    if bFadeIn == true then
+        CurLetterBoxSize = 0.0
+        letterBox:SetFadeIn(FadeSize, Opacity, FadeTime, CurLetterBoxSize)
+        CurLetterBoxSize = FadeSize
+    else
+        letterBox:SetFadeOut(FadeTime, CurLetterBoxSize)
+    end
+    
     PlayerCameraManager:AddCameraModifier(letterBox)
 end
 
+function CameraUtility.AddVignetting(Color, Radius, Softness, FadeInTime)
+    if not PlayerCameraManager then
+        return;
+    end
+
+    -- Vignetting 모디파이어 생성
+    local Vignetting = UCameraModifier_Vignetting();
+
+    -- 기본값 설정
+    Color = Color or FVector4(1.0, 207.0 / 255.0, 64.0 / 255.0, 1.0);
+    Radius = Radius or 0.99;
+    Softness = Softness or 0.2;
+    FadeInTime = FadeInTime or 1.0;
+
+    PrintToConsole(string.format("[AddVignetting] Color: (%.2f, %.2f, %.2f)", Color.X, Color.Y, Color.Z));
+    PrintToConsole(string.format("[AddVignetting] Radius: %.2f, Softness: %.2f", Radius, Softness));
+
+    -- Vignetting 파라미터 설정
+    Vignetting:SetRadius(Radius);
+    Vignetting:SetSoftness(Softness);
+    Vignetting:SetVignettingColor(Color);
+
+    -- FadeIn 시작 (AlphaInTime 설정 + 활성화 + FadeIn 플래그)
+    Vignetting:SetAlphaInTime(FadeInTime);
+    Vignetting:EnableModifier();
+    Vignetting:SetIsFadingIn(true);
+
+    -- PlayerCameraManager에 추가
+    PlayerCameraManager:AddCameraModifier(Vignetting);
+end
+
+function CameraUtility.AddScoreAndShowGoldVignetting()
+    _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
+    CameraUtility.AddVignetting(
+            FVector4(1.0, 207.0 / 255.0, 64.0 / 255.0, 1.0),
+            1.2,
+            0.2,
+            3.0
+    );
+end
+
     -- 비활성화된 카메라 셰이크 제거
-function CameraUtility.RemoveDisabledCameraShakes()
+function CameraUtility.RemoveDisabledCameraModifiers()
     if not PlayerCameraManager then
         return;
     end

@@ -107,7 +107,7 @@ namespace FMath
 		float Exp
 	)
 	{
-		float const ModifiedAlpha = 1.f - std::pow(Alpha, Exp);
+		float const ModifiedAlpha = 1.f - std::pow(1.f - Alpha, Exp);
 		return Lerp(Current, Target, ModifiedAlpha);
 	}
 

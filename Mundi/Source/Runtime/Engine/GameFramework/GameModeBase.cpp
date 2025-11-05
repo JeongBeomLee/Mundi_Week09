@@ -6,6 +6,7 @@
 #include "World.h"
 #include "DeltaTimeManager.h"
 #include "PlayerCameraManager.h"
+#include "CameraBlendPresetLibrary.h"
 
 // AGameModeBase를 ObjectFactory에 등록
 IMPLEMENT_CLASS(AGameModeBase)
@@ -35,6 +36,13 @@ void AGameModeBase::BeginPlay()
 	Super::BeginPlay();
 
 	UE_LOG("[GameMode] BeginPlay");
+
+	// 카메라 블렌드 프리셋 라이브러리 초기화
+	UCameraBlendPresetLibrary* PresetLibrary = UCameraBlendPresetLibrary::GetInstance();
+	if (PresetLibrary)
+	{
+		PresetLibrary->PrintAllPresets();  // 디버그: 등록된 프리셋 목록 출력
+	}
 
 	// World의 PIE 설정을 GameMode에 적용
 	if (World)
@@ -76,6 +84,11 @@ void AGameModeBase::BeginPlay()
 	{
 		InitPlayer();
 	}
+}
+
+void AGameModeBase::EndPlay(EEndPlayReason Reason)
+{
+	USoundManager::GetInstance().StopAllSounds();
 }
 
 void AGameModeBase::Tick(float DeltaTime)

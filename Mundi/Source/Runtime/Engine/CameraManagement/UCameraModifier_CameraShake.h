@@ -24,6 +24,7 @@ public:
 
     void SetAlphaInTime(const float InAlphaInTime) override;
     void SetNumSamples(const float InNumSamples);
+
 private:
     UPerlinNoiseFloat PerlinNoiseXAxis;
     UPerlinNoiseFloat PerlinNoiseYAxis;

@@ -6,6 +6,8 @@ local RandomManager = require("RandomManager");
 local CollisionUtility = require("CollisionUtility");
 local CameraUtility = require("CameraUtility");
 
+-- local RunnerCharacter = require("RunnerCharacter");
+
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
 local DEFAULT_SCALE = 0.4;
@@ -148,26 +150,38 @@ end
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
     -- PrintToConsole("[ObstacleGenerator] OnOverlap called!");
 
-    if not CollisionUtility.IsObstacleActor(OtherActor) then
-        --PrintToConsole("[ObstacleGenerator] Not an obstacle actor, returning");
-        return;
-    end
+--     if not CollisionUtility.IsObstacleActor(OtherActor) then
+--         --PrintToConsole("[ObstacleGenerator] Not an obstacle actor, returning");
+--         return;
+--     end
 
-    -- 플레이어 사망 처리
-    GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
+--     -- 플레이어 사망 처리
+--     -- PrintToConsole("[ObstacleGenerator] Player hit an obstacle! Processing death sound...");
+--     -- StartCoroutine(function()
+--     --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/FailedSoundFx.mp3", false, SoundChannelType.SFX);
+--     --     coroutine.yield(1.5);
+--     --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GameOverSoundFx.mp3", false, SoundChannelType.SFX);
+--     -- end);
 
-    -- 카메라 셰이크 추가 (기본 파라미터 사용)
-    CameraUtility.AddCameraShake();
+--     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/PlayerHitFX.mp3", false, SoundChannelType.SFX);
+--     RunnerCharacter.DecreaseHealth(1);
+    
+--     if RunnerCharacter.GetHealth() <= 0 then
+--         GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
 
-    -- 레터 박스 추가
-    CameraUtility.AddLetterBox(0.15, 1.0, 1.0);  -- Height: 0.2, Duration: 0.5초
+--         -- 카메라 셰이크 추가 (기본 파라미터 사용)
+--         CameraUtility.AddCameraShake();
 
-    -- 화면 암전 효과 (5초에 걸쳐 검은색으로 FadeOut)
-    -- FromAlpha: 1.0 (완전 투명, 원본 씬 보임)
-    -- ToAlpha: 0.0 (완전 불투명, 검은색만 보임)
-    -- Duration: 5.0초
-    -- FadeColor: 검은색 (기본값)
-    CameraUtility.StartCameraFade(1.0, 0.0, 5.0);
+--         -- 레터 박스 추가
+--         CameraUtility.AddLetterBox(0.15, 1.0, 1.0);  -- Height: 0.2, Duration: 0.5초
+
+--         -- 화면 암전 효과 (5초에 걸쳐 검은색으로 FadeOut)
+--         -- FromAlpha: 1.0 (완전 투명, 원본 씬 보임)
+--         -- ToAlpha: 0.0 (완전 불투명, 검은색만 보임)
+--         -- Duration: 5.0초
+--         -- FadeColor: 검은색 (기본값)
+--         CameraUtility.StartCameraFade(1.0, 0.0, 5.0);
+--     end
 end
 
 function Tick(dt)
@@ -186,9 +200,6 @@ function Restart()
             Queue.push(ObstaclePool);
         end
     end
-
-    -- 모든 활성 카메라 셰이크 제거
-    CameraUtility.ClearAllCameraShakes();
 
     -- 카메라 페이드 중지 및 초기화 (화면 정상화)
     CameraUtility.StopCameraFade();

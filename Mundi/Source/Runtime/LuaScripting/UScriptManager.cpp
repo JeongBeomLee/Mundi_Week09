@@ -36,9 +36,11 @@
 #include "UCameraModifier.h"
 #include "UCameraModifier_CameraShake.h"
 #include "UCameraModifier_LetterBox.h"
+#include "UCameraModifier_Vignetting.h"
 #include "HeightFogComponent.h"
 #include "DeltaTimeManager.h"
 #include "Color.h"
+#include "SoundManager.h"
 
 IMPLEMENT_CLASS(UScriptManager)
 
@@ -466,6 +468,18 @@ void UScriptManager::RegisterUserTypeToLua()
     Lua["FVector"]["Cross"] = &FVector::Cross;
     Lua["FVector"]["Dot"] = &FVector::Dot;
     Lua["FVector"]["Lerp"] = &FVector::Lerp;
+
+    // FVector4 타입을 Lua에 등록
+    Lua.new_usertype<FVector4>("FVector4",
+        sol::call_constructor, sol::factories(
+            []() { return FVector4(); },
+            [](float x, float y, float z, float w) { return FVector4(x, y, z, w); }
+        ),
+        "X", &FVector4::X,
+        "Y", &FVector4::Y,
+        "Z", &FVector4::Z,
+        "W", &FVector4::W
+    );
 
     // FQuat 타입을 Lua에 등록
     Lua.new_usertype<FQuat>("FQuat",
@@ -1046,6 +1060,7 @@ void UScriptManager::RegisterUserTypeToLua()
         "OnCoinCollected", &ARunnerGameMode::OnCoinCollected,
         "OnObstacleAvoided", &ARunnerGameMode::OnObstacleAvoided,
         "OnPlayerJump", &ARunnerGameMode::OnPlayerJump,
+		"OnDecreasePlayerHealth", &ARunnerGameMode::OnDecreasePlayerHealth,
         "RestartGame", &ARunnerGameMode::RestartGame
         //// 난이도 설정
         //"BaseDifficulty", &ARunnerGameMode::BaseDifficulty,
@@ -1118,6 +1133,86 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetOpacity", &UCameraModifier_LetterBox::SetOpacity
     );
 
+    // UCameraModifier_Vignetting 클래스 등록
+    Lua.new_usertype<UCameraModifier_Vignetting>("UCameraModifier_Vignetting",
+        sol::call_constructor, sol::factories(
+            []() { return new UCameraModifier_Vignetting(); }
+        ),
+        sol::base_classes, sol::bases<UCameraModifier, UObject>(),
+        "GetRadius", &UCameraModifier_Vignetting::GetRadius,
+        "SetRadius", &UCameraModifier_Vignetting::SetRadius,
+        "GetSoftness", &UCameraModifier_Vignetting::GetSoftness,
+        "SetSoftness", &UCameraModifier_Vignetting::SetSoftness,
+        "GetVignettingColor", &UCameraModifier_Vignetting::GetVignettingColor,
+        "SetVignettingColor", &UCameraModifier_Vignetting::SetVignettingColor
+    );
+
+    // ESoundChannelType enum 바인딩
+    Lua.new_enum<ESoundChannelType>("SoundChannelType",
+        {
+            {"Master", ESoundChannelType::Master},
+            {"Music", ESoundChannelType::Music},
+            {"SFX", ESoundChannelType::SFX}
+        });
+
+    // USoundManager 클래스 등록
+    Lua.new_usertype<USoundManager>("USoundManager",
+        sol::no_constructor,
+        // 2D 사운드 재생 - void 반환 (Channel은 내부적으로 관리)
+        "PlaySound2D", sol::overload(
+            // 모든 인자 지정
+            [](USoundManager* self, const FString& SoundPath, bool bLoop, ESoundChannelType ChannelType) {
+                self->PlaySound2D(SoundPath, bLoop, ChannelType);
+            },
+            // ChannelType 생략 (기본값: SFX)
+            [](USoundManager* self, const FString& SoundPath, bool bLoop) {
+                self->PlaySound2D(SoundPath, bLoop, ESoundChannelType::SFX);
+            },
+            // bLoop 생략 (기본값: false)
+            [](USoundManager* self, const FString& SoundPath) {
+                self->PlaySound2D(SoundPath, false, ESoundChannelType::SFX);
+            }
+        ),
+        // 3D 사운드 재생 - void 반환
+        "PlaySound3D", sol::overload(
+            // 모든 인자 지정
+            [](USoundManager* self, const FString& SoundPath, const FVector& Location,
+                bool bLoop, float MinDistance, float MaxDistance, ESoundChannelType ChannelType) {
+                    self->PlaySound3D(SoundPath, Location, bLoop, MinDistance, MaxDistance, ChannelType);
+            },
+            // ChannelType 생략
+            [](USoundManager* self, const FString& SoundPath, const FVector& Location,
+                bool bLoop, float MinDistance, float MaxDistance) {
+                    self->PlaySound3D(SoundPath, Location, bLoop, MinDistance, MaxDistance, ESoundChannelType::SFX);
+            },
+            // MinDistance, MaxDistance 생략
+            [](USoundManager* self, const FString& SoundPath, const FVector& Location, bool bLoop) {
+                self->PlaySound3D(SoundPath, Location, bLoop, 100.0f, 10000.0f, ESoundChannelType::SFX);
+            },
+            // bLoop 생략
+            [](USoundManager* self, const FString& SoundPath, const FVector& Location) {
+                self->PlaySound3D(SoundPath, Location, false, 100.0f, 10000.0f, ESoundChannelType::SFX);
+            }
+        ),
+        // BGM 제어
+        "PlayBGM", &USoundManager::PlayBGM,
+        "StopBGM", &USoundManager::StopBGM,
+        "IsBGMPlaying", &USoundManager::IsBGMPlaying,
+        // 채널 제어 - FMOD::Channel* 타입은 Lua에 노출하지 않음
+        "StopAllSounds", &USoundManager::StopAllSounds,
+        // 3D 리스너 설정
+        "SetListenerPosition", &USoundManager::SetListenerPosition,
+        // 볼륨 제어
+        "SetMasterVolume", &USoundManager::SetMasterVolume,
+        "GetMasterVolume", &USoundManager::GetMasterVolume,
+        "SetMusicVolume", &USoundManager::SetMusicVolume,
+        "GetMusicVolume", &USoundManager::GetMusicVolume,
+        "SetSFXVolume", &USoundManager::SetSFXVolume,
+        "GetSFXVolume", &USoundManager::GetSFXVolume,
+        // 상태 확인
+        "IsInitialized", &USoundManager::IsInitialized
+    );
+
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
 }
 
@@ -1126,6 +1221,8 @@ void UScriptManager::RegisterGlobalValueToLua()
 #ifdef _EDITOR
     Lua["GEngine"] = &GEngine;
 #endif
+    // SoundManager 싱글톤 등록
+    Lua["SoundManager"] = &USoundManager::GetInstance();
 }
 
 void UScriptManager::RegisterGlobalFuncToLua()
