@@ -64,4 +64,8 @@ public:
 	int32 JumpScore = 10;
 	int32 CoinScore = 0;
 	int32 AvoidScore = 20;
+
+	/** 사운드 지연 재생을 위한 타이머 */
+	float SoundDelayTimer = 0.0f;
+	bool bWaitingForSecondSound = false;
 };

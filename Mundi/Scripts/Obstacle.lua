@@ -52,6 +52,8 @@ function OnOverlap(
     -- PrintToConsole("[coin_collision] Collided with: " .. actorName)
 
     if actorName == "Projectile Actor" then
+        SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/ObstacleHitFx.mp3", false, SoundChannelType.SFX);
+
         -- Health가 줄기 전에 현재 Health에 해당하는 빌보드를 숨김
         if Health > 0 and BillboardComponents[Health] then
             for j = 1, Health do
@@ -68,6 +70,7 @@ function OnOverlap(
         
         if Health <= 0 then
             -- PrintToConsole("[coin_collision] Coin collected!")
+            SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GetScoreFx.mp3", false, SoundChannelType.SFX);
             GameMode:OnCoinCollected(1)
             MyActor:Destroy()
         else

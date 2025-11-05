@@ -78,6 +78,11 @@ void AGameModeBase::BeginPlay()
 	}
 }
 
+void AGameModeBase::EndPlay(EEndPlayReason Reason)
+{
+	USoundManager::GetInstance().StopAllSounds();
+}
+
 void AGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

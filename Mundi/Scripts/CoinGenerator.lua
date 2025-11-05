@@ -151,6 +151,7 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     -- OtherActor가 코인인지 확인
     if (IsCoinActor(OtherActor)) then
         -- 점수 추가
+        SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GetScoreFx.mp3", false, SoundChannelType.SFX);
         _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
         PrintToConsole("[CoinGenerator] Coin collected!");
         
