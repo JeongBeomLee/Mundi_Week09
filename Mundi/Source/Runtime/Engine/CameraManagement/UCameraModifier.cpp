@@ -32,7 +32,7 @@ void UCameraModifier::ModifyCamera(
         // InOutPOV struct.
         {
             float PPBlendWeight = 0.f;
-            FPostProcessSettings PPSettings;
+            FPostProcessSettings PPSettings = CameraOwner->GetViewTarget_Internal().PostProcessSettings;
 			
             //  Let native code modify the post process settings.
             ModifyPostProcess(

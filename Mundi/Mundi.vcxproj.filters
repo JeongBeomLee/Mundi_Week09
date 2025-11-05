@@ -65,6 +65,9 @@
     <FxCompile Include="Shaders\Common\ShadowVSM_PS.hlsl">
       <Filter>Shaders\Common</Filter>
     </FxCompile>
+    <FxCompile Include="Shaders\PostProcess\GammaCorrection_PS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
   </ItemGroup>
   <!-- Root Files -->
   <ItemGroup>
