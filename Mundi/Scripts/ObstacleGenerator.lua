@@ -10,14 +10,14 @@ local CameraUtility = require("CameraUtility");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
-local DEFAULT_SCALE = 0.4;
+local DEFAULT_SCALE = 0.04;  -- 스케일 10분의 1로 축소 (0.4 -> 0.04)
 
 local DEFAULT_SPAWN_DELAY_MIN = 3.0;
 local DEFAULT_SPAWN_DELAY_MAX = 5.0;
 
 local DEFAULT_POOL_SIZE = 50;
 
-local OBSTACLE_OBJ_FILE_PATH = "Data/Model/smokegrenade.obj";
+local OBSTACLE_OBJ_FILE_PATH = "Data/Model/backup.obj";
 
 local BILLBOARD_COUNT = 5;  -- 빌보드 컴포넌트 개수
 
