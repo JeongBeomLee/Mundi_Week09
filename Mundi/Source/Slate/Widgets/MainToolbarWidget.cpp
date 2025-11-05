@@ -6,6 +6,9 @@
 #include "SelectionManager.h"
 #include "CameraActor.h"
 #include "EditorEngine.h"
+#include "UIManager.h"
+#include "Windows/CameraBlendEditorWindow.h"
+#include "Windows/UIWindow.h"
 #include <commdlg.h>
 #include <random>
 
@@ -44,6 +47,7 @@ void UMainToolbarWidget::LoadToolbarIcons()
     IconPlay = UResourceManager::GetInstance().Load<UTexture>("Data/Icon/Toolbar_Play.png");
     IconStop = UResourceManager::GetInstance().Load<UTexture>("Data/Icon/Toolbar_Stop.png");
     IconAddActor = UResourceManager::GetInstance().Load<UTexture>("Data/Icon/Toolbar_AddActor.png");
+    IconBlendEditor = UResourceManager::GetInstance().Load<UTexture>("Data/Icon/Toolbar_BlendEditor.png");
     LogoTexture = UResourceManager::GetInstance().Load<UTexture>("Data/Icon/Mundi_Logo.png");
 }
 
@@ -100,6 +104,10 @@ void UMainToolbarWidget::RenderToolbar()
         // Actor Spawn 버튼
         ImGui::SameLine(0, 12.0f);
         RenderActorSpawnButton();
+
+        // Blend Editor 버튼
+        ImGui::SameLine(0, 12.0f);
+        RenderBlendEditorButton();
 
         // 구분선
         ImGui::SameLine(0, 12.0f);
@@ -1012,4 +1020,61 @@ void UMainToolbarWidget::HandleActorSelection(AActor* Actor)
     // Clear previous selection and select this actor
     GWorld->GetSelectionManager()->ClearSelection();
     GWorld->GetSelectionManager()->SelectActor(Actor);
+}
+
+void UMainToolbarWidget::RenderBlendEditorButton()
+{
+    const ImVec2 IconSizeVec(IconSize, IconSize);
+
+    // 버튼 스타일
+    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 4));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 4.0f);
+    ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.2f, 0.2f, 0.5f));
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.3f, 0.3f, 0.3f, 0.7f));
+
+    ImGui::BeginGroup();
+
+    if (IconBlendEditor && IconBlendEditor->GetShaderResourceView())
+    {
+        if (ImGui::ImageButton("##BlendEditorBtn", (void*)IconBlendEditor->GetShaderResourceView(),
+                                IconSizeVec, ImVec2(0,0), ImVec2(1,1), ImVec4(0,0,0,0), ImVec4(1, 1, 1, 1)))
+        {
+            // UCameraBlendEditorWindow 찾기 또는 생성
+            UUIWindow* BlendEditorWindow = UUIManager::GetInstance().FindUIWindow("Camera Blend Editor");
+            if (!BlendEditorWindow)
+            {
+                // 윈도우가 없으면 생성 후 등록
+                BlendEditorWindow = new UCameraBlendEditorWindow();
+                BlendEditorWindow->Initialize();
+                UUIManager::GetInstance().RegisterUIWindow(BlendEditorWindow);
+            }
+
+            // 윈도우 열기
+            BlendEditorWindow->SetWindowState(EUIWindowState::Visible);
+        }
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("카메라 블렌드 에디터를 엽니다");
+        }
+    }
+
+    // 테두리 그리기
+    ImVec2 groupMin = ImGui::GetItemRectMin();
+    ImVec2 groupMax = ImGui::GetItemRectMax();
+
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    drawList->AddRect(
+        groupMin,
+        groupMax,
+        ImGui::GetColorU32(ImVec4(0.4f, 0.45f, 0.5f, 0.8f)),
+        4.0f,
+        0,
+        1.3f
+    );
+
+    ImGui::EndGroup();
+
+    ImGui::PopStyleColor(3);
+    ImGui::PopStyleVar(2);
 }

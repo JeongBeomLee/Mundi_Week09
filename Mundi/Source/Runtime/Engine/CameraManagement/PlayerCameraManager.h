@@ -5,7 +5,7 @@
 #include "CameraTypes.h"
 
 class UCameraComponent;
-class UCameraModifier; // 전방 선언 (다른 팀원이 구현 중)
+class UCameraModifier;
 class USpringArmComponent;
 
 // 플레이어 카메라를 관리하는 매니저 클래스
@@ -77,6 +77,9 @@ public:
 
 	// 블렌딩 중단
 	void StopBlending();
+
+	// 초기 카메라 위치/회전/FOV를 즉시 설정
+	void SetCameraTransform(const FVector& Location, const FQuat& Rotation, float FOV);
 
 	// 블렌딩 진행 중인지 확인
 	bool IsBlending() const { return BlendParams.IsBlending(); }

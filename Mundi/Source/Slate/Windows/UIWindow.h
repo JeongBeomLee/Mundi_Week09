@@ -108,7 +108,7 @@ public:
 		return CurrentState == EUIWindowState::Visible || CurrentState == EUIWindowState::Maximized;
 	}
 
-	void SetWindowState(EUIWindowState NewState) { CurrentState = NewState; }
+	void SetWindowState(EUIWindowState NewState);
 	void SetWindowTitle(const FString& NewTitle) { Config.WindowTitle = NewTitle; }
 	void SetPriority(int NewPriority) { Config.Priority = NewPriority; }
 	void SetConfig(const FUIWindowConfig& InConfig) { Config = InConfig; }

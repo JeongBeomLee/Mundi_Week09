@@ -13,6 +13,7 @@ public:
 
 	virtual void Initialize() override;
 	virtual void RenderContent() override;
+	virtual bool OnWindowClose() override;
 
 private:
 	// UI 렌더링 함수들

@@ -152,9 +152,10 @@ function BeginPlay()
 end
 
 function Tick(deltaTime)
-    -- 카메라 업데이트
-    CameraUtility.UpdateCamera(deltaTime);
-    
+    -- 카메라 업데이트는 PlayerController::Tick에서 자동으로 수행됨
+    -- (중복 호출 방지를 위해 주석 처리)
+    -- CameraUtility.UpdateCamera(deltaTime);
+
     -- 회전 중에는 모든 입력 무시
     if GravitySystem and GravitySystem.IsCurrentlyRotating and GravitySystem.IsCurrentlyRotating() then
         return

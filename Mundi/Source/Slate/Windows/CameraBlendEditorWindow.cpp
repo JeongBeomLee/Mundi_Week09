@@ -33,6 +33,13 @@ void UCameraBlendEditorWindow::Initialize()
 	UE_LOG("CameraBlendEditorWindow: 윈도우가 생성되었습니다");
 }
 
+bool UCameraBlendEditorWindow::OnWindowClose()
+{
+	// X버튼 클릭 시 윈도우를 완전히 닫지 않고 숨김 처리
+	SetWindowState(EUIWindowState::Hidden);
+	return false; // false를 반환하여 ImGui의 기본 닫기 동작 방지
+}
+
 void UCameraBlendEditorWindow::RenderContent()
 {
 	ImGui::BeginChild("CameraBlendEditor", ImVec2(0, 0), false);
@@ -111,6 +118,17 @@ void UCameraBlendEditorWindow::RenderPresetSelector()
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(150);
 		ImGui::DragFloat("##BlendExp", &EditingParams.BlendExp, 0.1f, 0.5f, 5.0f, "%.1f");
+	}
+
+	// SpringArm 블렌딩 설정
+	ImGui::Separator();
+	ImGui::Checkbox("Blend SpringArm Length", &EditingParams.bBlendSpringArmLength);
+	if (EditingParams.bBlendSpringArmLength)
+	{
+		ImGui::Text("Target SpringArm Length:");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(150);
+		ImGui::DragFloat("##TargetSpringArmLength", &EditingParams.TargetSpringArmLength, 1.0f, 10.0f, 1000.0f, "%.1f");
 	}
 }
 

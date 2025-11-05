@@ -461,6 +461,14 @@ void APlayerCameraManager::StopBlending()
 	PendingViewTarget.Target = nullptr;
 }
 
+void APlayerCameraManager::SetCameraTransform(const FVector& Location, const FQuat& Rotation, float FOV)
+{
+	// 현재 ViewTarget의 카메라 위치/회전/FOV를 즉시 설정
+	ViewTarget.POV_Location = Location;
+	ViewTarget.POV_Rotation = Rotation;
+	ViewTarget.POV_FOV = FOV;
+}
+
 void APlayerCameraManager::UpdateViewTargetBlending(float DeltaTime)
 {
 	// 블렌딩 중이 아니면 리턴
@@ -487,7 +495,6 @@ void APlayerCameraManager::UpdateViewTargetBlending(float DeltaTime)
 			}
 		}
 
-		// PendingViewTarget 업데이트
 		UCameraComponent* PendingCamera = FindCameraComponent(PendingViewTarget.Target);
 		if (PendingCamera)
 		{
