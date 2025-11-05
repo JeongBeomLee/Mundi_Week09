@@ -4,6 +4,7 @@ local Queue = require("Queue");
 local GlobalObjectManager = require("GlobalObjectManager");
 local RandomManager = require("RandomManager");
 local CollisionUtility = require("CollisionUtility");
+local CameraUtility = require("CameraUtility");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
@@ -29,11 +30,6 @@ local ObstaclesSpawned = Queue.new();
 
 local PoolSize = DEFAULT_POOL_SIZE;
 local ObstaclePool = Queue.new();
-
--- PlayerController와 CameraManager 저장
-local PlayerController = nil;
-local PlayerCameraManager = nil;
-local ActiveCameraShakeModifiers = {};  -- 활성 CameraShake 추적용
 
 -- 충돌 컴포넌트가 포함되어 있으면 다른 물체와 OnOVerlap될 수 있으므로
 -- Pool마다 STORAGE_POSITION을 다르게 해야 함.
@@ -130,23 +126,8 @@ function BeginPlay()
     -- 풀 초기화
     InitializePool();
 
-    -- PlayerController와 PlayerCameraManager 가져오기
-    local GameMode = GetRunnerGameMode(GlobalObjectManager.GetPIEWorld());
-    if GameMode then
-        PlayerController = GameMode:GetPlayerController();
-        if PlayerController then
-            PlayerCameraManager = PlayerController:GetPlayerCameraManager();
-            if PlayerCameraManager then
-                PrintToConsole("[ObstacleGenerator] PlayerCameraManager initialized");
-            else
-                PrintToConsole("[ObstacleGenerator] WARNING: PlayerCameraManager is nil");
-            end
-        else
-            PrintToConsole("[ObstacleGenerator] WARNING: PlayerController is nil");
-        end
-    else
-        PrintToConsole("[ObstacleGenerator] WARNING: GameMode is nil");
-    end
+    ---- CameraUtility 초기화
+    --CameraUtility.Initialize(GlobalObjectManager.GetPIEWorld());
 
     -- 코루틴으로 장애물 스폰 시작 (한 번만 실행)
     StartCoroutine(function()
@@ -158,10 +139,6 @@ function EndPlay()
     PrintToConsole("[ObstacleGenerator] End Play");
 end
 
-local function AddCameraShake()
-    if not PlayerCameraManager then
-        return;
-    end
 
     -- LetterBox 모디파이어 생성
     PrintToConsole("[RunnerCharacter] Adding LetterBox camera modifier")
@@ -188,41 +165,32 @@ local function AddCameraShake()
 end
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
+    -- PrintToConsole("[ObstacleGenerator] OnOverlap called!");
+
     if not CollisionUtility.IsObstacleActor(OtherActor) then
+        PrintToConsole("[ObstacleGenerator] Not an obstacle actor, returning");
         return;
     end
 
     -- 플레이어 사망 처리
     GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
 
-    -- 카메라 셰이크 추가
-    AddCameraShake();
-end
+    -- 카메라 셰이크 추가 (기본 파라미터 사용)
+    CameraUtility.AddCameraShake();
 
-local function RemoveDisabledCameraShakes()
-    local i = 1;
-    while i <= #ActiveCameraShakeModifiers do
-        local modifier = ActiveCameraShakeModifiers[i];
-
-        if modifier:IsDisabled() then
-            PlayerCameraManager:RemoveCameraModifier(modifier);
-            table.remove(ActiveCameraShakeModifiers, i);
-        else
-            i = i + 1;
-        end
-    end
+    -- 화면 암전 효과 (5초에 걸쳐 검은색으로 FadeOut)
+    -- FromAlpha: 1.0 (완전 투명, 원본 씬 보임)
+    -- ToAlpha: 0.0 (완전 불투명, 검은색만 보임)
+    -- Duration: 5.0초
+    -- FadeColor: 검은색 (기본값)
+    CameraUtility.StartCameraFade(1.0, 0.0, 5.0);
 end
 
 function Tick(dt)
     CheckObstacleLocationAndWithDraw();
 
-    -- 카메라 업데이트
-    if PlayerCameraManager then
-        PlayerCameraManager:UpdateCamera(dt);
-    end
-
     -- 비활성화된 카메라 셰이크 제거
-    RemoveDisabledCameraShakes();
+    CameraUtility.RemoveDisabledCameraShakes();
 end
 
 -- 부활 작업
@@ -234,4 +202,10 @@ function Restart()
             Queue.push(ObstaclePool);
         end
     end
+
+    -- 모든 활성 카메라 셰이크 제거
+    CameraUtility.ClearAllCameraShakes();
+
+    -- 카메라 페이드 중지 및 초기화 (화면 정상화)
+    CameraUtility.StopCameraFade();
 end
