@@ -194,8 +194,10 @@ end
 -- end
 
 function Tick(deltaTime)
-    -- 카메라 업데이트
-    CameraUtility.UpdateCamera(deltaTime);
+    -- 카메라 업데이트는 PlayerController::Tick에서 자동으로 수행됨
+    -- (중복 호출 방지를 위해 주석 처리)
+    -- CameraUtility.UpdateCamera(deltaTime);
+
     -- 모든 비활성 Camera Modifier 제거
     CameraUtility.RemoveDisabledCameraModifiers();
     

@@ -77,6 +77,7 @@ public:
 
     uint8 GetPriority() const;
     void SetPriority(const uint8 InPriority);
+
 protected:
     APlayerCameraManager* CameraOwner = nullptr;
     float AlphaInTime = 1.0f;
