@@ -117,12 +117,6 @@ extern const FString GCacheDir;
 //CUR ENGINE MODE
 #define _EDITOR
 
-#ifdef _EDITOR
 extern UEditorEngine GEngine;
-#endif
-
-#ifdef _GAME
-extern UGameEngine GEngine;
-#endif
 
 extern UWorld* GWorld;

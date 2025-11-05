@@ -553,6 +553,9 @@
     <ClCompile Include="ThirdParty\ImGui\imgui_widgets.cpp">
       <Filter>ThirdParty\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClCompile>
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->

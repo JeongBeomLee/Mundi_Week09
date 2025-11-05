@@ -3,6 +3,7 @@ local _ENV = ...
 local Queue = require("Queue");
 local GlobalObjectManager = require("GlobalObjectManager");
 local RandomManager = require("RandomManager");
+local CameraUtility = require("CameraUtility");
 
 local DEFAULT_HORIZONTAL_SPAWN_RANGE = 10 * 2;  -- 맵 기준 한 변의 블록 개수 * 블록 크기
 local DEFAULT_VERTICAL_SPAWN_RANGE = 10 * 2;
@@ -163,6 +164,13 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         OtherActor:SetTransform(STORAGE_POSITION);
         RemoveCoinFromSpawned(OtherActor);
         Queue.push(CoinPool, OtherActor);
+        
+        CameraUtility.AddVignetting(
+                FVector(1.0, 207.0 / 255.0, 64.0 / 255.0),
+                0.99,
+                0.2,
+                1.0
+        );
     end
 end
 

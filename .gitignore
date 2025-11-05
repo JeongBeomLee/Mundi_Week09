@@ -483,3 +483,7 @@ Document/*
 /Mundi/Data/untracked/**
 /Mundi/DerivedDataCache/**
 .claude/agents/project-optimizer.md
+
+# Build directories
+Binaries/
+Intermediate/

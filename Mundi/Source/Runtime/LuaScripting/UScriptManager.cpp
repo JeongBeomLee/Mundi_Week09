@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Source/Runtime/LuaScripting/UScriptManager.h"
 
 #include "CollisionComponent/BoxComponent.h"
@@ -34,6 +34,7 @@
 #include "UCameraModifier.h"
 #include "UCameraModifier_CameraShake.h"
 #include "UCameraModifier_LetterBox.h"
+#include "UCameraModifier_Vignetting.h"
 #include "HeightFogComponent.h"
 #include "DeltaTimeManager.h"
 #include "Color.h"
@@ -1086,6 +1087,20 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetSize", &UCameraModifier_LetterBox::SetSize,
         "GetOpacity", &UCameraModifier_LetterBox::GetOpacity,
         "SetOpacity", &UCameraModifier_LetterBox::SetOpacity
+    );
+
+    // UCameraModifier_Vignetting 클래스 등록
+    Lua.new_usertype<UCameraModifier_Vignetting>("UCameraModifier_Vignetting",
+        sol::call_constructor, sol::factories(
+            []() { return new UCameraModifier_Vignetting(); }
+        ),
+        sol::base_classes, sol::bases<UCameraModifier, UObject>(),
+        "GetRadius", &UCameraModifier_Vignetting::GetRadius,
+        "SetRadius", &UCameraModifier_Vignetting::SetRadius,
+        "GetSoftness", &UCameraModifier_Vignetting::GetSoftness,
+        "SetSoftness", &UCameraModifier_Vignetting::SetSoftness,
+        "GetVignettingColor", &UCameraModifier_Vignetting::GetVignettingColor,
+        "SetVignettingColor", &UCameraModifier_Vignetting::SetVignettingColor
     );
 
     // ESoundChannelType enum 바인딩

@@ -194,9 +194,6 @@ function Restart()
         end
     end
 
-    -- 모든 활성 카메라 셰이크 제거
-    CameraUtility.ClearAllCameraShakes();
-
     -- 카메라 페이드 중지 및 초기화 (화면 정상화)
     CameraUtility.StopCameraFade();
 end

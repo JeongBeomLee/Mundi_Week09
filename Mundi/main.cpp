@@ -19,7 +19,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     if (!GEngine.Startup(hInstance))
         return -1;
-
+#ifdef STANDALONE_BUILD
+    GEngine.BuildScene();
+    GEngine.StartPIE();
+#endif
     GEngine.MainLoop();
     GEngine.Shutdown();
 
