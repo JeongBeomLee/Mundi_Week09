@@ -154,6 +154,13 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     end
 
     -- 플레이어 사망 처리
+    -- PrintToConsole("[ObstacleGenerator] Player hit an obstacle! Processing death sound...");
+    -- StartCoroutine(function()
+    --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/FailedSoundFx.mp3", false, SoundChannelType.SFX);
+    --     coroutine.yield(1.5);
+    --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GameOverSoundFx.mp3", false, SoundChannelType.SFX);
+    -- end);
+    
     GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
 
     -- 카메라 셰이크 추가 (기본 파라미터 사용)

@@ -35,6 +35,7 @@ public:
 
 	// AActor 오버라이드
 	virtual void BeginPlay() override;
+	virtual void EndPlay(EEndPlayReason Reason) override;
 	virtual void Tick(float DeltaTime) override;
 
 	// 게임 라이프사이클

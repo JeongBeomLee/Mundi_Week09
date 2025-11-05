@@ -728,6 +728,7 @@ if "$(Configuration)"=="Debug" (
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\actor_transform.lua" />
+    <None Include="Scripts\CameraUtility.lua" />
     <None Include="Scripts\CoinGenerator.lua" />
     <None Include="Scripts\coin_collision.lua" />
     <None Include="Scripts\CollisionUtility.lua" />
@@ -743,6 +744,7 @@ if "$(Configuration)"=="Debug" (
     <None Include="Scripts\RandomManager.lua" />
     <None Include="Scripts\RunnerCharacter.lua" />
     <None Include="Scripts\template.lua" />
+    <None Include="Scripts\test_coroutine.lua" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Scripts\CameraUtility.lua" />

@@ -180,6 +180,8 @@ FMOD::Channel* USoundManager::PlaySound2D(const FString& SoundPath, bool bLoop, 
 		Channel->setMode(bLoop ? FMOD_LOOP_NORMAL : FMOD_LOOP_OFF);
 	}
 
+	UE_LOG("[USoundManager] 2D 사운드 재생: %s", SoundPath);
+
 	return Channel;
 }
 

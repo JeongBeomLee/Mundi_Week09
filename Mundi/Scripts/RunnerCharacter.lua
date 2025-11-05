@@ -149,8 +149,49 @@ function BeginPlay()
     -- -- Slomo (2초간 30% 속도)
     -- dtManager:ApplySlomoEffect(10.0, 0.05)
     -- PrintToConsole("[RunnerCharacter] Slomo effect applied")
+    SoundManager:PlayBGM("Data/Sounds/InfinityRunner/Run2BGM.wav");
 
+    -- StartCoroutine(function() CameraIntroSequence() end)
 end
+
+-- function CameraIntroSequence()
+--     PrintToConsole("[Camera Intro] Starting cinematic sequence...")
+    
+--     -- 시네마틱 느낌을 위한 레터박스 추가 (선택사항)
+--     -- CameraUtility.AddLetterBox(0.1, 0.8, 1.5)  -- FadeSize=0.1, Opacity=0.8, FadeInTime=1.5초
+--     -- PrintToConsole("[Camera Intro] Letter box added")
+    
+--     -- -- 카메라 페이드 인 효과
+--     -- CameraUtility.StartCameraFade(1.0, 0.0, 2.0)  -- 완전 불투명 -> 투명 (2초)
+--     -- PrintToConsole("[Camera Intro] Fade in started")
+    
+--     -- 7초 동안 카메라가 궤도를 그리며 플레이어에게 접근
+--     -- (실제 궤도 이동은 SpringArm 설정이나 별도 로직으로 구현)
+--     coroutine.yield(7.0)
+    
+--     -- 7초 시점: 첫 번째 카메라 셰이크 (중간 강도)
+--     PrintToConsole("[Camera Intro] First shake at 7s")
+--     CameraUtility.AddCameraShake(10.0, 2.0, 6)
+--     -- RotationAmplitude=10도, Duration=2초, NumSamples=6
+    
+--     -- 추가 7초 대기 (총 14초)
+--     coroutine.yield(7.0)
+    
+--     -- 14초 시점: 더 큰 카메라 셰이크
+--     PrintToConsole("[Camera Intro] Bigger shake at 14s")
+--     CameraUtility.AddCameraShake(15.0, 3.0, 8)
+--     -- RotationAmplitude=15도, Duration=3초, NumSamples=8
+    
+--     -- 이후 14초마다 큰 셰이크 반복
+--     while true do
+--         coroutine.yield(14.0)
+--         PrintToConsole("[Camera Intro] Repeating shake")
+--         CameraUtility.AddCameraShake(15.0, 3.0, 8)
+        
+--         -- 비활성화된 모디파이어 정리 (메모리 관리)
+--         CameraUtility.RemoveDisabledCameraShakes()
+--     end
+-- end
 
 function Tick(deltaTime)
     -- 카메라 업데이트
@@ -227,6 +268,7 @@ end
 
 function OnJumpPressed()
     if MyActor.Jump then
+        SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/JumpFx.mp3", false, SoundChannelType.SFX);
         MyActor:Jump()
     end
 end
@@ -239,6 +281,7 @@ end
 
 function OnThrowProjectile()
   PrintToConsole("[RunnerCharacter] function OnThrowProjectile()!")
+    SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/LaserShotFx.mp3", false, SoundChannelType.SFX);
     ThrowProjectile()
 end
 
