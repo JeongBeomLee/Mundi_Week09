@@ -523,6 +523,14 @@
     <ClCompile Include="Source\Runtime\Engine\GameFramework\DeltaTimeManager.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
+    <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
+    <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\SpringArmComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
+    <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -1084,6 +1092,15 @@
     <ClInclude Include="Source\Runtime\Engine\GameFramework\DeltaTimeManager.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
+    <ClInclude Include="Source\Runtime\Core\Math\UCurveFloat.h" />
+    <ClInclude Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.h" />
+    <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\SpringArmComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
+    <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\coin_collision.lua">
@@ -1135,9 +1152,6 @@
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\template.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\test_coroutine.lua">
       <Filter>Scripts</Filter>
     </None>
   </ItemGroup>
