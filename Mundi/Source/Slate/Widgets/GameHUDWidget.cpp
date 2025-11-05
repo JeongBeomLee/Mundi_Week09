@@ -1,6 +1,10 @@
 ﻿#include "pch.h"
 #include "GameHUDWidget.h"
 #include "GameStateBase.h"
+#include "RunnerGameMode.h"
+#include "Texture.h"
+#include "ResourceManager.h"
+#include "D3D11RHI.h"
 #include <sstream>
 #include <iomanip>
 
@@ -8,22 +12,29 @@ IMPLEMENT_CLASS(UGameHUDWidget)
 
 UGameHUDWidget::UGameHUDWidget()
 	: GameState(nullptr)
+	, GameMode(nullptr)
 	, GameStateChangedHandle(0)
 	, ScoreChangedHandle(0)
 	, TimerUpdatedHandle(0)
+	, PlayerHealthDecreasedHandle(0)
 	, CachedScore(0)
 	, CachedElapsedTime(0.0f)
 	, CachedGameStateText("Not Started")
+	, CachedPlayerHealth(PLAYER_HEALTH)
 	, ViewportX(0.0f)
 	, ViewportY(0.0f)
 	, ViewportWidth(1920.0f)
 	, ViewportHeight(1080.0f)
+	, HeartIconTexture(nullptr)
+	, HeartIconWidth(0)
+	, HeartIconHeight(0)
 {
 }
 
 void UGameHUDWidget::Initialize()
 {
-	// 초기화 (GameState는 나중에 SetGameState()로 설정됨)
+	// 하트 아이콘 로드
+	LoadHeartIcon();
 }
 
 void UGameHUDWidget::Update()
@@ -201,6 +212,9 @@ void UGameHUDWidget::RenderWidget()
 			ImGui::PopStyleVar();
 		}
 		ImGui::End();
+
+		// 하트 아이콘 렌더링 (우측 상단)
+		RenderHeartIcons();
 	}
 }
 
@@ -234,6 +248,28 @@ void UGameHUDWidget::SetGameState(AGameStateBase* InGameState)
 	}
 }
 
+void UGameHUDWidget::SetGameMode(ARunnerGameMode* InGameMode)
+{
+	// 기존 GameMode 델리게이트 해제
+	if (GameMode.IsValid())
+	{
+		ARunnerGameMode* Mode = GameMode.Get();
+		Mode->OnPlayerHealthDecreased.RemoveDynamic(PlayerHealthDecreasedHandle);
+	}
+
+	if (InGameMode)
+	{
+		GameMode = TWeakPtr<ARunnerGameMode>(InGameMode);
+
+		// 체력 감소 델리게이트 바인딩
+		PlayerHealthDecreasedHandle = InGameMode->OnPlayerHealthDecreased.AddDynamic(this, &UGameHUDWidget::OnPlayerHealthDecreased_Handler);
+	}
+	else
+	{
+		GameMode.Reset();
+	}
+}
+
 void UGameHUDWidget::SetViewportBounds(float X, float Y, float Width, float Height)
 {
 	ViewportX = X;
@@ -251,6 +287,12 @@ void UGameHUDWidget::UnbindDelegates()
 		State->OnGameStateChanged.RemoveDynamic(GameStateChangedHandle);
 		State->OnScoreChanged.RemoveDynamic(ScoreChangedHandle);
 		State->OnTimerUpdated.RemoveDynamic(TimerUpdatedHandle);
+	}
+
+	if (GameMode.IsValid())
+	{
+		ARunnerGameMode* Mode = GameMode.Get();
+		Mode->OnPlayerHealthDecreased.RemoveDynamic(PlayerHealthDecreasedHandle);
 	}
 }
 
@@ -272,6 +314,13 @@ void UGameHUDWidget::OnTimerUpdated_Handler(float ElapsedTime)
 {
 	// 타이머 캐시 업데이트
 	CachedElapsedTime = ElapsedTime;
+}
+
+void UGameHUDWidget::OnPlayerHealthDecreased_Handler(int32 CurrentHealth)
+{
+	// 체력 캐시 업데이트
+	CachedPlayerHealth = CurrentHealth;
+	UE_LOG("GameHUDWidget: Player health changed to %d", CurrentHealth);
 }
 
 FString UGameHUDWidget::FormatTime(float Seconds) const
@@ -328,4 +377,83 @@ ImVec4 UGameHUDWidget::GetGameStateColor() const
 	default:
 		return ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // 흰색
 	}
+}
+
+void UGameHUDWidget::LoadHeartIcon()
+{
+	// ResourceManager를 통해 하트 아이콘 텍스처 로드
+	UResourceManager& ResMgr = UResourceManager::GetInstance();
+	UTexture* HeartTexture = ResMgr.Load<UTexture>("Data/Icon/heart.png");
+	UTexture* EmptyHeartTexture = ResMgr.Load<UTexture>("Data/Icon/empty_heart.png");
+
+	if (HeartTexture && HeartTexture->GetShaderResourceView())
+	{
+		HeartIconTexture = (void*)HeartTexture->GetShaderResourceView();
+		EmptyHeartIconTexture = (void*)EmptyHeartTexture->GetShaderResourceView();
+		HeartIconWidth = HeartTexture->GetWidth();
+		HeartIconHeight = HeartTexture->GetHeight();
+		UE_LOG("GameHUDWidget: Heart icon loaded successfully (%dx%d)", HeartIconWidth, HeartIconHeight);
+	}
+	else
+	{
+		UE_LOG("GameHUDWidget: Failed to load heart icon from Data/Icon/heart.png");
+		HeartIconTexture = nullptr;
+		HeartIconWidth = 0;
+		HeartIconHeight = 0;
+	}
+}
+
+void UGameHUDWidget::RenderHeartIcons()
+{
+	if (!HeartIconTexture)
+		return;
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	// 하트 아이콘 설정
+	const float HeartSize = 50.0f; // 하트 크기
+	const float HeartSpacing = 8.0f; // 하트 간격
+	const float Padding = 20.0f; // 화면 가장자리에서의 패딩
+
+	// 게임 화면 영역(Viewport) 기준 우측 상단 위치 계산
+	const float TotalWidth = (HeartSize + HeartSpacing) * 3 - HeartSpacing + HeartSpacing + HeartSpacing;
+	const float StartX = ViewportX + ViewportWidth - TotalWidth - Padding;
+	const float StartY = ViewportY + Padding;
+
+	// 투명 배경의 윈도우 생성
+	ImGui::SetNextWindowPos(ImVec2(StartX, StartY));
+	ImGui::SetNextWindowSize(ImVec2(TotalWidth, HeartSize + HeartSpacing));
+	ImGui::SetNextWindowBgAlpha(0.0f); // 완전 투명
+
+	ImGuiWindowFlags flags =
+		ImGuiWindowFlags_NoTitleBar |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoScrollbar |
+		ImGuiWindowFlags_NoInputs |
+		ImGuiWindowFlags_NoSavedSettings;
+
+	ImGui::Begin("##HeartIcons", nullptr, flags);
+
+	// 하트 아이콘을 오른쪽부터 왼쪽으로 그리기
+	for (int i = 0; i < PLAYER_HEALTH; ++i)
+	{
+		if (i > 0)
+		{
+			ImGui::SameLine(0.0f, HeartSpacing);
+		}
+
+		bool bShouldShow = i < CachedPlayerHealth;
+
+		if (bShouldShow)
+		{
+			ImGui::Image(HeartIconTexture, ImVec2(HeartSize, HeartSize));
+		}
+		else
+		{
+			ImGui::Image(EmptyHeartIconTexture, ImVec2(HeartSize, HeartSize));
+		}
+	}
+
+	ImGui::End();
 }

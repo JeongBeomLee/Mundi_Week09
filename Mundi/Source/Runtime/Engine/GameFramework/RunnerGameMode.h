@@ -5,10 +5,16 @@
 #pragma once
 
 #include "GameModeBase.h"
+#include "Delegate.h"
 
 // 전방 선언
 class ARunnerGameState;
 class ACharacter;
+
+// 플레이어 체력 감소 델리게이트 선언 (클래스 외부에서)
+using FOnPlayerHealthDecreased = TMulticastDelegate<int32>;
+
+constexpr int PLAYER_HEALTH = 3;
 
 /**
  * ARunnerGameMode
@@ -30,6 +36,8 @@ public:
 	// 게임 이벤트
 	// ────────────────────────────────────────────────
 
+	void OnDecreasePlayerHealth(ACharacter* Player, uint32 DamageAmount);
+
 	/** 플레이어 사망 */
 	void OnPlayerDeath(ACharacter* Player);
 
@@ -41,6 +49,13 @@ public:
 
 	/** 점프 */
 	void OnPlayerJump();
+
+	// ────────────────────────────────────────────────
+	// 델리게이트
+	// ────────────────────────────────────────────────
+
+	/** 플레이어 체력 감소 시 호출되는 델리게이트 (현재 남은 체력 전달) */
+	FOnPlayerHealthDecreased OnPlayerHealthDecreased;
 
 	// ────────────────────────────────────────────────
 	// RunnerGameState 접근 (나중에 추가)
