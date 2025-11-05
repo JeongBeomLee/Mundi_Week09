@@ -9,6 +9,7 @@ local _ENV = ...
 
 local GravitySystem = require("GravitySystem");
 local CameraUtility = require("CameraUtility");
+local CollisionUtility = require("CollisionUtility");
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 설정 (에디터에서 조정 가능)
@@ -61,7 +62,21 @@ local Config = {
 
     -- 디버그
     bDebugLog = true,
+
+    Health = 3,                -- 캐릭터 체력
 }
+
+function GetHealth()
+    return Config.Health
+end
+
+function DecreaseHealth(amount)
+    Config.Health = Config.Health - amount
+    if Config.Health < 0 then
+        Config.Health = 0
+    end
+    PrintToConsole("[RunnerCharacter] Health decreased by " .. amount .. ". Current Health: " .. Config.Health)
+end
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 내부 변수
@@ -534,6 +549,44 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
 
     -- TODO: 벽면 감지 및 중력 방향 전환 로직
     -- 예: OtherActor의 태그를 확인해서 "WallTrigger"면 중력 방향 변경
+    if not CollisionUtility.IsObstacleActor(OtherActor) then
+        --PrintToConsole("[ObstacleGenerator] Not an obstacle actor, returning");
+        return;
+    end
+
+    -- 플레이어 사망 처리
+    -- PrintToConsole("[ObstacleGenerator] Player hit an obstacle! Processing death sound...");
+    -- StartCoroutine(function()
+    --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/FailedSoundFx.mp3", false, SoundChannelType.SFX);
+    --     coroutine.yield(1.5);
+    --     SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GameOverSoundFx.mp3", false, SoundChannelType.SFX);
+    -- end);
+
+    SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/PlayerHitFX.mp3", false, SoundChannelType.SFX);
+    DecreaseHealth(1);
+    CameraUtility.AddVignetting(
+            FVector4(1.0, 0.0, 0.0, 1.0),
+            0.5,
+            0.2,
+            3.0
+    );
+    local dtManager = World:GetDeltaTimeManager()
+    dtManager:ApplyHitStop(0.2);
+
+    if Config.Health <= 0 then
+        Config.Health = 3;
+        GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnPlayerDeath(MyActor);
+
+        -- 카메라 셰이크 추가 (기본 파라미터 사용)
+        CameraUtility.AddCameraShake();
+
+        -- 화면 암전 효과 (5초에 걸쳐 검은색으로 FadeOut)
+        -- FromAlpha: 1.0 (완전 투명, 원본 씬 보임)
+        -- ToAlpha: 0.0 (완전 불투명, 검은색만 보임)
+        -- Duration: 5.0초
+        -- FadeColor: 검은색 (기본값)
+        CameraUtility.StartCameraFade(1.0, 0.0, 5.0);
+    end
 end
 
 -- ════════════════════════════════════════════════════════════════════════════
