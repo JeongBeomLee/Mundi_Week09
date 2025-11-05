@@ -566,6 +566,10 @@
     <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp" />
     <ClCompile Include="Source\Slate\Windows\CameraBlendEditorWindow.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -1171,6 +1175,10 @@
     <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h" />
     <ClInclude Include="Source\Slate\Windows\CameraBlendEditorWindow.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\coin_collision.lua">
@@ -1230,6 +1238,8 @@
     <None Include="Scripts\test_coroutine.lua">
       <Filter>Scripts</Filter>
     </None>
+    <None Include="Shaders\PostProcess\FadeInOut_PS.hlsl" />
+    <None Include="Shaders\PostProcess\Vignetting_PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">

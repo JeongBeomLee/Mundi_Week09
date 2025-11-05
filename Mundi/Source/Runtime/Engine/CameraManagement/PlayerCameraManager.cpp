@@ -618,6 +618,12 @@ void APlayerCameraManager::UpdateViewTargetBlending(float DeltaTime)
 		// 블렌딩 완료: PendingViewTarget을 ViewTarget으로 전환
 		ViewTarget = PendingViewTarget;
 		PendingViewTarget.Target = nullptr;
+
+		// 블렌딩 완료 델리게이트 호출
+		if (OnBlendComplete.IsBound())
+		{
+			OnBlendComplete.Broadcast();
+		}
 		return;
 	}
 

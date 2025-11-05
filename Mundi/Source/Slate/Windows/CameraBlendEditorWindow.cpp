@@ -506,15 +506,6 @@ void UCameraBlendEditorWindow::RenderTimelinePreview()
 	ImGui::TextColored(ImVec4(0.4f, 0.4f, 1.0f, 1.0f), "  FOV: %.3f", FOVAlpha);
 	ImGui::SameLine();
 	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.4f, 1.0f), "  SpringArm: %.3f", SpringArmAlpha);
-
-	// Apply 버튼
-	ImGui::Separator();
-	if (ImGui::Button("Apply to Camera", ImVec2(200, 30)))
-	{
-		ApplyToCamera();
-	}
-	ImGui::SameLine();
-	ImGui::TextDisabled("(현재 편집 중인 커브를 카메라에 적용)");
 }
 
 ImVec2 UCameraBlendEditorWindow::CurveToScreenPos(float Time, float Value) const
@@ -730,50 +721,5 @@ void UCameraBlendEditorWindow::LoadPresetFromFile()
 	{
 		Library->RegisterPreset(Preset);
 		UE_LOG("CameraBlendEditor: 프리셋을 라이브러리에 등록했습니다 - %s", Preset.PresetName.c_str());
-	}
-}
-
-void UCameraBlendEditorWindow::ApplyToCamera()
-{
-	if (!PlayerCameraManager)
-	{
-		UE_LOG("CameraBlendEditor: PlayerCameraManager가 설정되지 않았습니다. SetPlayerCameraManager()를 먼저 호출하세요.");
-		return;
-	}
-
-	// 현재 편집 중인 파라미터를 카메라에 적용
-	// 예시: 고정 위치로 블렌딩 (테스트용)
-	// 실제 사용 시에는 ViewTarget 액터를 지정하거나, 특정 Transform을 전달
-
-	// 방법 1: 커스텀 베지어로 현재 ViewTarget 유지하면서 블렌딩
-	if (EditingParams.BlendFunction == EViewTargetBlendFunction::VTBlend_BezierCustom)
-	{
-		// 현재 ViewTarget을 그대로 유지하면서 커브만 적용
-		AActor* CurrentViewTarget = PlayerCameraManager->GetViewTarget();
-		if (CurrentViewTarget)
-		{
-			PlayerCameraManager->SetViewTargetWithBezierBlend(CurrentViewTarget, EditingParams);
-			UE_LOG("CameraBlendEditor: 커스텀 베지어 커브를 적용했습니다.");
-		}
-		else
-		{
-			UE_LOG("CameraBlendEditor: 현재 ViewTarget이 없습니다.");
-		}
-	}
-	else
-	{
-		// 방법 2: 프리셋 블렌드 함수 사용
-		AActor* CurrentViewTarget = PlayerCameraManager->GetViewTarget();
-		if (CurrentViewTarget)
-		{
-			PlayerCameraManager->SetViewTargetWithBlend(
-				CurrentViewTarget,
-				EditingParams.BlendTime,
-				EditingParams.BlendFunction,
-				EditingParams.BlendExp,
-				EditingParams.bLockOutgoing
-			);
-			UE_LOG("CameraBlendEditor: 프리셋 블렌드를 적용했습니다.");
-		}
 	}
 }
