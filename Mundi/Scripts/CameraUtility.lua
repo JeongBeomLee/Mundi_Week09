@@ -125,7 +125,7 @@ function CameraUtility.AddScoreAndShowGoldVignetting()
             FVector4(1.0, 207.0 / 255.0, 64.0 / 255.0, 1.0),
             1.2,
             0.2,
-            3.0
+            0.5
     );
 end
 

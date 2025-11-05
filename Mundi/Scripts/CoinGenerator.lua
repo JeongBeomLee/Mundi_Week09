@@ -152,7 +152,8 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     if (IsCoinActor(OtherActor)) then
         -- 점수 추가
         SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GetScoreFx.mp3", false, SoundChannelType.SFX);
-        CameraUtility.AddScoreAndShowGoldVignetting();
+        -- _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
+        CameraUtility.AddScoreAndShowGoldVignetting()
         PrintToConsole("[CoinGenerator] Coin collected!");
         
         -- 슬로우 모션 효과 테스트

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "pch.h"
 
 // Per-world render settings (view mode + show flags)
@@ -62,8 +62,8 @@ private:
     uint32 TileSize = 16;                   // 타일 크기 (픽셀, 기본값: 16)
 
     // Gamma correction parameters
-    float Gamma = 2.2f;                     // 감마 값 (sRGB 표준: 2.2)
-    float InvGamma = 1.0f / 2.2f;          // 1.0 / Gamma (미리 계산)
+    float Gamma = 1.0f;                     // 감마 값 (sRGB 표준: 2.2)
+    float InvGamma = 1.0f / 1.0f;          // 1.0 / Gamma (미리 계산)
     float Brightness = 1.0f;                // 밝기 조정 (1.0 = 변화 없음)
     float Saturation = 1.0f;                // 채도 조정 (1.0 = 변화 없음)
 };

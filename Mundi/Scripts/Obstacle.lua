@@ -73,7 +73,8 @@ function OnOverlap(
         if Health <= 0 then
             -- PrintToConsole("[coin_collision] Coin collected!")
             SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GetScoreFx.mp3", false, SoundChannelType.SFX);
-            CameraUtility.AddScoreAndShowGoldVignetting();
+            -- _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
+            CameraUtility.AddScoreAndShowGoldVignetting()
             MyActor:Destroy()
         else
             -- PrintToConsole("[coin_collision] Health remaining: " .. Health)
