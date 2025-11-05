@@ -364,6 +364,111 @@ void UEditorEngine::Shutdown()
 }
 
 
+void UEditorEngine::BuildScene()
+{
+    // Standalone: 게임 씬 직접 로드
+  //  WorldContexts.Add(FWorldContext(NewObject<UWorld>(), EWorldType::Game));
+   // GWorld = WorldContexts[0].World;
+    //GWorld->Initialize();
+
+    // 게임 씬 로드 (RunnerGameScene.Scene)
+    const char* GameScenePath = "Scene/RunnerGameScene.Scene";
+
+    // Windows 파일 다이얼로그 열기
+    std::filesystem::path selectedPath = GameScenePath;
+    if (selectedPath.empty())
+        return;
+
+    try
+    {
+        FString InFilePath = selectedPath.string();
+
+        // 파일명에서 씬 이름 추출
+        FString SceneName = InFilePath;
+        size_t LastSlash = SceneName.find_last_of("\\/");
+        if (LastSlash != std::string::npos)
+        {
+            SceneName = SceneName.substr(LastSlash + 1);
+        }
+        size_t LastDot = SceneName.find_last_of(".");
+        if (LastDot != std::string::npos)
+        {
+            SceneName = SceneName.substr(0, LastDot);
+        }
+
+        // World 가져오기
+        UWorld* CurrentWorld = GWorld;
+        if (!CurrentWorld)
+        {
+            UE_LOG("MainToolbar: Cannot find World!");
+            return;
+        }
+
+        // 로드 직전: Transform 위젯/선택 초기화
+        UUIManager::GetInstance().ClearTransformWidgetSelection();
+        GWorld->GetSelectionManager()->ClearSelection();
+
+        // Scene JSON 로드
+        JSON SceneJson;
+        if (!FJsonSerializer::LoadJsonFromFile(SceneJson, InFilePath))
+        {
+            UE_LOG("MainToolbar: Failed To Load Scene From: %s", InFilePath.c_str());
+            return;
+        }
+
+        // Level 데이터 로드
+        std::unique_ptr<ULevel> NewLevel = ULevelService::CreateDefaultLevel();
+        JSON LevelJsonData;
+        if (FJsonSerializer::ReadObject(SceneJson, "Level", LevelJsonData, nullptr, false))
+        {
+            NewLevel->Serialize(true, LevelJsonData);
+        }
+        else
+        {
+            // 구버전 호환: 직접 Level 데이터인 경우
+            NewLevel->Serialize(true, SceneJson);
+        }
+        CurrentWorld->SetLevel(std::move(NewLevel));
+
+        // World 설정 로드
+        JSON WorldSettingsJson;
+        if (FJsonSerializer::ReadObject(SceneJson, "WorldSettings", WorldSettingsJson, nullptr, false))
+        {
+            // Helper lambda: 클래스 이름으로부터 UClass 로드
+            auto LoadClass = [&](const char* Key, auto SetterFunc) {
+                FString ClassName;
+                if (FJsonSerializer::ReadString(WorldSettingsJson, Key, ClassName, "", false))
+                {
+                    UClass* Class = UClass::FindClass(ClassName);
+                    if (Class)
+                    {
+                        (CurrentWorld->*SetterFunc)(Class);
+                        UE_LOG("MainToolbar: Loaded %s: %s", Key, ClassName.c_str());
+                    }
+                }
+                };
+
+            // 클래스 설정 로드
+            LoadClass("GameModeClass", &UWorld::SetGameModeClass);
+            LoadClass("DefaultPawnClass", &UWorld::SetDefaultPawnClass);
+            LoadClass("PlayerControllerClass", &UWorld::SetPlayerControllerClass);
+
+            // PlayerSpawnLocation 로드
+            FVector SpawnLoc;
+            if (FJsonSerializer::ReadVector(WorldSettingsJson, "PlayerSpawnLocation", SpawnLoc, FVector(0.0f, 0.0f, 100.0f), false))
+            {
+                CurrentWorld->SetPlayerSpawnLocation(SpawnLoc);
+                UE_LOG("MainToolbar: Loaded PlayerSpawnLocation: (%.1f, %.1f, %.1f)",
+                    SpawnLoc.X, SpawnLoc.Y, SpawnLoc.Z);
+            }
+        }
+    }
+    catch (const std::exception& Exception)
+    {
+        UE_LOG("MainToolbar: Load Error: %s", Exception.what());
+    }
+}
+
 void UEditorEngine::StartPIE()
 {
     UWorld* EditorWorld = WorldContexts[0].World;

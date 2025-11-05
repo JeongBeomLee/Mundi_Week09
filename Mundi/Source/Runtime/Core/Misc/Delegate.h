@@ -89,7 +89,7 @@ public:
 	// 람다, 함수 포인터, std::function 추가
 	DelegateHandle Add(HandlerType InFunction)
 	{
-		DelegateHandle Handle = NextHandle++;
+			DelegateHandle Handle = NextHandle++;
 		Functions.emplace_back(Handle, InFunction);
 		return Handle;
 	}

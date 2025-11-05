@@ -5,6 +5,7 @@
 #include "Pawn.h"
 #include "World.h"
 #include "DeltaTimeManager.h"
+#include "PlayerCameraManager.h"
 
 // AGameModeBase를 ObjectFactory에 등록
 IMPLEMENT_CLASS(AGameModeBase)
@@ -94,6 +95,9 @@ void AGameModeBase::StartGame()
 
 	// 이전 게임에서 적용되었던 모든 델타타임 효과 취소
 	GWorld->GetDeltaTimeManager()->CancelAllEffects();
+
+	// 이전 게임에서 적용되었던 모든 포스트 프로세스 설정 초기화
+	PlayerController->GetPlayerCameraManager()->ResetPostProcessSettings();
 
 	bGameStarted = true;
 

@@ -285,6 +285,7 @@ void USceneComponent::DetachFromParent(bool bKeepWorld)
     if (AttachParent)
     {
         auto& Siblings = AttachParent->AttachChildren;
+        if(!Siblings.IsEmpty())
         Siblings.erase(std::remove(Siblings.begin(), Siblings.end(), this), Siblings.end());
         AttachParent = nullptr;
     }

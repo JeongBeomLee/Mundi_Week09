@@ -75,15 +75,17 @@ USlateManager::~USlateManager()
 
 void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FRect& InRect)
 {
-    // MainToolbar 생성
+#ifndef STANDALONE_BUILD
+    // MainToolbar 생성 (Editor 전용)
     MainToolbar = NewObject<UMainToolbarWidget>();
     MainToolbar->Initialize();
+#endif
 
-    // GameHUD 생성 (PIE 전용)
+    // GameHUD 생성
     GameHUD = NewObject<UGameHUDWidget>();
     GameHUD->Initialize();
 
-    // GameControlWindow 생성 (PIE 전용)
+    // GameControlWindow 생성
     GameControlWindow = NewObject<UGameControlWindow>();
     GameControlWindow->Initialize();
 
@@ -91,6 +93,17 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
     World = InWorld;
     Rect = InRect;
 
+#ifdef STANDALONE_BUILD
+    // Standalone 모드: 메인 뷰포트만 생성
+    MainViewport = new SViewportWindow();
+    MainViewport->Initialize(0, 0, Rect.GetWidth(), Rect.GetHeight(),
+        World, Device, EViewportType::Perspective);
+    World->SetCameraActor(MainViewport->GetViewportClient()->GetCamera());
+
+    // 배열 초기화
+    for (int i = 0; i < 4; i++)
+        Viewports[i] = nullptr;
+#else
     // === 전체 화면: 좌(4뷰포트) + 우(Control + Details) ===
     TopPanel = new SSplitterH();  // 수평 분할 (좌우)
     TopPanel->SetSplitRatio(0.7f);  // 70% 뷰포트, 30% UI
@@ -167,6 +180,7 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
 
     // === Blueprint Editor 생성 ===
     ActorBlueprintEditor = NewObject<SActorBlueprintEditor>();
+#endif
 }
 
 void USlateManager::SwitchLayout(EViewportLayoutMode NewMode)
@@ -199,12 +213,25 @@ void USlateManager::SwitchPanel(SWindow* SwitchPanel)
 
 void USlateManager::Render()
 {
-    // 메인 툴바 렌더링 (항상 최상단에)
-    MainToolbar->RenderWidget();
+#ifndef STANDALONE_BUILD
+    // 메인 툴바 렌더링 (Editor 전용)
+    if (MainToolbar)
+        MainToolbar->RenderWidget();
+#endif
+
+#ifdef STANDALONE_BUILD
+    // Standalone 모드: 메인 뷰포트만 렌더
+    if (MainViewport)
+    {
+        MainViewport->OnRender();
+    }
+#else
+    // Editor 모드: TopPanel 렌더
     if (TopPanel)
     {
         TopPanel->OnRender();
     }
+#endif
 
     // 게임 HUD 오버레이 렌더링 (PIE 모드에서만)
     if (GameHUD)
@@ -223,7 +250,7 @@ void USlateManager::Render()
         GameHUD->RenderWidget();
     }
 
-    // 게임 컨트롤 윈도우 렌더링 (PIE 모드에서만)
+    // 게임 컨트롤 윈도우 렌더링
     if (GameControlWindow)
     {
         GameControlWindow->Update();
@@ -317,9 +344,22 @@ void USlateManager::Render()
 void USlateManager::Update(float DeltaSeconds)
 {
     ProcessInput();
-    // MainToolbar 업데이트
-    MainToolbar->Update();
 
+#ifndef STANDALONE_BUILD
+    // MainToolbar 업데이트 (Editor 전용)
+    if (MainToolbar)
+        MainToolbar->Update();
+#endif
+
+#ifdef STANDALONE_BUILD
+    // Standalone 모드: 메인 뷰포트만 업데이트
+    if (MainViewport)
+    {
+        MainViewport->Rect = FRect(0, 0, CLIENTWIDTH, CLIENTHEIGHT);
+        MainViewport->OnUpdate(DeltaSeconds);
+    }
+#else
+    // Editor 모드: TopPanel 업데이트
     if (TopPanel)
     {
         // 툴바 높이만큼 아래로 이동 (50px)
@@ -327,6 +367,7 @@ void USlateManager::Update(float DeltaSeconds)
         TopPanel->Rect = FRect(0, toolbarHeight, CLIENTWIDTH, CLIENTHEIGHT);
         TopPanel->OnUpdate(DeltaSeconds);
     }
+#endif
 
     // 콘솔 애니메이션 업데이트
     if (bIsConsoleAnimating)

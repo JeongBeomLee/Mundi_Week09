@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "ViewTarget.h"
 
 class APlayerCameraManager;
 
@@ -33,8 +34,8 @@ public:
     /** Allows modifying the post process in native code. */
     virtual void ModifyPostProcess(
         float DeltaTime,
-        float& PostProcessBlendWeight//,
-        //FPostProcessSettings& PostProcessSettings
+        float& PostProcessBlendWeight,
+        FPostProcessSettings& PostProcessSettings
     );
     
     /* Get & Set & Update */

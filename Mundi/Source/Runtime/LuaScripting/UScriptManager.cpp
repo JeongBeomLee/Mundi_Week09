@@ -33,6 +33,7 @@
 #include "PlayerController.h"
 #include "UCameraModifier.h"
 #include "UCameraModifier_CameraShake.h"
+#include "UCameraModifier_LetterBox.h"
 #include "HeightFogComponent.h"
 #include "DeltaTimeManager.h"
 #include "Color.h"
@@ -81,7 +82,7 @@ void UScriptManager::AttachScriptTo(FLuaLocalValue LuaLocalValue, const FString&
             LuaLocalValue.MyActor,
             Script->LuaTemplateFunctions.OnOverlap
         );
-        LinkRestartToDeligate(Script->LuaTemplateFunctions.Restart);
+        LinkRestartToDeligate(Script->LuaTemplateFunctions);
     }
     catch (std::exception& e)
     {
@@ -108,6 +109,35 @@ void UScriptManager::PrintDebugLog()
     }
 }
 
+void UScriptManager::RemoveSelfOnDelegate(
+    AActor* InActor,
+    FLuaTemplateFunctions& LuaTemplateFunctions
+)
+{
+    for (UActorComponent* Component : InActor->GetOwnedComponents())
+    {
+        UShapeComponent* ShapeComponent = Cast<UShapeComponent>(Component);
+        if (!ShapeComponent) continue;
+
+        ShapeComponent->OnComponentBeginOverlap.RemoveDynamic(
+            LuaTemplateFunctions.OnOverlapDelegateHandle
+        );
+    }
+
+    UWorld* PIEWorld = GEngine.GetPIEWorld();
+    if (!PIEWorld) return;
+
+    AGameModeBase* GameMode = PIEWorld->GetGameMode();
+    if (!GameMode) return;
+    
+    ARunnerGameMode* RunnerGameMode = Cast<ARunnerGameMode>(GEngine.GetPIEWorld()->GetGameMode());
+    if (!RunnerGameMode) return;
+
+    RunnerGameMode->GetOnGameRestarted().RemoveDynamic(
+        LuaTemplateFunctions.OnRestartDelegateHandle
+    );
+}
+
 void UScriptManager::DetachScriptFrom(AActor* InActor, const FString& ScriptName)
 {
     // Actor에 부착된 Script를 찾는다.
@@ -121,6 +151,8 @@ void UScriptManager::DetachScriptFrom(AActor* InActor, const FString& ScriptName
                 {
                     FScript* Tmp = *Iter;
                     Script.second.erase(Iter);
+
+                    RemoveSelfOnDelegate(InActor, Tmp->LuaTemplateFunctions);
 
                     delete Tmp;
                     break;
@@ -140,6 +172,9 @@ void UScriptManager::DetachAllScriptFrom(AActor* InActor)
             {
                 FScript* Tmp = Script.second.back();
                 Script.second.RemoveAt(Script.second.size() - 1);
+
+                RemoveSelfOnDelegate(InActor, Tmp->LuaTemplateFunctions);
+
                 delete Tmp;
             }
         }
@@ -1038,6 +1073,20 @@ void UScriptManager::RegisterUserTypeToLua()
         "SetNumSamples", &UCameraModifier_CameraShake::SetNumSamples
     );
 
+    // UCameraModifier_LetterBox 클래스 등록
+    Lua.new_usertype<UCameraModifier_LetterBox>("UCameraModifier_LetterBox",
+        sol::call_constructor, sol::factories(
+            []() { return new UCameraModifier_LetterBox(); }
+        ),
+        sol::base_classes, sol::bases<UCameraModifier, UObject>(),
+        "SetFadeIn", &UCameraModifier_LetterBox::SetFadeIn,
+        "SetFadeOut", &UCameraModifier_LetterBox::SetFadeOut,
+        "GetSize", &UCameraModifier_LetterBox::GetSize,
+        "SetSize", &UCameraModifier_LetterBox::SetSize,
+        "GetOpacity", &UCameraModifier_LetterBox::GetOpacity,
+        "SetOpacity", &UCameraModifier_LetterBox::SetOpacity
+    );
+
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
 }
 
@@ -1132,10 +1181,19 @@ void UScriptManager::LinkOnOverlapWithShapeComponent(AActor* MyActor, sol::funct
     }
 }
 
-void UScriptManager::LinkRestartToDeligate(sol::function Restart)
+void UScriptManager::LinkRestartToDeligate(FLuaTemplateFunctions& LuaTemplateFunctions)
 {
-    ARunnerGameMode* GameMode = Cast<ARunnerGameMode>(GEngine.GetPIEWorld()->GetGameMode());
-    GameMode->GetOnGameRestarted().Add(Restart);
+    UWorld* PIEWorld = GEngine.GetPIEWorld();
+    if (!PIEWorld) return;
+
+    AGameModeBase* GameMode = PIEWorld->GetGameMode();
+    if (!GameMode) return;
+    
+    ARunnerGameMode* RunnerGameMode = Cast<ARunnerGameMode>(GEngine.GetPIEWorld()->GetGameMode());
+    if (!RunnerGameMode) return;
+    
+    LuaTemplateFunctions.OnRestartDelegateHandle =
+        RunnerGameMode->GetOnGameRestarted().Add(LuaTemplateFunctions.Restart);
 }
 
 // Lua로부터 Template 함수를 가져온다.

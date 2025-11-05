@@ -45,6 +45,13 @@ struct FogBufferType // b2
     float Padding[2]; // 16바이트 정렬을 위한 패딩
 };
 
+struct LetterBoxBufferType // b2 (PostProcess와 동일한 슬롯 사용)
+{
+    float LetterBoxSize;     // 레터박스 크기 (0.0 ~ 1.0)
+    float LetterBoxOpacity;  // 레터박스 불투명도 (0.0 ~ 1.0)
+    FVector2D Padding;       // 16바이트 정렬
+};
+
 struct FXAABufferType // b2
 {
     FVector2D ScreenSize; // 화면 해상도 (e.g., float2(1920.0f, 1080.0f))
@@ -192,6 +199,7 @@ MACRO(ModelBufferType)              \
 MACRO(DecalBufferType)              \
 MACRO(PostProcessBufferType)        \
 MACRO(FogBufferType)                \
+MACRO(LetterBoxBufferType)          \
 MACRO(FXAABufferType)               \
 MACRO(GammaCorrectionBufferType)    \
 MACRO(FFadeBufferType)              \
@@ -215,6 +223,7 @@ CONSTANT_BUFFER_INFO(ModelBufferType, 0, true, false)
 CONSTANT_BUFFER_INFO(PostProcessBufferType, 0, false, true)
 CONSTANT_BUFFER_INFO(ViewProjBufferType, 1, true, true) // b1 카메라 행렬 고정
 CONSTANT_BUFFER_INFO(FogBufferType, 2, false, true)
+CONSTANT_BUFFER_INFO(LetterBoxBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(FXAABufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(GammaCorrectionBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(FFadeBufferType, 2, false, true)

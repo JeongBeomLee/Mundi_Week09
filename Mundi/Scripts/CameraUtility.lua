@@ -53,6 +53,7 @@ function CameraUtility.AddCameraShake(RotationAmplitude, AlphaInTime, NumSamples
     AlphaInTime = AlphaInTime or 2.0;
     NumSamples = NumSamples or 6;
 
+    -- Camera Shake
     local CameraShakeModifier = UCameraModifier_CameraShake();
     -- 흔들리는 정도 설정
     CameraShakeModifier:SetRotationAmplitude(RotationAmplitude);
@@ -66,7 +67,19 @@ function CameraUtility.AddCameraShake(RotationAmplitude, AlphaInTime, NumSamples
     PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
 end
 
--- 비활성화된 카메라 셰이크 제거
+function CameraUtility.AddLetterBox(FadeSize, Opacity, FadeInTime)
+    if not PlayerCameraManager then
+        return;
+    end
+
+    -- LetterBox 모디파이어 생성
+    local letterBox = UCameraModifier_LetterBox()
+    -- 레터박스 시작 (크기, 불투명도, 페이드인 시간)
+    letterBox:SetFadeIn(FadeSize, Opacity, FadeInTime)
+    PlayerCameraManager:AddCameraModifier(letterBox)
+end
+
+    -- 비활성화된 카메라 셰이크 제거
 function CameraUtility.RemoveDisabledCameraShakes()
     if not PlayerCameraManager then
         return;

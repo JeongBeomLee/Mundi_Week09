@@ -3,6 +3,30 @@
 
 class AActor;
 
+struct FPostProcessSettings
+{
+    // Letter Box
+    float LetterBoxSize = 0.0f;
+    float LetterBoxOpacity = 1.0f;
+
+    // Vignetting
+    float VignettingIntensity = 0.0f;
+    float VignettingRadius = 0.5f;
+
+    //// Color Grading
+    //float Saturation = 1.0f;
+    //float Contrast = 1.0f;
+    //FLinearColor ColorTint = FLinearColor(1, 1, 1, 1);
+
+    //// Bloom
+    //float BloomIntensity = 0.0f;
+    //float BloomThreshold = 1.0f;
+
+    //// Depth of Field
+    //float DOFDistance = 100.0f;
+    //float DOFBlurAmount = 0.0f;
+};
+
 // ViewTarget 정보를 담는 구조체
 // 현재 카메라가 바라보는 대상과 최종 POV(Point of View) 정보를 저장
 struct FViewTarget
@@ -14,6 +38,8 @@ struct FViewTarget
 	FVector POV_Location;
 	FQuat POV_Rotation;
 	float POV_FOV = 60.0f;
+
+	FPostProcessSettings PostProcessSettings;
 
 	FViewTarget()
 		: Target(nullptr)

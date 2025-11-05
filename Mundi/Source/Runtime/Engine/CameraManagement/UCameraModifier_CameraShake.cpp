@@ -9,7 +9,7 @@ END_PROPERTIES()
 
 UCameraModifier_CameraShake::UCameraModifier_CameraShake()
 {
-   SetAlphaInTime(2.f);
+    SetAlphaInTime(2.f);
    SetAlphaOutTime(2.f);
    SetAlpha(0.f);
    SetIsFadingIn(true);
