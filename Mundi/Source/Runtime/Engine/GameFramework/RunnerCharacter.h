@@ -10,7 +10,7 @@
 class UBoxComponent;
 class UCameraComponent;
 class USpringArmComponent;
-
+class UParticleComponent;
 /**
  * ARunnerCharacter
  *
@@ -45,6 +45,9 @@ public:
 
 	/** SpringArmComponent를 반환합니다 */
 	USpringArmComponent* GetSpringArm() const { return SpringArmComponent; }
+
+	/** ParticleComponent를 반환합니다 */
+	UParticleComponent* GetParticleComponent() const { return SpriteComponent; }
 
 	void SetupPlayerInputComponent(UInputComponent* InInputComponent) override;
 
@@ -117,9 +120,10 @@ protected:
 
 	/** 충돌 감지용 Box 컴포넌트 */
 	UBoxComponent* CollisionBox;
-
+	UParticleComponent* SpriteComponent;
 	/** 카메라 컴포넌트 */
 	UCameraComponent* CameraComponent;
+	
 	USpringArmComponent* SpringArmComponent;
 	// ────────────────────────────────────────────────
 	// 카메라 설정

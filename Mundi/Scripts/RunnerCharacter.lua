@@ -78,13 +78,29 @@ function BeginPlay()
     -- CameraUtility 초기화
     CameraUtility.Initialize(GlobalObjectManager.GetPIEWorld());
     
-    -- 캐릭터 메시 변경
+    -- 캐릭터 메시 변경 및 숨김 처리
     if MyActor.GetStaticMesh then
         local StaticMeshComponent = MyActor:GetStaticMesh()
         if StaticMeshComponent then
             -- 원하는 메시 파일 경로로 변경
             StaticMeshComponent:SetStaticMesh("Data/runner_cube.obj")
+            -- 메시를 게임에서 안보이게 설정
+            StaticMeshComponent:SetHiddenInGame(true)
           --  PrintToConsole("[RunnerCharacter] Character mesh changed to smokegrenade.obj")
+        end
+    end
+
+    -- ParticleComponent 설정 및 재생
+    if MyActor.GetParticleComponent then
+        local ParticleComp = MyActor:GetParticleComponent()
+        PrintToConsole("[RunnerCharacter] ParticleComponent found: " .. tostring(ParticleComp))
+        if ParticleComp then
+            ParticleComp:SetSpriteSheet("Data/UI/Sprite/FireExplosion_6x6.dds", 6, 6, 15.0)
+            ParticleComp:SetLooping(true)
+            ParticleComp:Play()
+            if Config.bDebugLog then
+                PrintToConsole("[RunnerCharacter] ParticleComponent configured and playing")
+            end
         end
     end
 

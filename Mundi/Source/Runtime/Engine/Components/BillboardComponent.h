@@ -34,7 +34,7 @@ public:
     void DuplicateSubObjects() override;
     DECLARE_DUPLICATE(UBillboardComponent)
 
-private:
+protected:
     FString TexturePath;
     UTexture* Texture = nullptr;  // 리플렉션 시스템용 Texture 포인터
     UMaterialInterface* Material = nullptr;

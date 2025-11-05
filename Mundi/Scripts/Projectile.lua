@@ -8,6 +8,7 @@ local _ENV = ...
 -- ════════════════════════════════════════════════════════════════════════════
 
 local CollisionUtility = require("CollisionUtility")
+local GlobalObjectManager = require("GlobalObjectManager")
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 설정
@@ -57,6 +58,66 @@ function EndPlay()
 end
 
 -- ════════════════════════════════════════════════════════════════════════════
+-- 스프라이트 애니메이션 스폰
+-- ════════════════════════════════════════════════════════════════════════════
+
+function SpawnSpriteAnimation(location)
+    PrintToConsole("[Projectile] SpawnSpriteAnimation called")
+
+    -- SpriteActor 소환 (CoinGenerator 방식 따라하기)
+    local PieWorld = GlobalObjectManager.GetPIEWorld()
+    if not PieWorld then
+        PrintToConsole("[Projectile] ERROR: PieWorld is nil")
+        return
+    end
+
+    local spriteTransform = FTransform()
+    spriteTransform.Translation = location
+    spriteTransform.Rotation = FQuat.MakeFromEuler(0, 0, 0)
+    spriteTransform.Scale3D = FVector(3.0, 3.0, 3.0)  -- 스프라이트 크기 3배
+
+    local spriteActor = PieWorld:SpawnActor(spriteTransform, "ASpriteActor")
+    PrintToConsole("[Projectile] SpriteActor spawned: " .. tostring(spriteActor))
+
+    if spriteActor then
+        -- ParticleComponent 가져오기
+        if spriteActor.GetParticleComponent then
+            PrintToConsole("[Projectile] GetParticleComponent exists")
+            local particleComp = spriteActor:GetParticleComponent()
+            PrintToConsole("[Projectile] ParticleComponent: " .. tostring(particleComp))
+
+            if particleComp then
+                -- 스프라이트 시트 설정 (텍스처 경로, 행, 열, 프레임레이트)
+                particleComp:SetSpriteSheet("Data/UI/Sprite/FireExplosion_6x6.dds", 6, 6, 30.0)
+                PrintToConsole("[Projectile] SetSpriteSheet done")
+                particleComp:SetLooping(false)
+                PrintToConsole("[Projectile] SetLooping done")
+                particleComp:Play()
+                PrintToConsole("[Projectile] Play done")
+
+                if Config.bDebugLog then
+                    PrintToConsole("[Projectile] Sprite animation spawned at collision point")
+                end
+            else
+                PrintToConsole("[Projectile] ERROR: ParticleComponent is nil")
+            end
+        else
+            PrintToConsole("[Projectile] ERROR: GetParticleComponent does not exist")
+        end
+
+        -- 애니메이션 재생 시간 계산: 총 프레임 수 / FPS
+        -- 6x6 = 36 프레임, 30 FPS = 1.2초
+        local animationDuration = (6 * 6) / 30.0
+
+        -- 애니메이션이 끝나면 자동 삭제 (애니메이션 시간 + 여유 0.1초)
+        spriteActor:SetAutoDestroy(true, animationDuration + 0.1)
+        PrintToConsole("[Projectile] SetAutoDestroy done, duration: " .. tostring(animationDuration + 0.1))
+    else
+        PrintToConsole("[Projectile] ERROR: SpriteActor is nil")
+    end
+end
+
+-- ════════════════════════════════════════════════════════════════════════════
 -- 충돌 처리
 -- ════════════════════════════════════════════════════════════════════════════
 
@@ -78,6 +139,11 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         if Config.bDebugLog then
             PrintToConsole("[Projectile] Hit Obstacle! Destroying both obstacle and projectile...")
         end
+         PrintToConsole("[Projectile] Hit Obstacle MyActor:GetActorLocation()1")
+        -- 충돌 위치에 스프라이트 애니메이션 소환
+        local hitLocation = MyActor:GetLocation()
+        PrintToConsole("[Projectile] MyActor:GetActorLocation()2")
+        SpawnSpriteAnimation(hitLocation)
 
         -- 장애물 파괴
        -- if OtherActor.SetActorHiddenInGame then

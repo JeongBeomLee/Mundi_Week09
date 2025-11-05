@@ -1652,7 +1652,24 @@ void FSceneRenderer::DrawMeshBatches(TArray<FMeshBatchElement>& InMeshBatches, b
 
 		// 4. 오브젝트별 상수 버퍼 설정 (매번 변경)
 		RHIDevice->SetAndUpdateConstantBuffer(ModelBufferType(Batch.WorldMatrix, Batch.WorldMatrix.InverseAffine().Transpose()));
-		RHIDevice->SetAndUpdateConstantBuffer(ColorBufferType(Batch.InstanceColor, Batch.ObjectID));
+
+		// CustomData가 있으면 스프라이트 애니메이션 정보 전달
+		ColorBufferType ColorBuffer;
+		ColorBuffer.Color = Batch.InstanceColor;
+		ColorBuffer.UUID = Batch.ObjectID;
+		if (Batch.CustomData.size() >= 3)
+		{
+			ColorBuffer.SpriteRows = Batch.CustomData[0];
+			ColorBuffer.SpriteColumns = Batch.CustomData[1];
+			ColorBuffer.CurrentFrame = Batch.CustomData[2];
+		}
+		else
+		{
+			ColorBuffer.SpriteRows = 0.0f;
+			ColorBuffer.SpriteColumns = 0.0f;
+			ColorBuffer.CurrentFrame = 0.0f;
+		}
+		RHIDevice->SetAndUpdateConstantBuffer(ColorBuffer);
 
 		// 5. 드로우 콜 실행
 		RHIDevice->GetDeviceContext()->DrawIndexed(Batch.IndexCount, Batch.StartIndex, Batch.BaseVertexIndex);

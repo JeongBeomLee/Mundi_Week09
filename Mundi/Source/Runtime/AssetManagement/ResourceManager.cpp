@@ -491,6 +491,7 @@ void UResourceManager::InitShaderILMap()
     layout.Add({ "SIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 });
     layout.Add({ "UVRECT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 });
     ShaderToInputLayoutMap["Shaders/UI/TextBillboard.hlsl"] = layout;
+
     layout.clear();
 
     // ────────────────────────────────
@@ -501,6 +502,7 @@ void UResourceManager::InitShaderILMap()
     layout.Add({ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 12,
                  D3D11_INPUT_PER_VERTEX_DATA, 0 });
     ShaderToInputLayoutMap["Shaders/UI/Billboard.hlsl"] = layout;
+    ShaderToInputLayoutMap["Shaders/Effects/Particle.hlsl"] = layout;
     layout.clear();
     
 

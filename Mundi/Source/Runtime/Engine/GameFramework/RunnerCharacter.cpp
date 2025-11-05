@@ -12,6 +12,7 @@
 #include "CollisionComponent/BoxComponent.h"
 #include "ObjectFactory.h"
 #include "SpringArmComponent.h"
+#include "ParticleComponent.h"
 
 IMPLEMENT_CLASS(ARunnerCharacter)
 
@@ -28,6 +29,22 @@ ARunnerCharacter::ARunnerCharacter()
 	, CameraComponent(nullptr)
 	, CameraOffset(-5.0f, 0.0f, 5.0f)  // 플레이어 뒤쪽 5미터, 위쪽 5미터
 {
+
+	 SpriteComponent = CreateDefaultSubobject<UParticleComponent>("ParticleComp");
+	 if (SpriteComponent)
+	 {
+		 SpriteComponent->SetOwner(this);
+
+		 // MeshComponent가 있다면 그것에 부착, 없으면 RootComponent에 부착
+		 if (MeshComponent)
+		 {
+			 SpriteComponent->SetupAttachment(MeshComponent);
+		 }
+		 else
+		 {
+			 SpriteComponent->SetupAttachment(GetRootComponent());
+		 }
+	 }
 	// BoxComponent 생성 및 설정
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>("CollisionBox");
 	if (CollisionBox)

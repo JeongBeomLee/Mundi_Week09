@@ -28,6 +28,8 @@
 #include "DecalComponent.h"
 #include "TextRenderComponent.h"
 #include "BillboardComponent.h"
+#include "ParticleComponent.h"
+#include "SpriteActor.h"
 #include "HeightFogActor.h"
 #include "PlayerCameraManager.h"
 #include "PlayerController.h"
@@ -424,6 +426,17 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetFilePath", &UBillboardComponent::GetFilePath
     );
 
+    // UParticleComponent 등록
+    Lua.new_usertype<UParticleComponent>("UParticleComponent",
+        sol::base_classes, sol::bases<UBillboardComponent, UPrimitiveComponent, USceneComponent, UActorComponent>(),
+        "SetSpriteSheet", &UParticleComponent::SetSpriteSheet,
+        "SetFrameRate", &UParticleComponent::SetFrameRate,
+        "SetLooping", &UParticleComponent::SetLooping,
+        "Play", &UParticleComponent::Play,
+        "Stop", &UParticleComponent::Stop,
+        "Reset", &UParticleComponent::Reset
+    );
+
     // FVector 타입을 Lua에 등록
     Lua.new_usertype<FVector>("FVector",
         sol::call_constructor, sol::factories(
@@ -701,7 +714,16 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetUpDirection", &ARunnerCharacter::GetUpDirection,
         "SetGravityDirection", &ARunnerCharacter::SetGravityDirection,
         "GetGravityDirection", &ARunnerCharacter::GetGravityDirection,
-        "GetSpringArm", &ARunnerCharacter::GetSpringArm
+        "GetSpringArm", &ARunnerCharacter::GetSpringArm,
+        "GetParticleComponent", &ARunnerCharacter::GetParticleComponent
+    );
+
+    // ASpriteActor 클래스 등록
+    Lua.new_usertype<ASpriteActor>("ASpriteActor",
+        sol::base_classes, sol::bases<AActor>(),
+        "GetParticleComponent", &ASpriteActor::GetParticleComponent,
+        "SetSpriteSheet", &ASpriteActor::SetSpriteSheet,
+        "SetAutoDestroy", &ASpriteActor::SetAutoDestroy
     );
 
     // AGameModeBase 클래스 등록
@@ -900,6 +922,15 @@ void UScriptManager::RegisterUserTypeToLua()
                 {
                     AHeightFogActor* fog = World->SpawnActor<AHeightFogActor>(Transform);
                     return sol::make_object(lua, fog);
+                }
+                else if (ActorType == "ASpriteActor")
+                {
+                    ASpriteActor* sprite = World->SpawnActor<ASpriteActor>(Transform);
+                    if (sprite && World->bPie)
+                    {
+                        sprite->BeginPlay();
+                    }
+                    return sol::make_object(lua, sprite);
                 }
                 else
                 {
