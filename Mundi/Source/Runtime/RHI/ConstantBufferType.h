@@ -133,9 +133,12 @@ struct FPixelConstBufferType
 
 struct ColorBufferType // b3
 {
-    FLinearColor Color;
-    uint32 UUID;
-    FVector Padding;
+    FLinearColor Color;      // 16 bytes (4 floats)
+    uint32 UUID;             // 4 bytes
+    float SpriteRows;        // 4 bytes - 스프라이트 시트 행 수 (0이면 일반 빌보드)
+    float SpriteColumns;     // 4 bytes - 스프라이트 시트 열 수
+    float CurrentFrame;      // 4 bytes - 현재 프레임
+    // 총 32 bytes = 16바이트 정렬됨
 };
 
 struct FLightBufferType

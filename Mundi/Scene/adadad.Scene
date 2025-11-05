@@ -1,0 +1,86 @@
+{
+  "Level" : {
+    "Actors" : {
+      "144" : {
+        "Name" : "Directional Light Actor",
+        "OwnedComponents" : [{
+            "CSMLambda" : 0.500000,
+            "Id" : 145,
+            "Intensity" : 1.000000,
+            "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+            "NumCascades" : 3,
+            "ParentId" : 0,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [-62.900280, 16.769619, -62.900280],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShadowBias" : 0.005000,
+            "ShadowMapType" : 1,
+            "ShadowProjectionType" : 0,
+            "ShadowSharpen" : 1.000000,
+            "ShadowSlopeBias" : 2.000000,
+            "Temperature" : 6500.000000,
+            "Type" : "UDirectionalLightComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsCastShadows" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 145,
+        "Type" : "ADirectionalLightActor"
+      },
+      "146" : {
+        "Name" : "Ambient Light Actor",
+        "OwnedComponents" : [{
+            "Id" : 147,
+            "Intensity" : 0.100000,
+            "LightColor" : [1.000000, 1.000000, 1.000000, 1.000000],
+            "ParentId" : 0,
+            "RelativeLocation" : [0.000000, 0.000000, 0.000000],
+            "RelativeRotationEuler" : [0.000000, 0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "ShadowBias" : 0.001000,
+            "ShadowSharpen" : 1.000000,
+            "ShadowSlopeBias" : 0.000000,
+            "Temperature" : 6500.000000,
+            "Type" : "UAmbientLightComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsCastShadows" : true,
+            "bIsVisible" : true,
+            "bTickEnabled" : true
+          }, {
+            "FrameRate" : 10.000000,
+            "Id" : 761,
+            "ParentId" : 147,
+            "RelativeLocation" : [0.000000, 0.987777, 0.000000],
+            "RelativeRotationEuler" : [0.000000, -0.000000, 0.000000],
+            "RelativeScale" : [1.000000, 1.000000, 1.000000],
+            "SpriteColumns" : 8,
+            "SpriteRows" : 8,
+            "Texture" : "Data/UI/Sprite/Run2.png",
+            "Type" : "UParticleComponent",
+            "bHiddenInGame" : false,
+            "bIsActive" : true,
+            "bIsVisible" : true,
+            "bLooping" : true,
+            "bTickEnabled" : true
+          }],
+        "RootComponentId" : 147,
+        "Type" : "AAmbientLightActor"
+      }
+    },
+    "NextUUID" : 764,
+    "PerspectiveCamera" : {
+      "FOV" : [60.000000],
+      "FarClip" : [1000.000000],
+      "Location" : [-1.692480, 1.723886, 0.328458],
+      "NearClip" : [0.100000],
+      "Rotation" : [0.000000, -0.600035, -17.599924]
+    },
+    "Version" : 1
+  },
+  "WorldSettings" : {
+    "PlayerSpawnLocation" : [0.000000, 0.000000, 100.000000]
+  }
+}

@@ -56,7 +56,7 @@ struct FShadowConfiguration
 	// 라이트 타입별 쉐도우 맵 해상도
 	uint32 DirectionalLightResolution = 4096;  // Non-CSM용 (legacy)
 	uint32 SpotLightResolution = 1024;
-	uint32 PointLightResolution = 1024;
+	uint32 PointLightResolution = 512;
 
 	// CSM 3-Tier 해상도 설정 (DirectionalLight CSM 전용)
 	FCSMTierConfig CSMTierLow = FCSMTierConfig(512, 16);      // Tier 0: 256~512
@@ -65,14 +65,14 @@ struct FShadowConfiguration
 
 	// 광원 타입별 최대 쉐도우 캐스팅 라이트 수
 	uint32 MaxDirectionalLights = 1;
-	uint32 MaxSpotLights = 10;
-	uint32 MaxPointLights = 5;
+	uint32 MaxSpotLights = 100;
+	uint32 MaxPointLights = 50;
 
 	// 전체 쉐도우 캐스팅 라이트 수 (통계/검증용)
 	uint32 MaxShadowCastingLights = 16;
 
 	// 섀도우 필터링 설정
-	EShadowFilterType FilterType = EShadowFilterType::NONE;   // 필터링 타입
+	EShadowFilterType FilterType = EShadowFilterType::PCF;   // 필터링 타입
 
 	// PCF 설정
 	EPCFSampleCount PCFSampleCount = EPCFSampleCount::PCF_3x3;  // PCF 샘플 수

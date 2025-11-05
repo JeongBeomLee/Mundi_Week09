@@ -25,8 +25,6 @@ void UCameraModifier::ModifyCamera(
     float& InOutFOV
 )
 {
-    UpdateAlpha(DeltaTime);
-
     if (CameraOwner)
     {
         // note: pushing these through the cached PP blend system in the camera to get
@@ -34,7 +32,7 @@ void UCameraModifier::ModifyCamera(
         // InOutPOV struct.
         {
             float PPBlendWeight = 0.f;
-            FPostProcessSettings PPSettings;
+            FPostProcessSettings PPSettings = CameraOwner->GetViewTarget_Internal().PostProcessSettings;
 			
             //  Let native code modify the post process settings.
             ModifyPostProcess(

@@ -67,15 +67,24 @@ function CameraUtility.AddCameraShake(RotationAmplitude, AlphaInTime, NumSamples
     PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
 end
 
-function CameraUtility.AddLetterBox(FadeSize, Opacity, FadeInTime)
+local CurLetterBoxSize = 0.0;
+local letterBox = nil;
+
+function CameraUtility.AddLetterBox(FadeSize, Opacity, FadeTime, bFadeIn)
     if not PlayerCameraManager then
         return;
     end
 
-    -- LetterBox 모디파이어 생성
-    local letterBox = UCameraModifier_LetterBox()
+    letterBox = UCameraModifier_LetterBox()
     -- 레터박스 시작 (크기, 불투명도, 페이드인 시간)
-    letterBox:SetFadeIn(FadeSize, Opacity, FadeInTime)
+    if bFadeIn == true then
+        CurLetterBoxSize = 0.0
+        letterBox:SetFadeIn(FadeSize, Opacity, FadeTime, CurLetterBoxSize)
+        CurLetterBoxSize = FadeSize
+    else
+        letterBox:SetFadeOut(FadeTime, CurLetterBoxSize)
+    end
+    
     PlayerCameraManager:AddCameraModifier(letterBox)
 end
 
@@ -116,7 +125,7 @@ function CameraUtility.AddScoreAndShowGoldVignetting()
             FVector4(1.0, 207.0 / 255.0, 64.0 / 255.0, 1.0),
             1.2,
             0.2,
-            3.0
+            0.5
     );
 end
 

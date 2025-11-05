@@ -106,6 +106,8 @@ void UWorld::Tick(float DeltaSeconds)
 {
 	//DeltaSeconds *= 0.1f; //시간 느리게 흐르도록 조정
 
+	CurrentRealDeltaTime = DeltaSeconds;
+
 	if (DeltaTimeManager)
 	{
 		DeltaTimeManager->Update(DeltaSeconds);

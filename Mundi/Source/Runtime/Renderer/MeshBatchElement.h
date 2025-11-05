@@ -62,6 +62,9 @@ struct FMeshBatchElement
 	// (기본값으로 흰색(1,1,1,1)을 설정하는 것이 일반적입니다.)
 	FLinearColor InstanceColor = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+	// 커스텀 데이터 배열 (스프라이트 애니메이션 등 셰이더 파라미터 전달용)
+	TArray<float> CustomData;
+
 	// --- 기본 생성자 ---
 	FMeshBatchElement() = default;
 

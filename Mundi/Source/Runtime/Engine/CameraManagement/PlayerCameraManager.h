@@ -9,6 +9,9 @@ class UCameraComponent;
 class UCameraModifier;
 class USpringArmComponent;
 
+// 블렌딩 완료 델리게이트 (파라미터 없음)
+DECLARE_MULTICAST_DELEGATE(FOnBlendComplete);
+
 // 플레이어 카메라를 관리하는 매니저 클래스
 // PlayerController가 소유하며, ViewTarget의 카메라를 렌더링에 제공
 class APlayerCameraManager : public AActor
@@ -122,6 +125,9 @@ public:
 
 	// 현재 블렌드 파라미터 접근
 	const FViewTargetTransitionParams& GetBlendParams() const { return BlendParams; }
+
+	// 블렌딩 완료 델리게이트 (ViewTarget 전환 완료 시 호출)
+	FOnBlendComplete OnBlendComplete;
 
 	// Fade 효과 (구조만 구현, 실제 렌더링 연동은 추후)
 	void StartCameraFade(float FromAlpha, float ToAlpha, float Duration, const FLinearColor& Color);

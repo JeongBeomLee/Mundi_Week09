@@ -16,6 +16,7 @@
 #include "UIManager.h"
 #include "GlobalConsole.h"
 #include "GameModeBase.h"
+#include "RunnerGameMode.h"
 #include "Actor.h"
 #include "PlayerController.h"
 
@@ -574,6 +575,19 @@ void USlateManager::SetPIEWorld(UWorld* InWorld)
     {
         AGameStateBase* GameState = InWorld->GetGameState();
         GameHUD->SetGameState(GameState);
+
+        // PIE World의 GameMode를 GameHUD에 설정 (체력 델리게이트용)
+        AGameModeBase* GameModeBase = InWorld->GetGameMode();
+        if (GameModeBase)
+        {
+            // RunnerGameMode로 캐스팅 시도
+            ARunnerGameMode* RunnerMode = Cast<ARunnerGameMode>(GameModeBase);
+            if (RunnerMode)
+            {
+                GameHUD->SetGameMode(RunnerMode);
+                UE_LOG("USlateManager: GameHUD connected to RunnerGameMode");
+            }
+        }
     }
 
     // PIE World의 GameMode를 GameControlWindow에 설정
