@@ -220,6 +220,7 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\CharacterMovementComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.cpp" />
@@ -548,6 +549,7 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
       <DeploymentContent>false</DeploymentContent>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CharacterMovementComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.h" />

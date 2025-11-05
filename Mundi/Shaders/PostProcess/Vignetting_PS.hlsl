@@ -32,6 +32,9 @@ float4 mainPS(PS_INPUT input) : SV_TARGET
 
     // 원본 색상과의 합성
     float3 sceneColor = g_SceneColorTex.Sample(g_LinearClampSample, input.texCoord).rgb;
-    sceneColor *= vignette; // 가장 자리가 어둡게
-    return float4(sceneColor, 1.0f);
+
+    // VignettingColor와 블렌딩: vignette가 1이면 원본, 0이면 VignettingColor
+    float3 finalColor = lerp(VignettingColor, sceneColor, vignette);
+
+    return float4(finalColor, 1.0f);
 }

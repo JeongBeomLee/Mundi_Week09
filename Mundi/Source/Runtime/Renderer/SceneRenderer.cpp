@@ -54,6 +54,7 @@
 #include "PlayerCameraManager.h"
 #include "ViewTarget.h"
 #include "GameModeBase.h"
+#include "UCameraModifier_Vignetting.h"
 
 FSceneRenderer::FSceneRenderer(UWorld* InWorld, FSceneView* InView, URenderer* InOwnerRenderer)
 	: World(InWorld)
@@ -134,7 +135,6 @@ void FSceneRenderer::Render()
 	// 오버레이(Overlay) Primitive 렌더링
 	RenderOverayEditorPrimitivesPass();	// 기즈모 출력
 
-	//RenderFadeInOutPass();	// FadeInOut 처리
 	RenderVignettingPass(); // Vignetting 처리
 	// 레터박스 렌더링 (PIE 모드에서만)
 	RenderLetterBoxPass();
@@ -1337,16 +1337,25 @@ void FSceneRenderer::RenderVignettingPass()
 		return;
 	}
 
-	// bFading이 false면 Early Return
-	if (!CameraManager->IsFading())
+	TArray<UCameraModifier*>& ModifierList = CameraManager->GetModifierList();
+	bool bVignettingExist = false;
+	for (UCameraModifier* Modifier : ModifierList)
 	{
-		return;
-	}
+		UCameraModifier_Vignetting* Vignetting = Cast<UCameraModifier_Vignetting>(Modifier);
+		if (!Vignetting) continue;
 
-	// Fade 파라미터 가져오기
-	float VignettingRadius = CameraManager->GetFadeAmount();
-	FLinearColor VignettingColorLinear = CameraManager->GetFadeColor();
-	FVector VignettingColor(VignettingColorLinear.R, VignettingColorLinear.G, VignettingColorLinear.B);
+		bVignettingExist = true;
+	}
+	if (!bVignettingExist) return;
+	
+	// ViewTarget에서 PostProcessSettings 가져오기
+	const FViewTarget& ViewTarget = CameraManager->GetViewTarget_Internal();
+	const FPostProcessSettings& PostProcessSettings = ViewTarget.PostProcessSettings;
+
+	// Vignetting 파라미터 가져오기
+	float VignettingRadius = PostProcessSettings.VignettingRadius;
+	float VignettingSoftness = PostProcessSettings.VignettingSoftness;
+	FVector VignettingColor = PostProcessSettings.VignettingColor;
 
 	// Swap 가드 객체 생성: 스왑을 수행하고, 소멸 시 0번 슬롯의 SRV를 자동 해제하도록 설정
 	FSwapGuard SwapGuard(RHIDevice, 0, 1);
@@ -1386,7 +1395,7 @@ void FSceneRenderer::RenderVignettingPass()
 	FVignettingBufferType VignettingBuffer;
 	VignettingBuffer.VignettingColor = VignettingColor;
 	VignettingBuffer.Radius = VignettingRadius;
-	VignettingBuffer.Softness = 1.f;
+	VignettingBuffer.Softness = VignettingSoftness;
 	VignettingBuffer.AspectRatio = CameraManager->GetCameraComponentForRendering()->GetAspectRatio();
 
 	RHIDevice->SetAndUpdateConstantBuffer(VignettingBuffer);
