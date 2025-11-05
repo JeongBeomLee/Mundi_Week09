@@ -151,7 +151,8 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
     -- OtherActor가 코인인지 확인
     if (IsCoinActor(OtherActor)) then
         -- 점수 추가
-        _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
+        SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/GetScoreFx.mp3", false, SoundChannelType.SFX);
+        CameraUtility.AddScoreAndShowGoldVignetting();
         PrintToConsole("[CoinGenerator] Coin collected!");
         
         -- 슬로우 모션 효과 테스트
@@ -163,13 +164,6 @@ function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, Pen
         OtherActor:SetTransform(STORAGE_POSITION);
         RemoveCoinFromSpawned(OtherActor);
         Queue.push(CoinPool, OtherActor);
-        
-        CameraUtility.AddVignetting(
-                FVector(1.0, 207.0 / 255.0, 64.0 / 255.0),
-                0.99,
-                0.2,
-                1.0
-        );
     end
 end
 

@@ -21,10 +21,10 @@ public:
     float GetSoftness() const;
     void SetSoftness(float InSoftness);
 
-    FVector GetVignettingColor() const;
-    void SetVignettingColor(const FVector& InVignettingColor);
+    FVector4 GetVignettingColor() const;
+    void SetVignettingColor(const FVector4& InVignettingColor);
 private:
     float Radius;
     float Softness;
-    FVector VignettingColor;
+    FVector4 VignettingColor{};
 };

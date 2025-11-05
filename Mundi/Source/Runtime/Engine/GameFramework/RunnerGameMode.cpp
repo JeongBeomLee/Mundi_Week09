@@ -88,6 +88,20 @@ void ARunnerGameMode::BeginPlay()
 void ARunnerGameMode::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	// 사운드 지연 재생 처리
+	if (bWaitingForSecondSound)
+	{
+		SoundDelayTimer += DeltaSeconds;
+		if (SoundDelayTimer >= 1.5f)
+		{
+			// 두 번째 사운드 재생
+			USoundManager::GetInstance().PlaySound2D("Data/Sounds/InfinityRunner/GameOverSoundFx.mp3", false, ESoundChannelType::SFX);
+
+			bWaitingForSecondSound = false;
+			SoundDelayTimer = 0.0f;
+		}
+	}
 }
 
 void ARunnerGameMode::RestartGame()
@@ -102,6 +116,13 @@ void ARunnerGameMode::RestartGame()
 void ARunnerGameMode::OnPlayerDeath(ACharacter* Player)
 {
 	UE_LOG("[RunnerGameMode] Player Died!");
+
+	// 첫 번째 사운드 즉시 재생
+	USoundManager::GetInstance().PlaySound2D("Data/Sounds/InfinityRunner/FailedSoundFx.mp3", false, ESoundChannelType::SFX);
+
+	// 1.5초 후 두 번째 사운드 재생을 위한 타이머 시작
+	bWaitingForSecondSound = true;
+	SoundDelayTimer = 0.0f;
 
 	// GameState를 GameOver로 변경
 	if (GameState)

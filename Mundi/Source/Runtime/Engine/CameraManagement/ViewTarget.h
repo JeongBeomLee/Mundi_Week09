@@ -12,7 +12,7 @@ struct FPostProcessSettings
     // Vignetting
     float VignettingRadius = 0.5f;
     float VignettingSoftness = 0.5f;
-	FVector VignettingColor{};
+	FVector4 VignettingColor{};
 
     //// Color Grading
     //float Saturation = 1.0f;

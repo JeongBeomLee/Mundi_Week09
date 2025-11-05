@@ -35,6 +35,8 @@ local function RotateToNewGravity(newGravityDir)
         movement:SetIsRotating(true)
     end
 
+    SoundManager:PlaySound2D("Data/Sounds/InfinityRunner/RotatingFx.mp3", false, SoundChannelType.SFX);
+
     StartCoroutine(function()
         local newGravityCopy = FVector(newGravityDir.X, newGravityDir.Y, newGravityDir.Z)
         local oldGravityDir = CurrentGravityDirection

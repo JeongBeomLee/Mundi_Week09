@@ -88,7 +88,7 @@ function CameraUtility.AddVignetting(Color, Radius, Softness, FadeInTime)
     local Vignetting = UCameraModifier_Vignetting();
 
     -- 기본값 설정
-    Color = Color or FVector(1.0, 207.0 / 255.0, 64.0 / 255.0);
+    Color = Color or FVector4(1.0, 207.0 / 255.0, 64.0 / 255.0, 1.0);
     Radius = Radius or 0.99;
     Softness = Softness or 0.2;
     FadeInTime = FadeInTime or 1.0;
@@ -108,6 +108,16 @@ function CameraUtility.AddVignetting(Color, Radius, Softness, FadeInTime)
 
     -- PlayerCameraManager에 추가
     PlayerCameraManager:AddCameraModifier(Vignetting);
+end
+
+function CameraUtility.AddScoreAndShowGoldVignetting()
+    _G.GetRunnerGameMode(GlobalObjectManager.GetPIEWorld()):OnCoinCollected(1);
+    CameraUtility.AddVignetting(
+            FVector4(1.0, 207.0 / 255.0, 64.0 / 255.0, 1.0),
+            1.2,
+            0.2,
+            3.0
+    );
 end
 
     -- 비활성화된 카메라 셰이크 제거
