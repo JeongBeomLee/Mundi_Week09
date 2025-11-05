@@ -62,7 +62,7 @@ function CameraUtility.AddCameraShake(RotationAmplitude, AlphaInTime, NumSamples
     -- 흔들림 곡선의 주기 설정
     CameraShakeModifier:SetNumSamples(NumSamples);
     -- 앞선 설정으로 새로운 흔들림 생성
-    CameraShakeModifier:GetNewShake();
+    CameraShakeModifier:GetNewPerlinNoise();
 
     PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
 end

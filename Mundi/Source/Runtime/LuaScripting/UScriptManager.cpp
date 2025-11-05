@@ -1083,7 +1083,7 @@ void UScriptManager::RegisterUserTypeToLua()
         sol::base_classes, sol::bases<UCameraModifier, UObject>(),
         "GetRotationAmplitude", &UCameraModifier_CameraShake::GetRotationAmplitude,
         "SetRotationAmplitude", &UCameraModifier_CameraShake::SetRotationAmplitude,
-        "GetNewShake", &UCameraModifier_CameraShake::GetNewShake,
+        "GetNewPerlinNoise", &UCameraModifier_CameraShake::GetNewPerlinNoise,
         "SetNumSamples", &UCameraModifier_CameraShake::SetNumSamples
     );
 

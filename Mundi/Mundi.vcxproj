@@ -363,6 +363,7 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <None Include="Shaders\PostProcess\Vignetting_PS.hlsl" />
     <ClCompile Include="Source\Editor\Clipboard\ClipboardManager.cpp" />
     <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
+    <ClCompile Include="Source\Runtime\Core\Math\CurveData.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
     <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
     <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
@@ -754,6 +755,7 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClInclude Include="pch.h" />
     <ClInclude Include="Source\Editor\Clipboard\ClipboardManager.h" />
     <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
+    <ClInclude Include="Source\Runtime\Core\Math\CurveData.h" />
     <ClInclude Include="Source\Runtime\Core\Math\UCurveFloat.h" />
     <ClInclude Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.h" />
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h" />

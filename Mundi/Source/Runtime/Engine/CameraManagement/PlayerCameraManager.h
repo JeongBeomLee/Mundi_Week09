@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "ViewTarget.h"
 #include "Color.h"
+#include "UCurveFloat.h"
 
 class UCameraComponent;
 class UCameraModifier; // 전방 선언 (다른 팀원이 구현 중)
@@ -27,6 +28,9 @@ public:
 	void SetViewTarget(AActor* NewViewTarget);
 	AActor* GetViewTarget() const { return ViewTarget.Target; }
 
+	UCurveFloat GetBezierCurveFade() const;
+	void SetBezierCurveFade(const UCurveFloat& InBezierCurveFade);
+
 	// 렌더링용 카메라 컴포넌트 반환
 	UCameraComponent* GetCameraComponentForRendering() const;
 
@@ -40,7 +44,7 @@ public:
 	void SetCameraStyle(const FName& NewStyle) { CameraStyle = NewStyle; }
 	FName GetCameraStyle() const { return CameraStyle; }
 
-	// Fade 효과 (구조만 구현, 실제 렌더링 연동은 추후)
+	// Fade 효과
 	void StartCameraFade(float FromAlpha, float ToAlpha, float Duration, const FLinearColor& Color);
 	void StopCameraFade();
 
@@ -94,6 +98,8 @@ protected:
 
 	// ViewTarget (현재 렌더링 대상)
 	FViewTarget ViewTarget;
+
+	UCurveFloat BezierCurveFade{};
 
 	// 카메라 모디파이어 리스트 (다른 팀원이 구현 중)
 	TArray<UCameraModifier*> ModifierList;

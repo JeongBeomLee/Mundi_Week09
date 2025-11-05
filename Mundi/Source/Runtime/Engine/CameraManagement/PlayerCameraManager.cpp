@@ -78,6 +78,15 @@ void APlayerCameraManager::SetViewTarget(AActor* NewViewTarget)
 	}
 }
 
+UCurveFloat APlayerCameraManager::GetBezierCurveFade() const
+{
+	return BezierCurveFade;
+}
+void APlayerCameraManager::SetBezierCurveFade(const UCurveFloat& InBezierCurveFade)
+{
+	BezierCurveFade = InBezierCurveFade;
+}
+
 UCameraComponent* APlayerCameraManager::GetCameraComponentForRendering() const
 {
 	if (!ViewTarget.Target)

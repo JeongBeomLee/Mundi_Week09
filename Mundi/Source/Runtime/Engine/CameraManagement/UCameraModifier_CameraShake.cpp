@@ -9,7 +9,7 @@ END_PROPERTIES()
 
 UCameraModifier_CameraShake::UCameraModifier_CameraShake()
 {
-    SetAlphaInTime(2.f);
+   SetAlphaInTime(2.f);
    SetAlphaOutTime(2.f);
    SetAlpha(0.f);
    SetIsFadingIn(true);
@@ -19,10 +19,10 @@ UCameraModifier_CameraShake::UCameraModifier_CameraShake()
    SetNumSamples(12);
 
    // Curve 한 번만 생성
-   GetNewShake();
+   GetNewPerlinNoise();
 }
 
-void UCameraModifier_CameraShake::GetNewShake()
+void UCameraModifier_CameraShake::GetNewPerlinNoise()
 {
    PerlinNoiseXAxis.RenewCurve();
    PerlinNoiseYAxis.RenewCurve();
@@ -43,59 +43,68 @@ void UCameraModifier_CameraShake::ModifyCamera(
       InOutFOV
    );
 
+   const TArray<FRichCurveKey>* XKeys = nullptr;
+   const TArray<FRichCurveKey>* YKeys = nullptr;
+   const TArray<FRichCurveKey>* ZKeys = nullptr;
+   
+   switch (ShakeCurveType)
+   {
+   case ECurveType::ECT_PERLIN_NOISE:
+      XKeys = &PerlinNoiseXAxis.GetCurve().Keys;
+      YKeys = &PerlinNoiseYAxis.GetCurve().Keys;
+      ZKeys = &PerlinNoiseZAxis.GetCurve().Keys;
+      break;
+   case ECurveType::ECT_BEZIER:
+      XKeys = &BezierCurveXAxis.GetCurve().Keys;
+      YKeys = &BezierCurveYAxis.GetCurve().Keys;
+      ZKeys = &BezierCurveZAxis.GetCurve().Keys;
+      break;
+   default:
+      break;
+   }
+
    // CurveTime: 곡선의 시간 축에서의 위치 [0, AlphaInTime]
    float CurveTime = FMath::Lerp(0.f, AlphaInTime, Alpha);
    int32 NumSamples = PerlinNoiseXAxis.GetNumSamples();
-
-   const TArray<FRichCurveKey>& XKeys = PerlinNoiseXAxis.GetCurve().Keys;
-   const TArray<FRichCurveKey>& YKeys = PerlinNoiseYAxis.GetCurve().Keys;
-   const TArray<FRichCurveKey>& ZKeys = PerlinNoiseZAxis.GetCurve().Keys;
 
    FVector ViewNewRotation;
 
    for (int32 i = 0; i < NumSamples - 1; i++)
    {
-      if (CurveTime >= XKeys[i].Time && CurveTime <= XKeys[i + 1].Time)
+      if (CurveTime >= (*XKeys)[i].Time && CurveTime <= (*XKeys)[i + 1].Time)
       {
-         // Curve 한 번만 생성
-         // PerlinNoiseXAxis.RenewCurve();
-         // PerlinNoiseYAxis.RenewCurve();
-         // PerlinNoiseZAxis.RenewCurve();
          
          // InterpAlpha: 두 키 사이에서의 보간 비율 [0, 1]
-         float InterpAlpha = FMath::GetRangePct(XKeys[i].Time, XKeys[i + 1].Time, CurveTime);
+         float InterpAlpha = FMath::GetRangePct((*XKeys)[i].Time, (*XKeys)[i + 1].Time, CurveTime);
 
          // 각 축별로 비선형 보간 (InterpEaseInOut으로 부드러운 흔들림)
          ViewNewRotation.X = FMath::InterpEaseInOut(
-            XKeys[i].Value,
-            XKeys[i + 1].Value,
+            (*XKeys)[i].Value,
+            (*XKeys)[i + 1].Value,
             InterpAlpha,
             2.f
          ) * RotationAmplitude;
 
          ViewNewRotation.Y = FMath::InterpEaseInOut(
-            YKeys[i].Value,
-            YKeys[i + 1].Value,
+            (*YKeys)[i].Value,
+            (*YKeys)[i + 1].Value,
             InterpAlpha,
             2.f
          ) * RotationAmplitude;
 
          ViewNewRotation.Z = FMath::InterpEaseInOut(
-            ZKeys[i].Value,
-            ZKeys[i + 1].Value,
+            (*ZKeys)[i].Value,
+            (*ZKeys)[i + 1].Value,
             InterpAlpha,
             2.f
          ) * RotationAmplitude;
-
-         // InOutViewRotation = FQuat::MakeFromEulerZYX(ViewNewRotation);
-
+         
          // [Alternative Unreal 방식 - 주석]
          // Base Rotation에 Shake Offset을 Euler 각도로 더하는 방식:
          FVector CurrentEuler = InOutViewRotation.ToEulerZYXDeg();
          FVector NewEuler = CurrentEuler + ViewNewRotation;
          InOutViewRotation = FQuat::MakeFromEulerZYX(NewEuler);
-         // 이 방식은 Shake가 끝나면 자동으로 원래 회전으로 복귀함
-
+         
          break;
       }
    }
@@ -115,14 +124,57 @@ void UCameraModifier_CameraShake::SetAlphaInTime(const float InAlphaInTime)
 {
    UCameraModifier::SetAlphaInTime(InAlphaInTime);
 
+   // 펄린 노이즈 초기화
    PerlinNoiseXAxis.SetTimeRange(InAlphaInTime);
    PerlinNoiseYAxis.SetTimeRange(InAlphaInTime);
    PerlinNoiseZAxis.SetTimeRange(InAlphaInTime);
+
+   // 커스텀 커브 초기화
+   BezierCurveXAxis.SetTimeRange(InAlphaInTime);
+   BezierCurveYAxis.SetTimeRange(InAlphaInTime);
+   BezierCurveZAxis.SetTimeRange(InAlphaInTime);
 }
 
 void UCameraModifier_CameraShake::SetNumSamples(const float InNumSamples)
 {
+   // 펄린 노이즈 초기화
    PerlinNoiseXAxis.SetNumSamples(InNumSamples);
    PerlinNoiseYAxis.SetNumSamples(InNumSamples);
    PerlinNoiseZAxis.SetNumSamples(InNumSamples);
+
+   BezierCurveXAxis.SetNumSamples(InNumSamples);
+   BezierCurveYAxis.SetNumSamples(InNumSamples);
+   BezierCurveZAxis.SetNumSamples(InNumSamples);
+}
+
+void UCameraModifier_CameraShake::GetBezierCurve(
+   UCurveFloat& InOutBezierCurveXAxis,
+   UCurveFloat& InOutBezierCurveYAxis,
+   UCurveFloat& InOutBezierCurveZAxis
+) const
+{
+   InOutBezierCurveXAxis = BezierCurveXAxis;
+   InOutBezierCurveYAxis = BezierCurveYAxis;
+   InOutBezierCurveZAxis = BezierCurveZAxis;
+}
+
+void UCameraModifier_CameraShake::SetBezierCurve(
+   const UCurveFloat& InBezierCurveXAxis,
+   const UCurveFloat& InBezierCurveYAxis,
+   const UCurveFloat& InBezierCurveZAxis
+)
+{
+   BezierCurveXAxis = InBezierCurveXAxis;
+   BezierCurveYAxis = InBezierCurveYAxis;
+   BezierCurveZAxis = InBezierCurveZAxis;
+}
+
+ECurveType UCameraModifier_CameraShake::GetShakeCurveType() const
+{
+   return ShakeCurveType;
+}
+
+void UCameraModifier_CameraShake::SetShakeCurveType(const ECurveType& InShakeCurveType)
+{
+   ShakeCurveType = InShakeCurveType;
 }

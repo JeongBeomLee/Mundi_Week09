@@ -1,4 +1,5 @@
-﻿#include "UCurveFloat.h"
+﻿#pragma once
+#include "UCurveFloat.h"
 
 class UPerlinNoiseFloat : public UCurveFloat
 {
