@@ -1,6 +1,6 @@
 ﻿CollisionUtility = {};
-CollisionUtility.OBSTACLE_OBJ_FILE_PATH = "Data/Model/smokegrenade.obj";
-CollisionUtility.OBSTACLE_OBJBIN_FILE_PATH = "DerivedDataCache/Model/smokegrenade.obj.bin";
+CollisionUtility.OBSTACLE_OBJ_FILE_PATH = "Data/Model/backup.obj";
+CollisionUtility.OBSTACLE_OBJBIN_FILE_PATH = "DerivedDataCache/Model/backup.obj.bin";
 
 function CollisionUtility.IsObstacleActor(Actor)
 

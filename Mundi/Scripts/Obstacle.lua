@@ -16,8 +16,8 @@ function BeginPlay()
     Cnt = Cnt + 1;
     -- PrintToConsole("[coin_collision Begin Play] ");
     -- 빌보드 컴포넌트를 여러 개 생성
-    local centerY = 2.5
-    local spacing = 2.5
+    local centerY = -25.0
+    local spacing = 18.0
 
     -- 빌보드 개수가 홀수/짝수일 때 중앙 정렬 계산
     local startOffset = -(BILLBOARD_COUNT - 1) * spacing / 2
@@ -27,7 +27,7 @@ function BeginPlay()
         local yOffset = startOffset + (j - 1) * spacing
         local BillboardComponent = MyActor:CreateBillboardComponent("BillboardComponent" .. j);
         BillboardComponent:SetTextureName("Data/Icon/heart.png");
-        BillboardComponent:SetRelativeLocation(FVector(-5.0, centerY + yOffset, 4.0));
+        BillboardComponent:SetRelativeLocation(FVector(-26.0, centerY + yOffset, 4.0));
         -- BillboardComponent:SetActive(false);
         
         -- 배열에 빌보드 컴포넌트 추가
