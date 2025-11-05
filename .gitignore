@@ -456,6 +456,8 @@ editor.ini
 !Mundi/ThirdParty/DirectXTex/Lib/x64/Release/
 !Mundi/ThirdParty/DirectXTex/**/*.lib
 !Mundi/ThirdParty/lua**
+!Mundi/ThirdParty/FMOD/lib**
+!Mundi/ThirdParty/FMOD/bin**
 
 WARP.md
 

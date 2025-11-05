@@ -53,8 +53,8 @@ ARunnerCharacter::ARunnerCharacter()
 		SpringArmComponent->SetupAttachment(GetRootComponent());
 
 		// 기본 설정값
-		SpringArmComponent->SetTargetArmLength(3.0f);     // 캐릭터로부터 5m 떨어짐
-		SpringArmComponent->SetSocketOffset(FVector(0, 0, 1))  ;  // 캐릭터 머리 위
+		SpringArmComponent->SetTargetArmLength(5.0f);
+		SpringArmComponent->SetSocketOffset(FVector(0, 0, 2.5))  ;  // 캐릭터 머리 위
 		SpringArmComponent->SetEnableCameraLag(true) ;
 		SpringArmComponent->SetCameraLagSpeed(10.0f);
 		SpringArmComponent->SetDoCollisionTest(true);
