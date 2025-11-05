@@ -44,10 +44,10 @@ void UCameraModifier_LetterBox::ModifyPostProcess(
     PostProcessBlendWeight = Alpha;
 }
 
-void UCameraModifier_LetterBox::SetFadeIn(float InSize, float InOpacity, float InFadeInTime)
+void UCameraModifier_LetterBox::SetFadeIn(float InSize, float InOpacity, float InFadeInTime, float InStartSize)
 {
-	StartLetterBoxSize = CurrentLetterBoxSize;
-	StartLetterBoxOpacity = CurrentLetterBoxOpacity;
+	StartLetterBoxSize = InStartSize;
+	StartLetterBoxOpacity = 1.0f;
 
     TargetLetterBoxSize = FMath::Clamp(InSize, 0.0f, 1.0f);
     TargetLetterBoxOpacity = FMath::Clamp(InOpacity, 0.0f, 1.0f);
@@ -58,15 +58,16 @@ void UCameraModifier_LetterBox::SetFadeIn(float InSize, float InOpacity, float I
     SetAlpha(0.0f);
 }
 
-void UCameraModifier_LetterBox::SetFadeOut(float InFadeOutTime)
+void UCameraModifier_LetterBox::SetFadeOut(float InFadeOutTime, float InStartSize)
 {
-	StartLetterBoxSize = CurrentLetterBoxSize;
-	StartLetterBoxOpacity = CurrentLetterBoxOpacity;
+	StartLetterBoxSize = InStartSize;
+	StartLetterBoxOpacity = 1.0f;
 
     TargetLetterBoxSize = 0.0f;
-    TargetLetterBoxOpacity = 0.0f;
+    TargetLetterBoxOpacity = 1.0f;
 
-    SetAlphaOutTime(InFadeOutTime);
-    SetIsFadingIn(false);
-    SetAlpha(1.0f);
+    SetAlphaInTime(InFadeOutTime);
+    EnableModifier();
+    SetIsFadingIn(true);
+    SetAlpha(0.0f);
 }

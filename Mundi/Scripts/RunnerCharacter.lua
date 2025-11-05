@@ -251,11 +251,33 @@ function SetupInputBindings()
     if InputComponent.BindAction then
         InputComponent:BindAction("ThrowProjectile", string.byte('C'), OnThrowProjectile, nil)
     end
+
+    -- Action 바인딩: V 키 (슬로우모션)
+    if InputComponent.BindAction then
+        InputComponent:BindAction("ToggleSlomo", string.byte('V'), OnSlomoPressed, OnSlomoReleased)
+    end
 end
 
 -- ════════════════════════════════════════════════════════════════════════════
 -- 입력 콜백
 -- ════════════════════════════════════════════════════════════════════════════
+
+local slomoEffectId = nil
+
+function OnSlomoPressed()
+    local dtManager = World:GetDeltaTimeManager()
+    CameraUtility.AddLetterBox(0.2, 1.0, 0.2, true)  -- Height, Duration
+    slomoEffectId = dtManager:ApplySlomoEffect(1000.0, 0.2)
+    PrintToConsole("[RunnerCharacter] Slomo effect applied")
+end
+
+function OnSlomoReleased()
+    local dtManager = World:GetDeltaTimeManager()
+    dtManager:CancelEffect(slomoEffectId)
+    slomoEffectId = nil
+    CameraUtility.AddLetterBox(0.2, 1.0, 1.0, false)  -- 1초간 원래대로 페이드
+    PrintToConsole("[RunnerCharacter] Slomo effect removed")
+end
 
 function OnMoveLeft(value)
     

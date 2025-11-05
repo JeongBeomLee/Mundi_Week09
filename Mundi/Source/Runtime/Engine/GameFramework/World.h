@@ -146,6 +146,8 @@ public:
     float GetScaledDeltaTime(float RealDeltaTime) const;
 
 
+	float GetCurrentRealDeltaTime() const { return CurrentRealDeltaTime; }
+
     /** === 게임 프레임워크 (PIE 전용) === */
     AGameModeBase* GameMode = nullptr;
     AGameStateBase* GameState = nullptr;
@@ -195,6 +197,8 @@ private:
 
     // 지연 삭제 큐
     TArray<AActor*> PendingDestroyActors;
+
+	float CurrentRealDeltaTime = 0.016f; // 기본값 60FPS
 };
 
 template<class T>
