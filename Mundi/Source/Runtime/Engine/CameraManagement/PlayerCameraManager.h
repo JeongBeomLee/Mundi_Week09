@@ -88,12 +88,17 @@ public:
 	void StartCameraFade(float FromAlpha, float ToAlpha, float Duration, const FLinearColor& Color);
 	void StopCameraFade();
 
+	float GetFadeAmount() const;
+	bool IsFading() const { return bFading; }
+	FLinearColor GetFadeColor() const { return FadeColor; }
+
 	// 카메라 모디파이어 관리
 	void AddCameraModifier(UCameraModifier* NewModifier);
 	void RemoveCameraModifier(UCameraModifier* ModifierToRemove);
+	void RemoveDisabledCameraModifiers(); // 비활성화된 모디파이어 자동 제거
 
 	void Serialize(const bool bInIsLoading, JSON& InOutHandle) override;
-
+	
 	void DuplicateSubObjects() override;
 	DECLARE_DUPLICATE(APlayerCameraManager)
 
