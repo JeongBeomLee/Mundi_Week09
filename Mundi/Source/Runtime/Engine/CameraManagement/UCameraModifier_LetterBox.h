@@ -46,15 +46,15 @@ public:
     void SetLetterBoxOpacity(float InOpacity) { LetterBoxOpacity = FMath::Clamp(InOpacity, 0.0f, 1.0f); }
 
 protected:
-    /** 레터박스 크기 (0.0 ~ 1.0) */
-    float LetterBoxSize = 0.0f;
+	// 원래 레터박스 크기 및 불투명도 (모디파이어 시작 시점 저장용)
+	float OriginalLetterBoxSize = 0.0f;
+	float OriginalLetterBoxOpacity = 1.0f;
 
-    /** 레터박스 불투명도 (0.0 ~ 1.0) */
+	// 현재 레터박스 크기 및 불투명도
+    float LetterBoxSize = 0.0f;
     float LetterBoxOpacity = 1.0f;
 
-    /** 목표 레터박스 크기 */
+	// 목표 레터박스 크기 및 불투명도
     float TargetLetterBoxSize = 0.0f;
-
-    /** 목표 레터박스 불투명도 */
     float TargetLetterBoxOpacity = 1.0f;
 };

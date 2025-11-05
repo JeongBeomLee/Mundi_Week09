@@ -8,7 +8,9 @@ BEGIN_PROPERTIES(UCameraModifier_LetterBox)
 END_PROPERTIES()
 
 UCameraModifier_LetterBox::UCameraModifier_LetterBox()
-    : LetterBoxSize(0.0f)
+	: OriginalLetterBoxSize(0.0f)
+    , OriginalLetterBoxOpacity(1.0f)
+    , LetterBoxSize(0.0f)
     , LetterBoxOpacity(1.0f)
     , TargetLetterBoxSize(0.0f)
     , TargetLetterBoxOpacity(1.0f)
@@ -31,8 +33,8 @@ void UCameraModifier_LetterBox::ModifyPostProcess(
     }
 
     // Alpha 값에 따라 레터박스 크기와 불투명도를 보간
-    LetterBoxSize = FMath::Lerp(LetterBoxSize, TargetLetterBoxSize, Alpha);
-    LetterBoxOpacity = FMath::Lerp(LetterBoxOpacity, TargetLetterBoxOpacity, Alpha);
+    LetterBoxSize = FMath::Lerp(OriginalLetterBoxSize, TargetLetterBoxSize, Alpha);
+    LetterBoxOpacity = FMath::Lerp(OriginalLetterBoxOpacity, TargetLetterBoxOpacity, Alpha);
 
     // PostProcessSettings에 레터박스 설정 적용
     PostProcessSettings.LetterBoxSize = LetterBoxSize;

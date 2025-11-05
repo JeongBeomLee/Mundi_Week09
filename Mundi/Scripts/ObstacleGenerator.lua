@@ -169,22 +169,22 @@ local function AddCameraShake()
     -- PlayerCameraManager에 추가
     local cameraManager = GameMode:GetPlayerController():GetPlayerCameraManager()
     -- 레터박스 시작 (크기, 불투명도, 페이드인 시간)
-    letterBox:StartLetterBox(0.15, 1.0, 1000.0)
+    letterBox:StartLetterBox(0.15, 1.0, 1.0)
     cameraManager:AddCameraModifier(letterBox)
     PrintToConsole("[RunnerCharacter] LetterBox camera modifier added")
 
-    -- local CameraShakeModifier = UCameraModifier_CameraShake();
-    -- -- 흔들리는 정도 설정
-    -- CameraShakeModifier:SetRotationAmplitude(10.0);
-    -- -- 흔들리는 시간 설정
-    -- CameraShakeModifier:SetAlphaInTime(2.0);
-    -- -- 흔들림 곡선의 주기 설정
-    -- CameraShakeModifier:SetNumSamples(6);
-    -- -- 앞선 설정으로 새로운 흔들림 생성
-    -- CameraShakeModifier:GetNewShake();
+    local CameraShakeModifier = UCameraModifier_CameraShake();
+    -- 흔들리는 정도 설정
+    CameraShakeModifier:SetRotationAmplitude(10.0);
+    -- 흔들리는 시간 설정
+    CameraShakeModifier:SetAlphaInTime(2.0);
+    -- 흔들림 곡선의 주기 설정
+    CameraShakeModifier:SetNumSamples(6);
+    -- 앞선 설정으로 새로운 흔들림 생성
+    CameraShakeModifier:GetNewShake();
 
-    -- PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
-    -- table.insert(ActiveCameraShakeModifiers, CameraShakeModifier);
+    PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
+    table.insert(ActiveCameraShakeModifiers, CameraShakeModifier);
 end
 
 function OnOverlap(OverlappedComponent, OtherActor, OtherComp, ContactPoint, PenetrationDepth)
