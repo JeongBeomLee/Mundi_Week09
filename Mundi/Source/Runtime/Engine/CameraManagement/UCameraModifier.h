@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ViewTarget.h"
 
 class APlayerCameraManager;
@@ -78,6 +78,9 @@ public:
     uint8 GetPriority() const;
     void SetPriority(const uint8 InPriority);
 
+	bool IsUsingRealDeltaTime() const { return bUseRealDeltaTime; }
+	void SetUseRealDeltaTime(const bool bInUseRealDeltaTime) { bUseRealDeltaTime = bInUseRealDeltaTime; }
+
 protected:
     APlayerCameraManager* CameraOwner = nullptr;
     float AlphaInTime = 1.0f;
@@ -86,4 +89,6 @@ protected:
     bool bIsFadingIn = false;
     bool bDisabled = false;
     uint8 Priority = 0;
+
+	bool bUseRealDeltaTime = false;
 };

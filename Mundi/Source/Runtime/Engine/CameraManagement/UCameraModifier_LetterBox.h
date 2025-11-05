@@ -30,9 +30,9 @@ public:
      * @param InOpacity - 레터박스 불투명도 (0.0 ~ 1.0)
      * @param InFadeInTime - 페이드 인 시간 (초)
      */
-    void SetFadeIn(float InSize, float InOpacity, float InFadeInTime);
+    void SetFadeIn(float InSize, float InOpacity, float InFadeInTime, float InStartSize);
 
-    void SetFadeOut(float InFadeOutTime);
+    void SetFadeOut(float InFadeOutTime, float InStartSize);
 
     // Getters / Setters
     float GetSize() const { return CurrentLetterBoxSize; }

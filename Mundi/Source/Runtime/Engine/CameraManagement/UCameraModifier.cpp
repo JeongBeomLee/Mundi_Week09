@@ -25,8 +25,6 @@ void UCameraModifier::ModifyCamera(
     float& InOutFOV
 )
 {
-    UpdateAlpha(DeltaTime);
-
     if (CameraOwner)
     {
         // note: pushing these through the cached PP blend system in the camera to get

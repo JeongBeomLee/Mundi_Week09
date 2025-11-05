@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "UCameraModifier_Vignetting.h"
 
 IMPLEMENT_CLASS(UCameraModifier_Vignetting)
@@ -16,6 +16,7 @@ UCameraModifier_Vignetting::UCameraModifier_Vignetting()
     AlphaInTime = 1.0f;
     AlphaOutTime = 1.0f;
     bDisabled = true;
+	bUseRealDeltaTime = true;
 }
 
 void UCameraModifier_Vignetting::ModifyPostProcess(
