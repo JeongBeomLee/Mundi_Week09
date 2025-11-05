@@ -62,7 +62,7 @@ struct GammaCorrectionBufferType // b2
     float InvGamma;        // 1.0 / Gamma (미리 계산해서 넘겨주면 성능 향상)
     float Brightness;      // 추가 밝기 조정 (1.0 = 변화 없음)
     float Saturation;      // 채도 조정 (1.0 = 변화 없음)
-}
+};
 
 struct FFadeBufferType // b2
 {
