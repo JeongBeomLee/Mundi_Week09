@@ -132,42 +132,42 @@ void UCameraBlendPresetLibrary::LoadPresetsFromDirectory(const FString& Director
 
 void UCameraBlendPresetLibrary::RegisterDefaultPresets()
 {
-	// 1. Linear (선형 블렌드)
+	// Linear (선형 블렌드)
 	{
 		FViewTargetTransitionParams Params(1.0f, EViewTargetBlendFunction::VTBlend_Linear);
 		FCameraBlendPreset Preset("Linear", Params);
 		RegisterPreset(Preset);
 	}
 
-	// 2. Cubic (큐빅 보간)
+	// Cubic (큐빅 보간)
 	{
 		FViewTargetTransitionParams Params(1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
 		FCameraBlendPreset Preset("Cubic", Params);
 		RegisterPreset(Preset);
 	}
 
-	// 3. EaseIn (천천히 시작)
+	// EaseIn (천천히 시작)
 	{
 		FViewTargetTransitionParams Params(1.0f, EViewTargetBlendFunction::VTBlend_EaseIn, 2.0f);
 		FCameraBlendPreset Preset("EaseIn", Params);
 		RegisterPreset(Preset);
 	}
 
-	// 4. EaseOut (천천히 종료)
+	// EaseOut (천천히 종료)
 	{
 		FViewTargetTransitionParams Params(1.0f, EViewTargetBlendFunction::VTBlend_EaseOut, 2.0f);
 		FCameraBlendPreset Preset("EaseOut", Params);
 		RegisterPreset(Preset);
 	}
 
-	// 5. EaseInOut (천천히 시작하고 종료)
+	// EaseInOut (천천히 시작하고 종료)
 	{
 		FViewTargetTransitionParams Params(1.0f, EViewTargetBlendFunction::VTBlend_EaseInOut, 2.0f);
 		FCameraBlendPreset Preset("EaseInOut", Params);
 		RegisterPreset(Preset);
 	}
 
-	// 6. Smooth (매끄러운 전환 - 커스텀 베지어)
+	// Smooth (매끄러운 전환 - 커스텀 베지어)
 	{
 		FViewTargetTransitionParams Params(1.5f, EViewTargetBlendFunction::VTBlend_BezierCustom);
 		// 부드러운 S자 커브
@@ -179,19 +179,20 @@ void UCameraBlendPresetLibrary::RegisterDefaultPresets()
 		RegisterPreset(Preset);
 	}
 
-	// 7. Cinematic (시네마틱 - 느린 전환)
+	// Cinematic (시네마틱 - 느린 전환)
 	{
-		FViewTargetTransitionParams Params(3.0f, EViewTargetBlendFunction::VTBlend_BezierCustom);
+		FViewTargetTransitionParams Params(2.0f, EViewTargetBlendFunction::VTBlend_BezierCustom);
 		// 매우 부드러운 영화 같은 커브
 		Params.LocationCurve = FBezierControlPoints(0.0f, 0.05f, 0.95f, 1.0f);
 		Params.RotationCurve = FBezierControlPoints(0.0f, 0.05f, 0.95f, 1.0f);
 		Params.FOVCurve = FBezierControlPoints(0.0f, 0.05f, 0.95f, 1.0f);
 		Params.SpringArmCurve = FBezierControlPoints(0.0f, 0.05f, 0.95f, 1.0f);
+		Params.bLockOutgoing = true;
 		FCameraBlendPreset Preset("Cinematic", Params);
 		RegisterPreset(Preset);
 	}
 
-	// 8. Snap (거의 즉시 전환)
+	// Snap (거의 즉시 전환)
 	{
 		FViewTargetTransitionParams Params(0.1f, EViewTargetBlendFunction::VTBlend_Linear);
 		FCameraBlendPreset Preset("Snap", Params);

@@ -1,10 +1,11 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "PlayerCameraManager.h"
 #include "ObjectFactory.h"
 #include "CameraComponent.h"
 #include "CameraActor.h"
 #include "UCameraModifier_CameraShake.h"
 #include "SpringArmComponent.h"
+#include "CameraBlendPresetLibrary.h"
 
 IMPLEMENT_CLASS(APlayerCameraManager)
 
@@ -382,6 +383,47 @@ void APlayerCameraManager::SetViewTargetWithBezierBlend(
 	}
 }
 
+void APlayerCameraManager::SetViewTargetWithBlendPreset(
+	AActor* NewViewTarget,
+	const FString& PresetName
+)
+{
+	// 라이브러리에서 프리셋 검색
+	UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+	if (!Library)
+	{
+		UE_LOG("PlayerCameraManager: CameraBlendPresetLibrary가 초기화되지 않았습니다.");
+		// Fallback: Cubic 블렌드 사용
+		SetViewTargetWithBlend(NewViewTarget, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	const FCameraBlendPreset* Preset = Library->GetPreset(PresetName);
+	if (!Preset)
+	{
+		UE_LOG("PlayerCameraManager: 프리셋을 찾을 수 없음 - %s", PresetName.c_str());
+		// Fallback: Cubic 블렌드 사용
+		SetViewTargetWithBlend(NewViewTarget, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	// 프리셋 적용
+	SetViewTargetWithBlendPreset(NewViewTarget, *Preset);
+}
+
+void APlayerCameraManager::SetViewTargetWithBlendPreset(
+	AActor* NewViewTarget,
+	const FCameraBlendPreset& Preset
+)
+{
+	// 프리셋의 BlendParams를 사용하여 베지어 블렌드 호출
+	SetViewTargetWithBezierBlend(NewViewTarget, Preset.BlendParams);
+
+	UE_LOG("PlayerCameraManager: 프리셋 '%s'로 ViewTarget 블렌드 시작 (%.2fs)",
+		Preset.PresetName.c_str(),
+		Preset.BlendParams.BlendTime);
+}
+
 void APlayerCameraManager::BlendToTransform(
 	const FVector& TargetLocation,
 	const FQuat& TargetRotation,
@@ -463,6 +505,51 @@ void APlayerCameraManager::BlendToTransformWithBezier(
 	{
 		BlendStartSpringArmLength = SpringArm->GetTargetArmLength();
 	}
+}
+
+void APlayerCameraManager::BlendToTransformWithPreset(
+	const FVector& TargetLocation,
+	const FQuat& TargetRotation,
+	float TargetFOV,
+	const FString& PresetName
+)
+{
+	// 라이브러리에서 프리셋 검색
+	UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+	if (!Library)
+	{
+		UE_LOG("PlayerCameraManager: CameraBlendPresetLibrary가 초기화되지 않았습니다.");
+		// Fallback: Cubic 블렌드 사용
+		BlendToTransform(TargetLocation, TargetRotation, TargetFOV, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	const FCameraBlendPreset* Preset = Library->GetPreset(PresetName);
+	if (!Preset)
+	{
+		UE_LOG("PlayerCameraManager: 프리셋을 찾을 수 없음 - %s", PresetName.c_str());
+		// Fallback: Cubic 블렌드 사용
+		BlendToTransform(TargetLocation, TargetRotation, TargetFOV, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	// 프리셋 적용
+	BlendToTransformWithPreset(TargetLocation, TargetRotation, TargetFOV, *Preset);
+}
+
+void APlayerCameraManager::BlendToTransformWithPreset(
+	const FVector& TargetLocation,
+	const FQuat& TargetRotation,
+	float TargetFOV,
+	const FCameraBlendPreset& Preset
+)
+{
+	// 프리셋의 BlendParams를 사용하여 베지어 블렌드 호출
+	BlendToTransformWithBezier(TargetLocation, TargetRotation, TargetFOV, Preset.BlendParams);
+
+	UE_LOG("PlayerCameraManager: 프리셋 '%s'로 고정 Transform 블렌드 시작 (%.2fs)",
+		Preset.PresetName.c_str(),
+		Preset.BlendParams.BlendTime);
 }
 
 void APlayerCameraManager::StopBlending()

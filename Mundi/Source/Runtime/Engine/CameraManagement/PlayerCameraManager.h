@@ -57,6 +57,18 @@ public:
 		const FViewTargetTransitionParams& CustomBlendParams
 	);
 
+	// 프리셋 이름으로 ViewTarget 블렌딩
+	void SetViewTargetWithBlendPreset(
+		AActor* NewViewTarget,
+		const FString& PresetName
+	);
+
+	// 프리셋 객체로 ViewTarget 블렌딩
+	void SetViewTargetWithBlendPreset(
+		AActor* NewViewTarget,
+		const struct FCameraBlendPreset& Preset
+	);
+
 	// 고정 위치/회전으로 블렌딩 (더미 액터 불필요)
 	void BlendToTransform(
 		const FVector& TargetLocation,
@@ -73,6 +85,22 @@ public:
 		const FQuat& TargetRotation,
 		float TargetFOV,
 		const FViewTargetTransitionParams& CustomBlendParams
+	);
+
+	// 프리셋 이름으로 고정 위치 블렌딩
+	void BlendToTransformWithPreset(
+		const FVector& TargetLocation,
+		const FQuat& TargetRotation,
+		float TargetFOV,
+		const FString& PresetName
+	);
+
+	// 프리셋 객체로 고정 위치 블렌딩
+	void BlendToTransformWithPreset(
+		const FVector& TargetLocation,
+		const FQuat& TargetRotation,
+		float TargetFOV,
+		const struct FCameraBlendPreset& Preset
 	);
 
 	// 블렌딩 중단

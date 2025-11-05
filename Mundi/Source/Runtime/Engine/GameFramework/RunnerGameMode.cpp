@@ -79,26 +79,9 @@ void ARunnerGameMode::BeginPlay()
 			// 2. 카메라 초기 위치 덮어쓰기 (블렌딩 없이)
 			CameraManager->SetCameraTransform(StartLocation, StartRotation, StartFOV);
 
-			// 3. 2.5초 동안 EaseInOut 블렌딩으로 플레이어 카메라로 부드럽게 전환
-			// bLockOutgoing = true: 블렌딩 중 시작점(현재 위치)을 고정
-			CameraManager->SetViewTargetWithBlend(
-				PlayerPawn,
-				2.5f,  // 블렌딩 시간 (초)
-				EViewTargetBlendFunction::VTBlend_EaseInOut,
-				2.0f,  // BlendExp (사용되지 않음)
-				true   // bLockOutgoing = true (시작점 고정!)
-			);
-
-			UE_LOG("[RunnerGameMode] Camera transition started: Top-down view -> Player view (2.5s EaseInOut)");
+			// 3. 프리셋을 사용하여 플레이어 카메라로 부드럽게 전환, "Cinematic" 프리셋 사용
+			CameraManager->SetViewTargetWithBlendPreset(PlayerPawn, "Cinematic");
 		}
-		else
-		{
-			UE_LOG("[RunnerGameMode] WARNING: PlayerPawn not found for camera transition");
-		}
-	}
-	else
-	{
-		UE_LOG("[RunnerGameMode] WARNING: PlayerController or CameraManager not found");
 	}
 }
 
