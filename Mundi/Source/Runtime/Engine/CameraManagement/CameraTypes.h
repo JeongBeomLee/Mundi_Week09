@@ -120,4 +120,10 @@ struct FViewTargetTransitionParams
 
 	// 블렌드 업데이트
 	void UpdateBlend(float DeltaTime);
+
+	// 직렬화
+	void Serialize(JSON& InOutHandle, bool bIsLoading);
 };
+
+// FBezierControlPoints 직렬화 헬퍼 함수
+void SerializeBezierControlPoints(JSON& InOutHandle, const char* Key, FBezierControlPoints& Curve, bool bIsLoading);

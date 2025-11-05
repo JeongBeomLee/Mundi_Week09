@@ -168,6 +168,9 @@ void UUIWindow::RenderWindow()
 		// 실제 UI 컨텐츠 렌더링
 		RenderWidget();
 
+		// 서브클래스 커스텀 렌더링
+		RenderContent();
+
 		// 윈도우 정보 업데이트
 		UpdateWindowInfo();
 	}

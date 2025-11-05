@@ -182,3 +182,78 @@ void FViewTargetTransitionParams::UpdateBlend(float DeltaTime)
 		}
 	}
 }
+
+// FViewTargetTransitionParams 직렬화
+void FViewTargetTransitionParams::Serialize(JSON& InOutHandle, bool bIsLoading)
+{
+	if (bIsLoading)
+	{
+		// 블렌드 시간
+		FJsonSerializer::ReadFloat(InOutHandle, "BlendTime", BlendTime, 1.0f);
+		FJsonSerializer::ReadFloat(InOutHandle, "BlendTimeRemaining", BlendTimeRemaining, 0.0f);
+
+		// 블렌드 함수
+		int32 BlendFuncInt = 0;
+		FJsonSerializer::ReadInt32(InOutHandle, "BlendFunction", BlendFuncInt, 0);
+		BlendFunction = static_cast<EViewTargetBlendFunction>(BlendFuncInt);
+
+		FJsonSerializer::ReadFloat(InOutHandle, "BlendExp", BlendExp, 2.0f);
+		FJsonSerializer::ReadBool(InOutHandle, "bLockOutgoing", bLockOutgoing, false);
+
+		// 베지어 커브
+		SerializeBezierControlPoints(InOutHandle, "LocationCurve", LocationCurve, bIsLoading);
+		SerializeBezierControlPoints(InOutHandle, "RotationCurve", RotationCurve, bIsLoading);
+		SerializeBezierControlPoints(InOutHandle, "FOVCurve", FOVCurve, bIsLoading);
+		SerializeBezierControlPoints(InOutHandle, "SpringArmCurve", SpringArmCurve, bIsLoading);
+
+		// SpringArm 블렌딩
+		FJsonSerializer::ReadBool(InOutHandle, "bBlendSpringArmLength", bBlendSpringArmLength, false);
+		FJsonSerializer::ReadFloat(InOutHandle, "TargetSpringArmLength", TargetSpringArmLength, 300.0f);
+	}
+	else
+	{
+		// 블렌드 시간
+		InOutHandle["BlendTime"] = BlendTime;
+		InOutHandle["BlendTimeRemaining"] = BlendTimeRemaining;
+
+		// 블렌드 함수
+		InOutHandle["BlendFunction"] = static_cast<int32>(BlendFunction);
+		InOutHandle["BlendExp"] = BlendExp;
+		InOutHandle["bLockOutgoing"] = bLockOutgoing;
+
+		// 베지어 커브
+		SerializeBezierControlPoints(InOutHandle, "LocationCurve", LocationCurve, bIsLoading);
+		SerializeBezierControlPoints(InOutHandle, "RotationCurve", RotationCurve, bIsLoading);
+		SerializeBezierControlPoints(InOutHandle, "FOVCurve", FOVCurve, bIsLoading);
+		SerializeBezierControlPoints(InOutHandle, "SpringArmCurve", SpringArmCurve, bIsLoading);
+
+		// SpringArm 블렌딩
+		InOutHandle["bBlendSpringArmLength"] = bBlendSpringArmLength;
+		InOutHandle["TargetSpringArmLength"] = TargetSpringArmLength;
+	}
+}
+
+// FBezierControlPoints 직렬화 헬퍼 함수
+void SerializeBezierControlPoints(JSON& InOutHandle, const char* Key, FBezierControlPoints& Curve, bool bIsLoading)
+{
+	if (bIsLoading)
+	{
+		JSON CurveJson;
+		if (FJsonSerializer::ReadObject(InOutHandle, Key, CurveJson))
+		{
+			FJsonSerializer::ReadFloat(CurveJson, "P0", Curve.P0, 0.0f);
+			FJsonSerializer::ReadFloat(CurveJson, "P1", Curve.P1, 0.33f);
+			FJsonSerializer::ReadFloat(CurveJson, "P2", Curve.P2, 0.66f);
+			FJsonSerializer::ReadFloat(CurveJson, "P3", Curve.P3, 1.0f);
+		}
+	}
+	else
+	{
+		JSON CurveJson = JSON::Make(JSON::Class::Object);
+		CurveJson["P0"] = Curve.P0;
+		CurveJson["P1"] = Curve.P1;
+		CurveJson["P2"] = Curve.P2;
+		CurveJson["P3"] = Curve.P3;
+		InOutHandle[Key] = CurveJson;
+	}
+}

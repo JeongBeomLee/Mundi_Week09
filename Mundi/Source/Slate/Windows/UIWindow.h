@@ -84,21 +84,9 @@ public:
 	~UUIWindow() override;
 
 	virtual void Initialize();
-
-	
-
-
-	virtual void Cleanup()
-	{
-	}
-
-	virtual void OnFocusGained()
-	{
-	}
-
-	virtual void OnFocusLost()
-	{
-	}
+	virtual void Cleanup() {}
+	virtual void OnFocusGained() {}
+	virtual void OnFocusLost() {}
 
 	virtual bool OnWindowClose() { return true; }
 	virtual bool IsSingleton() { return false; }
@@ -137,9 +125,11 @@ public:
 	void ClampWindow();
 
 	void RenderWidget() const;
-	void Update() const;
-	// Render
 	void RenderWindow();
+	void Update() const;
+
+	// 서브클래스에서 커스텀 렌더링을 위한 가상 함수
+	virtual void RenderContent() {};
 
 protected:
 	void ApplyDockingSettings() const;
