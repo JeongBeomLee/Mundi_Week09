@@ -361,6 +361,8 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
     <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
     <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
@@ -758,6 +760,8 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClInclude Include="Source\Runtime\Core\Misc\WeakPtr.h" />
     <ClInclude Include="Source\Runtime\Core\Object\Property.h" />
     <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />

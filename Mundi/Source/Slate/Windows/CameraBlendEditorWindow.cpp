@@ -3,7 +3,10 @@
 #include "UIManager.h"
 #include "JsonSerializer.h"
 #include "PlayerCameraManager.h"
+#include "CameraBlendPresetLibrary.h"
 #include <fstream>
+#include <commdlg.h>
+#include <filesystem>
 
 IMPLEMENT_CLASS(UCameraBlendEditorWindow)
 
@@ -74,18 +77,46 @@ void UCameraBlendEditorWindow::RenderPresetSelector()
 	ImGui::Text("Blend Preset:");
 	ImGui::SameLine();
 
-	const char* PresetNames[] = {
-		"Linear",
-		"Cubic",
-		"EaseIn",
-		"EaseOut",
-		"EaseInOut",
-		"Bezier Custom"
-	};
-
-	if (ImGui::Combo("##PresetCombo", &CurrentPresetIndex, PresetNames, IM_ARRAYSIZE(PresetNames)))
+	// 라이브러리에서 프리셋 이름 목록 가져오기
+	UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+	if (Library)
 	{
-		ApplyPreset(static_cast<EViewTargetBlendFunction>(CurrentPresetIndex));
+		TArray<FString> PresetNames = Library->GetAllPresetNames();
+
+		// FString -> const char* 변환을 위한 벡터
+		std::vector<const char*> PresetNamesCStr;
+		for (const FString& Name : PresetNames)
+		{
+			PresetNamesCStr.push_back(Name.c_str());
+		}
+
+		// Combo 박스로 프리셋 선택
+		if (!PresetNamesCStr.empty())
+		{
+			// CurrentPresetIndex 범위 체크
+			if (CurrentPresetIndex < 0 || CurrentPresetIndex >= static_cast<int>(PresetNamesCStr.size()))
+			{
+				CurrentPresetIndex = 0;
+			}
+
+			if (ImGui::Combo("##PresetCombo", &CurrentPresetIndex, PresetNamesCStr.data(), static_cast<int>(PresetNamesCStr.size())))
+			{
+				// 선택된 프리셋 이름으로 라이브러리에서 검색
+				FString SelectedPresetName = PresetNames[CurrentPresetIndex];
+				const FCameraBlendPreset* Preset = Library->GetPreset(SelectedPresetName);
+
+				if (Preset)
+				{
+					EditingParams = Preset->BlendParams;
+					PreviewDuration = EditingParams.BlendTime;
+					UE_LOG("CameraBlendEditor: 프리셋 적용 - %s", SelectedPresetName.c_str());
+				}
+			}
+		}
+		else
+		{
+			ImGui::Text("No presets available");
+		}
 	}
 
 	ImGui::SameLine();
@@ -113,6 +144,55 @@ void UCameraBlendEditorWindow::RenderPresetSelector()
 	if (ImGui::DragFloat("##BlendTime", &EditingParams.BlendTime, 0.1f, 0.1f, 10.0f, "%.1f sec"))
 	{
 		PreviewDuration = EditingParams.BlendTime;
+	}
+
+	// Register to Library 버튼 (오른쪽 정렬)
+	ImGui::SameLine();
+	float availWidth = ImGui::GetContentRegionAvail().x;
+	float buttonWidth = 150.0f;
+	if (availWidth > buttonWidth)
+	{
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availWidth - buttonWidth);
+	}
+
+	static char presetNameBuffer[128] = "MyCustomPreset";
+
+	if (ImGui::Button("Register to Library", ImVec2(buttonWidth, 0)))
+	{
+		ImGui::OpenPopup("Enter Preset Name");
+	}
+
+	// 프리셋 이름 입력 팝업 모달
+	if (ImGui::BeginPopupModal("Enter Preset Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("Enter a name for this preset:");
+		ImGui::InputText("##PresetName", presetNameBuffer, sizeof(presetNameBuffer));
+
+		ImGui::Separator();
+
+		if (ImGui::Button("OK", ImVec2(120, 0)))
+		{
+			FString PresetName(presetNameBuffer);
+			FCameraBlendPreset Preset(PresetName, EditingParams);
+
+			UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+			if (Library)
+			{
+				Library->RegisterPreset(Preset);
+				UE_LOG("CameraBlendEditor: 프리셋을 라이브러리에 등록했습니다 - %s", PresetName.c_str());
+			}
+
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel", ImVec2(120, 0)))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
 	}
 
 	// BlendExp (EaseIn/Out/InOut에만 사용)
@@ -524,49 +604,119 @@ void UCameraBlendEditorWindow::ResetToDefault()
 
 void UCameraBlendEditorWindow::SavePresetToFile()
 {
-	// 파일 경로
-	FString FilePath = "CameraBlendPresets/CustomPreset.json";
+	using std::filesystem::path;
 
-	// JSON 생성
-	JSON RootJson = JSON::Make(JSON::Class::Object);
+	// 파일 다이얼로그 열기
+	OPENFILENAMEW ofn;
+	wchar_t szFile[260] = {};
+	wchar_t szInitialDir[260] = {};
 
-	// 프리셋 메타데이터
-	RootJson["PresetName"] = "Custom Camera Blend Preset";
-	RootJson["Version"] = "1.0";
+	// Data/CameraBlendPresets 폴더를 기본 경로로 설정
+	std::filesystem::path presetDir = std::filesystem::current_path() / "Data" / "CameraBlendPresets";
 
-	// EditingParams 직렬화
-	EditingParams.Serialize(RootJson, false);
+	// 폴더가 없으면 생성
+	if (!std::filesystem::exists(presetDir))
+	{
+		std::filesystem::create_directories(presetDir);
+	}
+
+	wcscpy_s(szInitialDir, presetDir.wstring().c_str());
+
+	// OPENFILENAME 초기화
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = GetActiveWindow();
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile) / sizeof(wchar_t);
+	ofn.lpstrFilter = L"JSON Files\0*.json\0All Files\0*.*\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = nullptr;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = szInitialDir;
+	ofn.lpstrTitle = L"Save Camera Blend Preset";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_EXPLORER | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ENABLESIZING;
+	ofn.lpstrDefExt = L"json";
+
+	// 다이얼로그 표시
+	if (GetSaveFileNameW(&ofn) != TRUE)
+	{
+		UE_LOG("CameraBlendEditor: 프리셋 저장 취소됨");
+		return;
+	}
+
+	// 선택된 파일 경로
+	FString FilePath = std::string(path(szFile).string());
+
+	// 파일명에서 확장자를 제외한 이름 추출 (프리셋 이름으로 사용)
+	path filePath(szFile);
+	FString PresetName = filePath.stem().string();
+
+	// FCameraBlendPreset 생성
+	FCameraBlendPreset Preset(PresetName, EditingParams);
 
 	// 파일로 저장
-	if (FJsonSerializer::SaveJsonToFile(RootJson, FilePath))
+	if (Preset.SaveToFile(FilePath))
 	{
-		UE_LOG("CameraBlendEditor: 프리셋을 저장했습니다 - %s", FilePath.c_str());
-	}
-	else
-	{
-		UE_LOG("CameraBlendEditor: 프리셋 저장 실패 - %s", FilePath.c_str());
+		// 라이브러리에 즉시 등록
+		UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+		if (Library)
+		{
+			Library->RegisterPreset(Preset);
+			UE_LOG("CameraBlendEditor: 프리셋을 라이브러리에 등록했습니다 - %s", PresetName.c_str());
+		}
 	}
 }
 
 void UCameraBlendEditorWindow::LoadPresetFromFile()
 {
-	// 파일 경로
-	FString FilePath = "CameraBlendPresets/CustomPreset.json";
+	using std::filesystem::path;
 
-	// JSON 로드
-	JSON RootJson;
-	if (!FJsonSerializer::LoadJsonFromFile(RootJson, FilePath))
+	// 파일 다이얼로그 열기
+	OPENFILENAMEW ofn;
+	wchar_t szFile[260] = {};
+	wchar_t szInitialDir[260] = {};
+
+	// Data/CameraBlendPresets 폴더를 기본 경로로 설정
+	std::filesystem::path presetDir = std::filesystem::current_path() / "Data" / "CameraBlendPresets";
+	if (std::filesystem::exists(presetDir))
+	{
+		wcscpy_s(szInitialDir, presetDir.wstring().c_str());
+	}
+
+	// OPENFILENAME 초기화
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = GetActiveWindow();
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile) / sizeof(wchar_t);
+	ofn.lpstrFilter = L"JSON Files\0*.json\0All Files\0*.*\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = nullptr;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = szInitialDir;
+	ofn.lpstrTitle = L"Load Camera Blend Preset";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_EXPLORER | OFN_HIDEREADONLY | OFN_NOCHANGEDIR | OFN_ENABLESIZING;
+
+	// 다이얼로그 표시
+	if (GetOpenFileNameW(&ofn) != TRUE)
+	{
+		UE_LOG("CameraBlendEditor: 프리셋 로드 취소됨");
+		return;
+	}
+
+	// 선택된 파일 경로
+	FString FilePath = std::string(path(szFile).string());
+
+	// FCameraBlendPreset으로 로드
+	FCameraBlendPreset Preset;
+	if (!FCameraBlendPreset::LoadFromFile(FilePath, Preset))
 	{
 		UE_LOG("CameraBlendEditor: 프리셋 로드 실패 - %s", FilePath.c_str());
 		return;
 	}
 
-	// 버전 확인 (선택사항)
-	FString Version;
-	FJsonSerializer::ReadString(RootJson, "Version", Version, "1.0");
-
-	// EditingParams 역직렬화
-	EditingParams.Serialize(RootJson, true);
+	// EditingParams 업데이트
+	EditingParams = Preset.BlendParams;
 
 	// UI 업데이트
 	CurrentPresetIndex = static_cast<int>(EditingParams.BlendFunction);
@@ -574,7 +724,13 @@ void UCameraBlendEditorWindow::LoadPresetFromFile()
 	PreviewTime = 0.0f;
 	bPreviewing = false;
 
-	UE_LOG("CameraBlendEditor: 프리셋을 로드했습니다 - %s", FilePath.c_str());
+	// 라이브러리에 등록
+	UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+	if (Library)
+	{
+		Library->RegisterPreset(Preset);
+		UE_LOG("CameraBlendEditor: 프리셋을 라이브러리에 등록했습니다 - %s", Preset.PresetName.c_str());
+	}
 }
 
 void UCameraBlendEditorWindow::ApplyToCamera()
