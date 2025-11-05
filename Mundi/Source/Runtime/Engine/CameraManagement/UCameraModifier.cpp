@@ -3,6 +3,15 @@
 
 IMPLEMENT_CLASS(UCameraModifier)
 
+BEGIN_PROPERTIES(UCameraModifier)
+	ADD_PROPERTY_RANGE(float, AlphaInTime, "Camera Modifier", 0.0f, 10.0f, false, "블렌드 인 시간")
+	ADD_PROPERTY_RANGE(float, AlphaOutTime, "Camera Modifier", 0.0f, 10.0f, false, "블렌드 아웃 시간")
+	ADD_PROPERTY_RANGE(float, Alpha, "Camera Modifier", 0.0f, 1.0f, false, "현재 알파 값")
+	ADD_PROPERTY(bool, bIsFadingIn, "Camera Modifier", false, "페이드 인 중 여부")
+	ADD_PROPERTY(bool, bDisabled, "Camera Modifier", false, "비활성화 여부")
+	ADD_PROPERTY_RANGE(int32, Priority, "Camera Modifier", 0, 255, false, "우선순위")
+END_PROPERTIES()
+
 void UCameraModifier::AddedToCamera( APlayerCameraManager* Camera ) 
 {
     CameraOwner = Camera;
@@ -10,12 +19,9 @@ void UCameraModifier::AddedToCamera( APlayerCameraManager* Camera )
 
 void UCameraModifier::ModifyCamera(
     float DeltaTime,
-    FVector ViewLocation,
-    FQuat ViewRotation,
-    float FOV,
-    FVector& NewViewLocation,
-    FQuat& NewViewRotation,
-    float& NewFOV
+    FVector& InOutViewLocation,
+    FQuat& InOutViewRotation,
+    float& InOutFOV
 )
 {
     UpdateAlpha(DeltaTime);
@@ -48,7 +54,7 @@ void UCameraModifier::ModifyPostProcess(
 
 float UCameraModifier::GetTargetAlpha()
 {
-    return bIsFadingIn ? 0.f : 1.f;
+    return bIsFadingIn ? 1.f : 0.f;  // bIsFadingIn이 true면 1.0을 향해 증가
 }
 
 bool UCameraModifier::IsDisabled() const
@@ -70,7 +76,7 @@ void UCameraModifier::UpdateAlpha(float DeltaTime)
 {
     float const TargetAlpha = GetTargetAlpha();
     float const BlendTime = (TargetAlpha == 0.f) ? AlphaOutTime : AlphaInTime;
-    
+
     // interpolate!
     if (BlendTime <= 0.f)
     {
@@ -86,6 +92,12 @@ void UCameraModifier::UpdateAlpha(float DeltaTime)
     {
         // interpolate upward to target, while protecting against overshooting
         Alpha = std::min<float>(Alpha + DeltaTime / BlendTime, TargetAlpha);
+    }
+
+    // Alpha가 1.0에 도달하면 바로 비활성화
+    if (bIsFadingIn && Alpha >= 1.f)
+    {
+        DisableModifier();
     }
 }
 
@@ -111,6 +123,10 @@ float UCameraModifier::GetAlpha() const
 {
     return Alpha;
 }
+void UCameraModifier::SetAlpha(const float InAlpha)
+{
+    Alpha = InAlpha;
+}
 
 bool UCameraModifier::IsFadingIn() const
 {
@@ -119,4 +135,13 @@ bool UCameraModifier::IsFadingIn() const
 void UCameraModifier::SetIsFadingIn(const bool InIsFadingIn)
 {
     bIsFadingIn = InIsFadingIn;
+}
+
+uint8 UCameraModifier::GetPriority() const
+{
+    return Priority;
+}
+void UCameraModifier::SetPriority(const uint8 InPriority)
+{
+    Priority = InPriority;
 }

@@ -1,8 +1,11 @@
-﻿class APlayerCameraManager;
+﻿#pragma once
+
+class APlayerCameraManager;
 
 class UCameraModifier : public UObject
 {
     DECLARE_CLASS(UCameraModifier, UObject)
+    GENERATED_REFLECTION_BODY()
 public:
     /* Initialize */
     
@@ -22,12 +25,9 @@ public:
      */
     virtual void ModifyCamera(
         float DeltaTime,
-        FVector ViewLocation,
-        FQuat ViewRotation,
-        float FOV,
-        FVector& NewViewLocation,
-        FQuat& NewViewRotation,
-        float& NewFOV
+        FVector& InOutViewLocation,
+        FQuat& InOutViewRotation,
+        float& InOutFOV
     );
 
     /** Allows modifying the post process in native code. */
@@ -63,16 +63,20 @@ public:
     virtual void UpdateAlpha(float DeltaTime);
 
     float GetAlphaInTime() const;
-    void SetAlphaInTime(const float InAlphaInTime);
+    virtual void SetAlphaInTime(const float InAlphaInTime);
     
     float GetAlphaOutTime() const;
     void SetAlphaOutTime(const float InAlphaOutTime);
     
     float GetAlpha() const;
+    void SetAlpha(const float InAlpha);
 
     bool IsFadingIn() const;
     void SetIsFadingIn(const bool InIsFadingIn);
-private:
+
+    uint8 GetPriority() const;
+    void SetPriority(const uint8 InPriority);
+protected:
     APlayerCameraManager* CameraOwner = nullptr;
     float AlphaInTime = 1.0f;
     float AlphaOutTime = 1.0f;

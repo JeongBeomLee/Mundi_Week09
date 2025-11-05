@@ -29,6 +29,10 @@
 #include "TextRenderComponent.h"
 #include "BillboardComponent.h"
 #include "HeightFogActor.h"
+#include "PlayerCameraManager.h"
+#include "PlayerController.h"
+#include "UCameraModifier.h"
+#include "UCameraModifier_CameraShake.h"
 #include "HeightFogComponent.h"
 #include "DeltaTimeManager.h"
 
@@ -935,6 +939,26 @@ void UScriptManager::RegisterUserTypeToLua()
         "EndPIE", &UEditorEngine::EndPIE
     );
 
+    // AGameModeBase 클래스 등록
+    Lua.new_usertype<AGameModeBase>("AGameModeBase",
+        sol::base_classes, sol::bases<AInfo>(),
+        "GetPlayerController", &AGameModeBase::GetPlayerController
+    );
+
+    // APlayerController 클래스 등록
+    Lua.new_usertype<APlayerController>("APlayerController",
+        sol::base_classes, sol::bases<AController>(),
+        "GetPlayerCameraManager", &APlayerController::GetPlayerCameraManager,
+        "ProcessPlayerInput", &APlayerController::ProcessPlayerInput,
+        "IsInputEnabled", &APlayerController::IsInputEnabled,
+        "SetInputEnabled", &APlayerController::SetInputEnabled,
+        "ShowMouseCursor", &APlayerController::ShowMouseCursor,
+        "HideMouseCursor", &APlayerController::HideMouseCursor,
+        "IsMouseCursorVisible", &APlayerController::IsMouseCursorVisible,
+        "GetMouseSensitivity", &APlayerController::GetMouseSensitivity,
+        "SetMouseSensitivity", &APlayerController::SetMouseSensitivity
+    );
+
     // ARunnerGameMode 클래스 등록 (AGameModeBase 상속)
     Lua.new_usertype<ARunnerGameMode>("ARunnerGameMode",
         sol::base_classes, sol::bases<AGameModeBase>(),
@@ -950,6 +974,49 @@ void UScriptManager::RegisterUserTypeToLua()
         //"JumpScore", &ARunnerGameMode::JumpScore,
         //"CoinScore", &ARunnerGameMode::CoinScore,
         //"AvoidScore", &ARunnerGameMode::AvoidScore
+    );
+
+    // APlayerCameraManager 클래스 등록
+    Lua.new_usertype<APlayerCameraManager>("APlayerCameraManager",
+        sol::base_classes, sol::bases<AActor>(),
+        "UpdateCamera", &APlayerCameraManager::UpdateCamera,
+        "AddCameraModifier", &APlayerCameraManager::AddCameraModifier,
+        "RemoveCameraModifier", &APlayerCameraManager::RemoveCameraModifier,
+        "SetViewTarget", &APlayerCameraManager::SetViewTarget,
+        "GetViewTarget", &APlayerCameraManager::GetViewTarget,
+        "GetCameraLocation", &APlayerCameraManager::GetCameraLocation,
+        "GetCameraRotation", &APlayerCameraManager::GetCameraRotation,
+        "GetCameraFOV", &APlayerCameraManager::GetCameraFOV
+    );
+
+    // UCameraModifier 클래스 등록
+    Lua.new_usertype<UCameraModifier>("UCameraModifier",
+        sol::base_classes, sol::bases<UObject>(),
+        "IsDisabled", &UCameraModifier::IsDisabled,
+        "EnableModifier", &UCameraModifier::EnableModifier,
+        "DisableModifier", &UCameraModifier::DisableModifier,
+        "GetAlpha", &UCameraModifier::GetAlpha,
+        "SetAlpha", &UCameraModifier::SetAlpha,
+        "GetAlphaInTime", &UCameraModifier::GetAlphaInTime,
+        "SetAlphaInTime", &UCameraModifier::SetAlphaInTime,
+        "GetAlphaOutTime", &UCameraModifier::GetAlphaOutTime,
+        "SetAlphaOutTime", &UCameraModifier::SetAlphaOutTime,
+        "IsFadingIn", &UCameraModifier::IsFadingIn,
+        "SetIsFadingIn", &UCameraModifier::SetIsFadingIn,
+        "GetPriority", &UCameraModifier::GetPriority,
+        "SetPriority", &UCameraModifier::SetPriority
+    );
+
+    // UCameraModifier_CameraShake 클래스 등록
+    Lua.new_usertype<UCameraModifier_CameraShake>("UCameraModifier_CameraShake",
+        sol::call_constructor, sol::factories(
+            []() { return new UCameraModifier_CameraShake(); }
+        ),
+        sol::base_classes, sol::bases<UCameraModifier, UObject>(),
+        "GetRotationAmplitude", &UCameraModifier_CameraShake::GetRotationAmplitude,
+        "SetRotationAmplitude", &UCameraModifier_CameraShake::SetRotationAmplitude,
+        "GetNewShake", &UCameraModifier_CameraShake::GetNewShake,
+        "SetNumSamples", &UCameraModifier_CameraShake::SetNumSamples
     );
 
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;
