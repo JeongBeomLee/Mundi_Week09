@@ -82,6 +82,6 @@ protected:
 	// ViewTarget (현재 렌더링 대상)
 	FViewTarget ViewTarget;
 
-	// 카메라 모디파이어 리스트 (다른 팀원이 구현 중)
+	// 카메라 모디파이어 리스트
 	TArray<UCameraModifier*> ModifierList;
 };
