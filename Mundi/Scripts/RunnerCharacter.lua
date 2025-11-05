@@ -100,7 +100,7 @@ function BeginPlay()
             -- 원하는 메시 파일 경로로 변경
             StaticMeshComponent:SetStaticMesh("Data/runner_cube.obj")
             -- 메시를 게임에서 안보이게 설정
-            StaticMeshComponent:SetHiddenInGame(true)
+            StaticMeshComponent:SetHiddenInGame(false)
           --  PrintToConsole("[RunnerCharacter] Character mesh changed to smokegrenade.obj")
         end
     end
