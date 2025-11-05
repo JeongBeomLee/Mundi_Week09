@@ -43,6 +43,8 @@ public:
 	/** CameraComponent를 반환합니다 */
 	UCameraComponent* GetCameraComponent() const { return CameraComponent; }
 
+	/** SpringArmComponent를 반환합니다 */
+	USpringArmComponent* GetSpringArm() const { return SpringArmComponent; }
 
 	void SetupPlayerInputComponent(UInputComponent* InInputComponent) override;
 

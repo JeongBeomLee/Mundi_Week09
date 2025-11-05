@@ -647,7 +647,8 @@ void UScriptManager::RegisterUserTypeToLua()
         "GetRightDirection", &ARunnerCharacter::GetRightDirection,
         "GetUpDirection", &ARunnerCharacter::GetUpDirection,
         "SetGravityDirection", &ARunnerCharacter::SetGravityDirection,
-        "GetGravityDirection", &ARunnerCharacter::GetGravityDirection
+        "GetGravityDirection", &ARunnerCharacter::GetGravityDirection,
+        "GetSpringArm", &ARunnerCharacter::GetSpringArm
     );
 
     // AGameModeBase 클래스 등록
