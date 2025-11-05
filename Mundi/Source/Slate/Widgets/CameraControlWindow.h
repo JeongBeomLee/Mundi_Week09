@@ -1,4 +1,7 @@
 #pragma once
+
+#ifndef STANDALONE_BUILD
+
 #include "Object.h"
 #include "WeakPtr.h"
 
@@ -8,6 +11,7 @@ struct FBezierControlPoints;
 struct FCameraBlendPreset;
 
 // PIE 모드에서 PlayerCameraManager를 제어하고 모니터링하는 UI 윈도우
+// Stand Alone 빌드에서는 컴파일되지 않음 (STANDALONE_BUILD 전처리기로 보호)
 class UCameraControlWindow : public UObject
 {
 public:
@@ -110,3 +114,5 @@ private:
 	// 프리셋 경로 상수
 	static constexpr const char* PresetDirectory = "Data/CameraBlendPresets";
 };
+
+#endif // STANDALONE_BUILD

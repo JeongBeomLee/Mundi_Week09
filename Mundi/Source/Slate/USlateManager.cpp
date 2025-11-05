@@ -11,7 +11,9 @@
 #include "Widgets/MainToolbarWidget.h"
 #include "Widgets/GameHUDWidget.h"
 #include "Widgets/GameControlWindow.h"
+#ifndef STANDALONE_BUILD
 #include "Widgets/CameraControlWindow.h"
+#endif
 #include "FViewportClient.h"
 #include "UIManager.h"
 #include "GlobalConsole.h"
@@ -92,12 +94,14 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
     GameControlWindow = NewObject<UGameControlWindow>();
     GameControlWindow->Initialize();
 
-    // CameraControlWindow 생성
+#ifndef STANDALONE_BUILD
+    // CameraControlWindow 생성 (에디터 전용)
     UE_LOG("USlateManager: Creating CameraControlWindow...");
     CameraControlWindow = NewObject<UCameraControlWindow>();
     UE_LOG("USlateManager: CameraControlWindow created, calling Initialize...");
     CameraControlWindow->Initialize();
     UE_LOG("USlateManager: CameraControlWindow Initialize completed");
+#endif
 
     Device = InDevice;
     World = InWorld;
@@ -267,12 +271,14 @@ void USlateManager::Render()
         GameControlWindow->RenderWidget();
     }
 
-    // 카메라 컨트롤 윈도우 렌더링
+#ifndef STANDALONE_BUILD
+    // 카메라 컨트롤 윈도우 렌더링 (에디터 전용)
     if (CameraControlWindow)
     {
         CameraControlWindow->Update();
         CameraControlWindow->RenderWidget();
     }
+#endif
 
     // 콘솔 오버레이 렌더링 (모든 것 위에 표시)
     if (ConsoleWindow && ConsoleAnimationProgress > 0.0f)
@@ -597,7 +603,8 @@ void USlateManager::SetPIEWorld(UWorld* InWorld)
         GameControlWindow->SetGameMode(GameMode);
     }
 
-    // PIE World의 PlayerCameraManager를 CameraControlWindow에 설정
+#ifndef STANDALONE_BUILD
+    // PIE World의 PlayerCameraManager를 CameraControlWindow에 설정 (에디터 전용)
     if (CameraControlWindow && InWorld)
     {
         AGameModeBase* GameMode = InWorld->GetGameMode();
@@ -627,6 +634,7 @@ void USlateManager::SetPIEWorld(UWorld* InWorld)
             UE_LOG("WARNING: GameMode is null in SetPIEWorld");
         }
     }
+#endif
 }
 
 void USlateManager::ToggleConsole()

@@ -1,4 +1,7 @@
 #include "pch.h"
+
+#ifndef STANDALONE_BUILD
+
 #include "CameraControlWindow.h"
 #include "PlayerCameraManager.h"
 #include "PlayerController.h"
@@ -1012,3 +1015,5 @@ ImVec2 UCameraControlWindow::BezierCurveToScreenPos(float Time, float Value, con
 
 	return ImVec2(X, Y);
 }
+
+#endif // STANDALONE_BUILD

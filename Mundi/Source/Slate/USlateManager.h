@@ -11,7 +11,9 @@ class UMainToolbarWidget;
 class UConsoleWindow; // 오버레이 콘솔 윈도우
 class UGameHUDWidget; // 게임 HUD 오버레이
 class UGameControlWindow; // 게임 컨트롤 윈도우
-class UCameraControlWindow; // 카메라 컨트롤 윈도우
+#ifndef STANDALONE_BUILD
+class UCameraControlWindow; // 카메라 컨트롤 윈도우 (에디터 전용)
+#endif
 class SActorBlueprintEditor; // 액터 블루프린트 에디터
 class AActor; // 전방 선언
 
@@ -119,8 +121,10 @@ private:
     // 게임 컨트롤 윈도우 (PIE 전용)
     UGameControlWindow* GameControlWindow = nullptr;
 
-    // 카메라 컨트롤 윈도우 (PIE 전용)
+#ifndef STANDALONE_BUILD
+    // 카메라 컨트롤 윈도우 (PIE 전용, 에디터 빌드에만 포함)
     UCameraControlWindow* CameraControlWindow = nullptr;
+#endif
 
     // 콘솔 오버레이
     UConsoleWindow* ConsoleWindow = nullptr;
