@@ -208,8 +208,38 @@ void APlayerCameraManager::UpdateFade(float DeltaTime)
 	}
 	else
 	{
-		// 선형 보간
-		float Alpha = 1.0f - (FadeTimeRemaining / FadeTime);
+		// 진행률 계산 (0~1)
+		float TimeRatio = 1.0f - (FadeTimeRemaining / FadeTime);
+		TimeRatio = FMath::Clamp(TimeRatio, 0.0f, 1.0f);
+
+		float Alpha = 0.0f;
+
+		// 베지어 곡선 기반 Fade 사용 여부 확인
+		if (bUseBezierFade && BezierCurveFade.GetNumSamples() > 0)
+		{
+			// 베지어 커브로부터 알파값 계산
+			const FRichCurve& Curve = BezierCurveFade.GetCurve();
+
+			// TimeRatio를 커브의 시간 범위에 맞게 변환
+			float CurveTime = TimeRatio * BezierCurveFade.GetTimeRange();
+
+			// 커브에서 값 샘플링
+			Alpha = EvaluateCurve(Curve, CurveTime);
+
+			// 값 범위에 맞게 정규화 (0~1)
+			const FVector2D& ValueRange = BezierCurveFade.GetValueRange();
+			if (ValueRange.Y - ValueRange.X > 0.0f)
+			{
+				Alpha = (Alpha - ValueRange.X) / (ValueRange.Y - ValueRange.X);
+				Alpha = FMath::Clamp(Alpha, 0.0f, 1.0f);
+			}
+		}
+		else
+		{
+			// 선형 보간
+			Alpha = TimeRatio;
+		}
+
 		FadeAmount = FadeAlphaFrom + (FadeAlphaTo - FadeAlphaFrom) * Alpha;
 	}
 }

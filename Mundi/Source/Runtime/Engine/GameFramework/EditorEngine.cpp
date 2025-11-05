@@ -525,9 +525,6 @@ void UEditorEngine::StartPIE()
         UE_LOG("PIE: WARNING - No CameraActor found in PIE world!");
     }
 
-    // GameHUD에 GameState 설정
-    SLATE.SetPIEWorld(GWorld);
-
     // Index-based iteration: BeginPlay에서 새 액터가 추가되어도 안전
     const TArray<AActor*>& Actors = GWorld->GetLevel()->GetActors();
     for (size_t i = 0; i < Actors.size(); ++i)
@@ -537,6 +534,11 @@ void UEditorEngine::StartPIE()
             Actors[i]->BeginPlay();
         }
     }
+
+    // BeginPlay 이후에 GameHUD와 CameraControlWindow에 설정
+    // (PlayerController와 CameraManager가 이미 초기화됨)
+    SLATE.SetPIEWorld(GWorld);
+
     UE_LOG("START PIE CLICKED");
 }
 

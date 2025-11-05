@@ -564,6 +564,7 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClCompile Include="Source\Slate\Widgets\MainToolbarWidget.cpp" />
     <ClCompile Include="Source\Slate\Widgets\GameHUDWidget.cpp" />
     <ClCompile Include="Source\Slate\Widgets\GameControlWindow.cpp" />
+    <ClCompile Include="Source\Slate\Widgets\CameraControlWindow.cpp" />
     <ClCompile Include="Source\Slate\Widgets\SceneManagerWidget.cpp" />
     <ClCompile Include="Source\Slate\Widgets\TargetActorTransformWidget.cpp" />
     <ClCompile Include="Source\Slate\Widgets\Widget.cpp" />
@@ -827,6 +828,7 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClInclude Include="Source\Runtime\RHI\SwapGuard.h" />
     <ClInclude Include="Source\Runtime\RHI\ConstantBufferType.h" />
     <ClInclude Include="Source\Slate\Widgets\GameControlWindow.h" />
+    <ClInclude Include="Source\Slate\Widgets\CameraControlWindow.h" />
     <ClInclude Include="Source\Slate\Widgets\PropertyRenderer.h" />
     <ClInclude Include="Source\Slate\Windows\CameraBlendEditorWindow.h" />
     <ClInclude Include="ThirdParty\ImGui\imconfig.h" />

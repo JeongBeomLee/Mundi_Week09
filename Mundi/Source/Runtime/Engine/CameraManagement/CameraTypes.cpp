@@ -257,3 +257,54 @@ void SerializeBezierControlPoints(JSON& InOutHandle, const char* Key, FBezierCon
 		InOutHandle[Key] = CurveJson;
 	}
 }
+
+// 베지어 곡선을 UCurveFloat로 변환하는 헬퍼 함수
+#include "UCurveFloat.h"
+
+UCurveFloat* ConvertBezierToUCurveFloat(const FBezierControlPoints& BezierCurve, int32 NumSamples)
+{
+	// NumSamples 유효성 검사
+	if (NumSamples < 2)
+	{
+		NumSamples = 2;
+	}
+
+	// UCurveFloat 생성 (시간 범위: 0~1, 값 범위: 베지어 결과에 따라 자동 계산)
+	UCurveFloat* CurveFloat = NewObject<UCurveFloat>();
+	CurveFloat->SetTimeRange(1.0f);
+	CurveFloat->SetNumSamples(NumSamples);
+
+	// 베지어 커브를 샘플링하여 키 생성
+	FRichCurve& Curve = const_cast<FRichCurve&>(CurveFloat->GetCurve());
+	Curve.Keys.Empty();
+	Curve.Keys.Reserve(NumSamples);
+	Curve.InterpMode = ERichCurveInterpMode::RCIM_Linear;
+
+	float MinValue = FLT_MAX;
+	float MaxValue = -FLT_MAX;
+
+	// 베지어 커브를 균등하게 샘플링
+	for (int32 i = 0; i < NumSamples; ++i)
+	{
+		float T = static_cast<float>(i) / static_cast<float>(NumSamples - 1);
+		float Value = BezierCurve.Evaluate(T);
+
+		// 값 범위 추적
+		MinValue = FMath::Min(MinValue, Value);
+		MaxValue = FMath::Max(MaxValue, Value);
+
+		// 키 추가
+		FRichCurveKey Key;
+		Key.Time = T;
+		Key.Value = Value;
+		Key.ArriveTangent = 0.0f;
+		Key.LeaveTangent = 0.0f;
+
+		Curve.Keys.Add(Key);
+	}
+
+	// 값 범위 설정
+	CurveFloat->SetValueRange(FVector2D(MinValue, MaxValue));
+
+	return CurveFloat;
+}

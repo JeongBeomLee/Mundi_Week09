@@ -30,8 +30,12 @@ public:
 	void SetViewTarget(AActor* NewViewTarget);
 	AActor* GetViewTarget() const { return ViewTarget.Target; }
 
+	// 베지어 곡선 Fade 관련
 	UCurveFloat GetBezierCurveFade() const;
 	void SetBezierCurveFade(const UCurveFloat& InBezierCurveFade);
+
+	bool IsUsingBezierFade() const { return bUseBezierFade; }
+	void SetUseBezierFade(bool bInUseBezierFade) { bUseBezierFade = bInUseBezierFade; }
 
 	// 렌더링용 카메라 컴포넌트 반환
 	UCameraComponent* GetCameraComponentForRendering() const;
@@ -174,6 +178,10 @@ protected:
 	float FadeTimeRemaining;
 	bool bFading;
 
+	// 베지어 곡선 기반 Fade
+	bool bUseBezierFade = false;
+	UCurveFloat BezierCurveFade;
+
 	// 카메라 스타일 (프리셋)
 	FName CameraStyle;
 
@@ -189,8 +197,6 @@ protected:
 	FQuat BlendStartRotation;
 	float BlendStartFOV;
 	float BlendStartSpringArmLength;
-
-	UCurveFloat BezierCurveFade{};
 
 	// 카메라 모디파이어 리스트
 	TArray<UCameraModifier*> ModifierList;

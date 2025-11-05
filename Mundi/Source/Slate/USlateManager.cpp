@@ -11,11 +11,13 @@
 #include "Widgets/MainToolbarWidget.h"
 #include "Widgets/GameHUDWidget.h"
 #include "Widgets/GameControlWindow.h"
+#include "Widgets/CameraControlWindow.h"
 #include "FViewportClient.h"
 #include "UIManager.h"
 #include "GlobalConsole.h"
 #include "GameModeBase.h"
 #include "Actor.h"
+#include "PlayerController.h"
 
 IMPLEMENT_CLASS(USlateManager)
 
@@ -88,6 +90,13 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
     // GameControlWindow 생성
     GameControlWindow = NewObject<UGameControlWindow>();
     GameControlWindow->Initialize();
+
+    // CameraControlWindow 생성
+    UE_LOG("USlateManager: Creating CameraControlWindow...");
+    CameraControlWindow = NewObject<UCameraControlWindow>();
+    UE_LOG("USlateManager: CameraControlWindow created, calling Initialize...");
+    CameraControlWindow->Initialize();
+    UE_LOG("USlateManager: CameraControlWindow Initialize completed");
 
     Device = InDevice;
     World = InWorld;
@@ -255,6 +264,13 @@ void USlateManager::Render()
     {
         GameControlWindow->Update();
         GameControlWindow->RenderWidget();
+    }
+
+    // 카메라 컨트롤 윈도우 렌더링
+    if (CameraControlWindow)
+    {
+        CameraControlWindow->Update();
+        CameraControlWindow->RenderWidget();
     }
 
     // 콘솔 오버레이 렌더링 (모든 것 위에 표시)
@@ -565,6 +581,37 @@ void USlateManager::SetPIEWorld(UWorld* InWorld)
     {
         AGameModeBase* GameMode = InWorld->GetGameMode();
         GameControlWindow->SetGameMode(GameMode);
+    }
+
+    // PIE World의 PlayerCameraManager를 CameraControlWindow에 설정
+    if (CameraControlWindow && InWorld)
+    {
+        AGameModeBase* GameMode = InWorld->GetGameMode();
+        if (GameMode)
+        {
+            APlayerController* PlayerController = GameMode->GetPlayerController();
+            if (PlayerController)
+            {
+                APlayerCameraManager* CameraManager = PlayerController->GetPlayerCameraManager();
+                if (CameraManager)
+                {
+                    CameraControlWindow->SetPlayerCameraManager(CameraManager);
+                    UE_LOG("USlateManager: CameraControlWindow connected to PlayerCameraManager");
+                }
+                else
+                {
+                    UE_LOG("WARNING: PlayerCameraManager is null in SetPIEWorld");
+                }
+            }
+            else
+            {
+                UE_LOG("WARNING: PlayerController is null in SetPIEWorld");
+            }
+        }
+        else
+        {
+            UE_LOG("WARNING: GameMode is null in SetPIEWorld");
+        }
     }
 }
 

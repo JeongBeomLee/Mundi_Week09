@@ -127,3 +127,11 @@ struct FViewTargetTransitionParams
 
 // FBezierControlPoints 직렬화 헬퍼 함수
 void SerializeBezierControlPoints(JSON& InOutHandle, const char* Key, FBezierControlPoints& Curve, bool bIsLoading);
+
+// 베지어 곡선을 UCurveFloat로 변환하는 헬퍼 함수
+class UCurveFloat;
+
+// 기본 샘플 수 상수
+constexpr int32 DEFAULT_BEZIER_CURVE_SAMPLES = 20;
+
+UCurveFloat* ConvertBezierToUCurveFloat(const FBezierControlPoints& BezierCurve, int32 NumSamples = DEFAULT_BEZIER_CURVE_SAMPLES);
