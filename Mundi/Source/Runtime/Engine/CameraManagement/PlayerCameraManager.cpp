@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "PlayerCameraManager.h"
 #include "ObjectFactory.h"
 #include "CameraComponent.h"
@@ -237,6 +237,11 @@ void APlayerCameraManager::RemoveCameraModifier(UCameraModifier* ModifierToRemov
 			return;
 		}
 	}
+}
+
+void APlayerCameraManager::ResetPostProcessSettings()
+{
+	ViewTarget.PostProcessSettings = FPostProcessSettings();
 }
 
 void APlayerCameraManager::RemoveDisabledCameraModifiers()

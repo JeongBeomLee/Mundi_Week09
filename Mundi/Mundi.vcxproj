@@ -217,6 +217,9 @@ if "$(Configuration)"=="Debug" (
     <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
+      <DeploymentContent>false</DeploymentContent>
+    </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\AmbientLightComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\CharacterMovementComponent.cpp" />
     <ClCompile Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.cpp" />
@@ -460,6 +463,12 @@ if "$(Configuration)"=="Debug" (
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="Shaders\PostProcess\LetterBox_PS.hlsl">
+      <FileType>Document</FileType>
+      <DeploymentContent>false</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Shaders\PostProcess\TileDebugVisualization_PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -536,6 +545,9 @@ if "$(Configuration)"=="Debug" (
     <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
+      <DeploymentContent>false</DeploymentContent>
+    </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Components\CharacterMovementComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\BoxComponent.h" />
     <ClInclude Include="Source\Runtime\Engine\Components\CollisionComponent\CapsuleComponent.h" />
