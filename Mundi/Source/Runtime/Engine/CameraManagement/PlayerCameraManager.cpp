@@ -240,6 +240,11 @@ void APlayerCameraManager::RemoveCameraModifier(UCameraModifier* ModifierToRemov
 	}
 }
 
+void APlayerCameraManager::ResetPostProcessSettings()
+{
+	ViewTarget.PostProcessSettings = FPostProcessSettings();
+}
+
 void APlayerCameraManager::Serialize(const bool bInIsLoading, JSON& InOutHandle)
 {
 	Super::Serialize(bInIsLoading, InOutHandle);

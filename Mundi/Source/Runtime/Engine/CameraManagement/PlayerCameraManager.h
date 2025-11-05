@@ -48,6 +48,8 @@ public:
 	void AddCameraModifier(UCameraModifier* NewModifier);
 	void RemoveCameraModifier(UCameraModifier* ModifierToRemove);
 
+	void ResetPostProcessSettings();
+
 	void Serialize(const bool bInIsLoading, JSON& InOutHandle) override;
 
 	void DuplicateSubObjects() override;
