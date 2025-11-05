@@ -56,6 +56,11 @@ void UUIWindow::SetWindowState(EUIWindowState NewState)
 	{
 		bIsWindowOpen = true;
 	}
+	// Hidden 상태로 변경되면 bIsWindowOpen을 false로 설정
+	else if (NewState == EUIWindowState::Hidden)
+	{
+		bIsWindowOpen = false;
+	}
 }
 
 /**

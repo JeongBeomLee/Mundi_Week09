@@ -1050,8 +1050,8 @@ void UMainToolbarWidget::RenderBlendEditorButton()
                 UUIManager::GetInstance().RegisterUIWindow(BlendEditorWindow);
             }
 
-            // 윈도우 열기
-            BlendEditorWindow->SetWindowState(EUIWindowState::Visible);
+            // 윈도우 토글 (열려있으면 닫고, 닫혀있으면 열기)
+            BlendEditorWindow->ToggleVisibility();
         }
         if (ImGui::IsItemHovered())
         {

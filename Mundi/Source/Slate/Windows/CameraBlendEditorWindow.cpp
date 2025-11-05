@@ -18,9 +18,13 @@ UCameraBlendEditorWindow::UCameraBlendEditorWindow()
 	Config.bResizable = true;
 	Config.bMovable = true;
 	Config.bCollapsible = true;
+	Config.InitialState = EUIWindowState::Hidden;  // 초기에는 숨김 상태
 
 	Config.UpdateWindowFlags();
 	SetConfig(Config);
+
+	// 초기 상태를 Hidden으로 설정
+	SetWindowState(EUIWindowState::Hidden);
 
 	// 기본값으로 Cubic 프리셋 설정
 	ApplyPreset(EViewTargetBlendFunction::VTBlend_Cubic);
