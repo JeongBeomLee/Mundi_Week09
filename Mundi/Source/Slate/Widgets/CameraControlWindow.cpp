@@ -364,9 +364,10 @@ void UCameraControlWindow::RenderFadeInOutTab()
 				ApproxCurve.P3 = RichCurve.Keys.Last().Value;
 			}
 
-			// 커브 시각화
+			// 커브 시각화 (Fade 탭용 고유 ID)
 			RenderBezierCurveVisualization(ApproxCurve,
-				ImVec2(CurveVisualizationWidth, CurveVisualizationHeight));
+				ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+				"FadeCurveVis");
 
 			ImGui::Spacing();
 			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
@@ -511,6 +512,65 @@ void UCameraControlWindow::RenderCameraShakeTab()
 	ImGui::Spacing();
 	ImGui::Spacing();
 
+	// ========== Curve Preview (선택된 프리셋 미리보기) ==========
+	// X, Y, Z 중 하나라도 선택되어 있으면 미리보기 표시
+	bool bHasAnySelection = (SelectedShakeCurveIndex_X >= 0 && SelectedShakeCurveIndex_X < AvailablePresets.Num()) ||
+	                         (SelectedShakeCurveIndex_Y >= 0 && SelectedShakeCurveIndex_Y < AvailablePresets.Num()) ||
+	                         (SelectedShakeCurveIndex_Z >= 0 && SelectedShakeCurveIndex_Z < AvailablePresets.Num());
+
+	if (bHasAnySelection)
+	{
+		ImGui::SeparatorText("Curve Preview");
+		ImGui::Spacing();
+
+		// X축 프리셋 미리보기
+		if (SelectedShakeCurveIndex_X >= 0 && SelectedShakeCurveIndex_X < AvailablePresets.Num())
+		{
+			FString FilePath_X = FString(PresetDirectory) + "/" + AvailablePresets[SelectedShakeCurveIndex_X] + ".json";
+			FCameraBlendPreset Preset_X;
+			if (FCameraBlendPreset::LoadFromFile(FilePath_X, Preset_X))
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "X-Axis Preview: %s", AvailablePresets[SelectedShakeCurveIndex_X].c_str());
+				RenderBezierCurveVisualization(Preset_X.BlendParams.LocationCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"PreviewX");
+				ImGui::Spacing();
+			}
+		}
+
+		// Y축 프리셋 미리보기
+		if (SelectedShakeCurveIndex_Y >= 0 && SelectedShakeCurveIndex_Y < AvailablePresets.Num())
+		{
+			FString FilePath_Y = FString(PresetDirectory) + "/" + AvailablePresets[SelectedShakeCurveIndex_Y] + ".json";
+			FCameraBlendPreset Preset_Y;
+			if (FCameraBlendPreset::LoadFromFile(FilePath_Y, Preset_Y))
+			{
+				ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Y-Axis Preview: %s", AvailablePresets[SelectedShakeCurveIndex_Y].c_str());
+				RenderBezierCurveVisualization(Preset_Y.BlendParams.LocationCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"PreviewY");
+				ImGui::Spacing();
+			}
+		}
+
+		// Z축 프리셋 미리보기
+		if (SelectedShakeCurveIndex_Z >= 0 && SelectedShakeCurveIndex_Z < AvailablePresets.Num())
+		{
+			FString FilePath_Z = FString(PresetDirectory) + "/" + AvailablePresets[SelectedShakeCurveIndex_Z] + ".json";
+			FCameraBlendPreset Preset_Z;
+			if (FCameraBlendPreset::LoadFromFile(FilePath_Z, Preset_Z))
+			{
+				ImGui::TextColored(ImVec4(0.4f, 0.4f, 1.0f, 1.0f), "Z-Axis Preview: %s", AvailablePresets[SelectedShakeCurveIndex_Z].c_str());
+				RenderBezierCurveVisualization(Preset_Z.BlendParams.LocationCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"PreviewZ");
+				ImGui::Spacing();
+			}
+		}
+
+		ImGui::Spacing();
+	}
+
 	// ========== Control Buttons ==========
 	ImGui::SeparatorText("Controls");
 	ImGui::Spacing();
@@ -585,6 +645,8 @@ void UCameraControlWindow::RenderCameraShakeTab()
 
 	TArray<UCameraModifier*>& ModifierList = Manager->GetModifierList();
 	int activeCount = 0;
+	UCameraModifier_CameraShake* FirstActiveShake = nullptr;
+
 	for (UCameraModifier* Modifier : ModifierList)
 	{
 		if (Modifier && !Modifier->IsDisabled())
@@ -593,6 +655,11 @@ void UCameraControlWindow::RenderCameraShakeTab()
 			UCameraModifier_CameraShake* Shake = Cast<UCameraModifier_CameraShake>(Modifier);
 			if (Shake)
 			{
+				if (!FirstActiveShake)
+				{
+					FirstActiveShake = Shake;
+				}
+
 				ECurveType CurveType = Shake->GetShakeCurveType();
 				const char* TypeName = (CurveType == ECurveType::ECT_PERLIN_NOISE) ? "Perlin" : "Bezier";
 				ImGui::Text("  Shake (%s) - Alpha: %.2f", TypeName, Shake->GetAlpha());
@@ -602,6 +669,108 @@ void UCameraControlWindow::RenderCameraShakeTab()
 	if (activeCount == 0)
 	{
 		ImGui::TextDisabled("  (None)");
+	}
+
+	// ========== Running Shake Visualization (First Active Shake) ==========
+	if (FirstActiveShake)
+	{
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::SeparatorText("Running Shake (Real-time)");
+		ImGui::Spacing();
+
+		ECurveType CurveType = FirstActiveShake->GetShakeCurveType();
+
+		if (CurveType == ECurveType::ECT_BEZIER)
+		{
+			// 베지어 모드: 3축 커브 시각화
+			UCurveFloat CurveX;
+			UCurveFloat CurveY;
+			UCurveFloat CurveZ;
+
+			FirstActiveShake->GetBezierCurve(CurveX, CurveY, CurveZ);
+			
+			// X축 커브
+			if (CurveX.GetNumSamples() > 0)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "X-Axis (Roll):");
+				FBezierControlPoints ApproxCurve = ApproximateCurveFromSamples(CurveX.GetCurve());
+				RenderBezierCurveVisualization(ApproxCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"ShakeBezierX");
+				ImGui::Spacing();
+			}
+
+			// Y축 커브
+			if (CurveY.GetNumSamples() > 0)
+			{
+				ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Y-Axis (Pitch):");
+				FBezierControlPoints ApproxCurve = ApproximateCurveFromSamples(CurveY.GetCurve());
+				RenderBezierCurveVisualization(ApproxCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"ShakeBezierY");
+				ImGui::Spacing();
+			}
+
+			// Z축 커브
+			if (CurveZ.GetNumSamples() > 0)
+			{
+				ImGui::TextColored(ImVec4(0.4f, 0.4f, 1.0f, 1.0f), "Z-Axis (Yaw):");
+				FBezierControlPoints ApproxCurve = ApproximateCurveFromSamples(CurveZ.GetCurve());
+				RenderBezierCurveVisualization(ApproxCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"ShakeBezierZ");
+				ImGui::Spacing();
+			}
+
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
+				"Visualizing approximation of Bezier curves");
+		}
+		else if (CurveType == ECurveType::ECT_PERLIN_NOISE)
+		{
+			// Perlin 모드: 3축 Perlin Noise 커브 시각화
+			UPerlinNoiseFloat NoiseX;
+			UPerlinNoiseFloat NoiseY;
+			UPerlinNoiseFloat NoiseZ;
+
+			FirstActiveShake->GetPerlinNoise(NoiseX, NoiseY, NoiseZ);
+
+			// X축 Perlin
+			if (NoiseX.GetNumSamples() > 0)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "X-Axis (Roll) - Perlin:");
+				FBezierControlPoints ApproxCurve = ApproximateCurveFromSamples(NoiseX.GetCurve());
+				RenderBezierCurveVisualization(ApproxCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"ShakePerlinX");
+				ImGui::Spacing();
+			}
+
+			// Y축 Perlin
+			if (NoiseY.GetNumSamples() > 0)
+			{
+				ImGui::TextColored(ImVec4(0.4f, 1.0f, 0.4f, 1.0f), "Y-Axis (Pitch) - Perlin:");
+				FBezierControlPoints ApproxCurve = ApproximateCurveFromSamples(NoiseY.GetCurve());
+				RenderBezierCurveVisualization(ApproxCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"ShakePerlinY");
+				ImGui::Spacing();
+			}
+
+			// Z축 Perlin
+			if (NoiseZ.GetNumSamples() > 0)
+			{
+				ImGui::TextColored(ImVec4(0.4f, 0.4f, 1.0f, 1.0f), "Z-Axis (Yaw) - Perlin:");
+				FBezierControlPoints ApproxCurve = ApproximateCurveFromSamples(NoiseZ.GetCurve());
+				RenderBezierCurveVisualization(ApproxCurve,
+					ImVec2(CurveVisualizationWidth, CurveVisualizationHeight),
+					"ShakePerlinZ");
+				ImGui::Spacing();
+			}
+
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
+				"Visualizing approximation of Perlin Noise curves");
+		}
 	}
 }
 
@@ -752,7 +921,7 @@ void UCameraControlWindow::RenderDebugTab()
 }
 
 // ========== Bezier Curve Visualization ==========
-void UCameraControlWindow::RenderBezierCurveVisualization(const FBezierControlPoints& Curve, const ImVec2& Size)
+void UCameraControlWindow::RenderBezierCurveVisualization(const FBezierControlPoints& Curve, const ImVec2& Size, const char* UniqueID)
 {
 	ImVec2 CursorPos = ImGui::GetCursorScreenPos();
 	ImDrawList* DrawList = ImGui::GetWindowDrawList();
@@ -829,9 +998,9 @@ void UCameraControlWindow::RenderBezierCurveVisualization(const FBezierControlPo
 	snprintf(Label, sizeof(Label), "P3:%.2f", Curve.P3);
 	DrawList->AddText(ImVec2(P3.x + 8, P3.y - 8), IM_COL32(255, 255, 255, 255), Label);
 
-	// 인비저블 버튼으로 영역 차지
+	// 인비저블 버튼으로 영역 차지 (고유한 ID 사용)
 	ImGui::SetCursorScreenPos(CursorPos);
-	ImGui::InvisibleButton("CurveVisualization", Size);
+	ImGui::InvisibleButton(UniqueID, Size);
 }
 
 ImVec2 UCameraControlWindow::BezierCurveToScreenPos(float Time, float Value, const ImVec2& Origin, const ImVec2& Size, const ImVec2& Padding) const

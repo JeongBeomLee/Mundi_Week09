@@ -92,7 +92,8 @@ private:
 	void ApplyBezierCurveToFade(const FBezierControlPoints& BezierCurve);
 
 	// === Bezier Curve Visualization ===
-	void RenderBezierCurveVisualization(const FBezierControlPoints& Curve, const ImVec2& Size);
+	// UniqueID는 ImGui ID 충돌 방지용 (같은 프레임에 여러 커브 렌더링 시 필수)
+	void RenderBezierCurveVisualization(const FBezierControlPoints& Curve, const ImVec2& Size, const char* UniqueID = "CurveVis");
 	ImVec2 BezierCurveToScreenPos(float Time, float Value, const ImVec2& Origin, const ImVec2& Size, const ImVec2& Padding) const;
 
 	// UI 레이아웃 상수

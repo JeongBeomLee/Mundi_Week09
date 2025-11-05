@@ -26,6 +26,12 @@ public:
     void SetAlphaInTime(const float InAlphaInTime) override;
     void SetNumSamples(const float InNumSamples);
 
+    void GetPerlinNoise(
+        UCurveFloat& InOutPerlinXAxis,
+        UCurveFloat& InOutPerlinYAxis,
+        UCurveFloat& InOutPerlinZAxis
+    ) const;
+    
     void GetBezierCurve(
         UCurveFloat& InOutBezierCurveXAxis,
         UCurveFloat& InOutBezierCurveYAxis,

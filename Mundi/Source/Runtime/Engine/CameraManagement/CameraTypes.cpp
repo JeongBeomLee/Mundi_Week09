@@ -308,3 +308,68 @@ UCurveFloat* ConvertBezierToUCurveFloat(const FBezierControlPoints& BezierCurve,
 
 	return CurveFloat;
 }
+
+FBezierControlPoints ApproximateCurveFromSamples(const FRichCurve& InCurve)
+{
+	FBezierControlPoints Result;
+
+	const TArray<FRichCurveKey>& Keys = InCurve.Keys;
+	const int32 NumKeys = Keys.Num();
+
+	if (NumKeys == 0)
+	{
+		// 키가 없으면 기본 선형 반환
+		Result.P0 = 0.0f;
+		Result.P1 = 0.33f;
+		Result.P2 = 0.66f;
+		Result.P3 = 1.0f;
+		return Result;
+	}
+
+	if (NumKeys == 1)
+	{
+		// 키가 1개면 평평한 선
+		float Value = Keys[0].Value;
+		Result.P0 = Value;
+		Result.P1 = Value;
+		Result.P2 = Value;
+		Result.P3 = Value;
+		return Result;
+	}
+
+	// 시간 정규화 (0~1 범위로)
+	const float StartTime = Keys[0].Time;
+	const float EndTime = Keys.Last().Time;
+	const float TimeRange = FMath::Max(EndTime - StartTime, 0.0001f);
+
+	// P0, P3는 시작/끝 값
+	Result.P0 = Keys[0].Value;
+	Result.P3 = Keys.Last().Value;
+
+	// P1, P2 계산: 샘플 곡선을 최대한 잘 근사하는 제어점 찾기
+	// 방법: 0.33과 0.66 지점의 실제 샘플 값을 사용
+	if (NumKeys >= 4)
+	{
+		// 충분한 샘플이 있으면 1/3, 2/3 지점 근처의 값 사용
+		int32 Index1 = NumKeys / 3;
+		int32 Index2 = (NumKeys * 2) / 3;
+
+		Result.P1 = Keys[Index1].Value;
+		Result.P2 = Keys[Index2].Value;
+	}
+	else if (NumKeys == 3)
+	{
+		// 3개면 중간값을 P1과 P2에 적절히 배분
+		float MidValue = Keys[1].Value;
+		Result.P1 = Result.P0 + (MidValue - Result.P0) * 0.7f;
+		Result.P2 = Result.P3 + (MidValue - Result.P3) * 0.7f;
+	}
+	else // NumKeys == 2
+	{
+		// 2개뿐이면 선형 보간
+		Result.P1 = FMath::Lerp(Result.P0, Result.P3, 0.33f);
+		Result.P2 = FMath::Lerp(Result.P0, Result.P3, 0.66f);
+	}
+
+	return Result;
+}

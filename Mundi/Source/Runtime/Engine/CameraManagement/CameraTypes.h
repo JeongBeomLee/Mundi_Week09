@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "pch.h"
+#include "CurveData.h"
 
 // 카메라 블렌드 함수 타입
 enum class EViewTargetBlendFunction : uint8
@@ -135,3 +136,4 @@ class UCurveFloat;
 constexpr int32 DEFAULT_BEZIER_CURVE_SAMPLES = 20;
 
 UCurveFloat* ConvertBezierToUCurveFloat(const FBezierControlPoints& BezierCurve, int32 NumSamples = DEFAULT_BEZIER_CURVE_SAMPLES);
+FBezierControlPoints ApproximateCurveFromSamples(const FRichCurve& InCurve);

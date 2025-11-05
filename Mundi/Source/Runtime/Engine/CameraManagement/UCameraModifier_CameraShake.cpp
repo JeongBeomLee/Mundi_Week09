@@ -147,6 +147,17 @@ void UCameraModifier_CameraShake::SetNumSamples(const float InNumSamples)
    BezierCurveZAxis.SetNumSamples(InNumSamples);
 }
 
+void UCameraModifier_CameraShake::GetPerlinNoise(
+   UCurveFloat& InOutPerlinXAxis,
+   UCurveFloat& InOutPerlinYAxis,
+   UCurveFloat& InOutPerlinZAxis
+) const
+{
+   InOutPerlinXAxis = PerlinNoiseXAxis;
+   InOutPerlinYAxis = PerlinNoiseYAxis;
+   InOutPerlinZAxis = PerlinNoiseZAxis;
+}
+
 void UCameraModifier_CameraShake::GetBezierCurve(
    UCurveFloat& InOutBezierCurveXAxis,
    UCurveFloat& InOutBezierCurveYAxis,
