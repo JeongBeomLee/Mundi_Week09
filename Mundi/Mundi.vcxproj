@@ -366,6 +366,7 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
       <DeploymentContent>false</DeploymentContent>
     </ClCompile>
@@ -773,6 +774,7 @@ if %ERRORLEVEL% LEQ 7 exit 0</Command>
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
       <DeploymentContent>false</DeploymentContent>
     </ClInclude>

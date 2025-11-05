@@ -34,9 +34,6 @@ private:
 	void SavePresetToFile();
 	void LoadPresetFromFile();
 
-	// 카메라 시스템과 통합
-	void ApplyToCamera();
-
 public:
 	// PlayerCameraManager 설정 (외부에서 호출)
 	void SetPlayerCameraManager(class APlayerCameraManager* InCameraManager)

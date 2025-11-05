@@ -67,6 +67,12 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	// 카메라 블렌딩 완료 시 호출되는 핸들러
+	void OnCameraBlendComplete();
+
+	// 게임 상태 변경 핸들러 (NotStarted -> Playing 시 카메라 재설정)
+	void OnGameStateChanged(EGameState OldState, EGameState NewState);
+
 public:
 	/** 게임 재시작 (플레이어 리스폰) */
 	virtual void RestartGame() override;
@@ -83,4 +89,8 @@ public:
 	/** 사운드 지연 재생을 위한 타이머 */
 	float SoundDelayTimer = 0.0f;
 	bool bWaitingForSecondSound = false;
+
+private:
+	/** 카메라 흔들림 모디파이어 (게임 시작 시 제거하기 위해 저장) */
+	class UCameraModifier_CustomBlend* HeadBobModifier = nullptr;
 };
