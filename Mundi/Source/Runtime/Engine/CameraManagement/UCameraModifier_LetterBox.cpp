@@ -8,14 +8,14 @@ BEGIN_PROPERTIES(UCameraModifier_LetterBox)
 END_PROPERTIES()
 
 UCameraModifier_LetterBox::UCameraModifier_LetterBox()
-	: OriginalLetterBoxSize(0.0f)
-    , OriginalLetterBoxOpacity(1.0f)
-    , LetterBoxSize(0.0f)
-    , LetterBoxOpacity(1.0f)
+	: StartLetterBoxSize(0.0f)
+    , StartLetterBoxOpacity(1.0f)
+    , CurrentLetterBoxSize(0.0f)
+    , CurrentLetterBoxOpacity(1.0f)
     , TargetLetterBoxSize(0.0f)
     , TargetLetterBoxOpacity(1.0f)
 {
-    // 기본값 설정
+    // 부모 클래스 기본값 설정
     AlphaInTime = 1.0f;
     AlphaOutTime = 1.0f;
     bDisabled = true;
@@ -33,42 +33,40 @@ void UCameraModifier_LetterBox::ModifyPostProcess(
     }
 
     // Alpha 값에 따라 레터박스 크기와 불투명도를 보간
-    LetterBoxSize = FMath::Lerp(OriginalLetterBoxSize, TargetLetterBoxSize, Alpha);
-    LetterBoxOpacity = FMath::Lerp(OriginalLetterBoxOpacity, TargetLetterBoxOpacity, Alpha);
+    CurrentLetterBoxSize = FMath::Lerp(StartLetterBoxSize, TargetLetterBoxSize, Alpha);
+    CurrentLetterBoxOpacity = FMath::Lerp(StartLetterBoxOpacity, TargetLetterBoxOpacity, Alpha);
 
     // PostProcessSettings에 레터박스 설정 적용
-    PostProcessSettings.LetterBoxSize = LetterBoxSize;
-    PostProcessSettings.LetterBoxOpacity = LetterBoxOpacity;
+    PostProcessSettings.LetterBoxSize = CurrentLetterBoxSize;
+    PostProcessSettings.LetterBoxOpacity = CurrentLetterBoxOpacity;
 
-    // Alpha 값을 블렌드 가중치로 설정
+    // Alpha 값을 블렌드 가중치로 설정(임시)
     PostProcessBlendWeight = Alpha;
 }
 
-void UCameraModifier_LetterBox::StartLetterBox(float InSize, float InOpacity, float InFadeInTime)
+void UCameraModifier_LetterBox::SetFadeIn(float InSize, float InOpacity, float InFadeInTime)
 {
-    // 목표 값 설정
+	StartLetterBoxSize = CurrentLetterBoxSize;
+	StartLetterBoxOpacity = CurrentLetterBoxOpacity;
+
     TargetLetterBoxSize = FMath::Clamp(InSize, 0.0f, 1.0f);
     TargetLetterBoxOpacity = FMath::Clamp(InOpacity, 0.0f, 1.0f);
 
-    // 페이드 인 시간 설정
     SetAlphaInTime(InFadeInTime);
-
-    // 모디파이어 활성화
     EnableModifier();
     SetIsFadingIn(true);
     SetAlpha(0.0f);
 }
 
-void UCameraModifier_LetterBox::StopLetterBox(float InFadeOutTime)
+void UCameraModifier_LetterBox::SetFadeOut(float InFadeOutTime)
 {
-    // 목표 값을 0으로 설정
+	StartLetterBoxSize = CurrentLetterBoxSize;
+	StartLetterBoxOpacity = CurrentLetterBoxOpacity;
+
     TargetLetterBoxSize = 0.0f;
     TargetLetterBoxOpacity = 0.0f;
 
-    // 페이드 아웃 시간 설정
     SetAlphaOutTime(InFadeOutTime);
-
-    // 페이드 아웃 시작
     SetIsFadingIn(false);
     SetAlpha(1.0f);
 }

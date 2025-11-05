@@ -150,12 +150,6 @@ void APlayerCameraManager::ApplyCameraModifiers(float DeltaTime, FVector& InOutL
 	        	InOutRotation,
 	        	InOutFOV
 	        );
-
-			float PPBlendWeight = 0.0f;
-			Modifier->ModifyPostProcess(
-				DeltaTime,
-				PPBlendWeight,
-				ViewTarget.PostProcessSettings);
 	    }
 	}
 }

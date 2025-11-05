@@ -1026,12 +1026,12 @@ void UScriptManager::RegisterUserTypeToLua()
             []() { return new UCameraModifier_LetterBox(); }
         ),
         sol::base_classes, sol::bases<UCameraModifier, UObject>(),
-        "StartLetterBox", &UCameraModifier_LetterBox::StartLetterBox,
-        "StopLetterBox", &UCameraModifier_LetterBox::StopLetterBox,
-        "GetLetterBoxSize", &UCameraModifier_LetterBox::GetLetterBoxSize,
-        "SetLetterBoxSize", &UCameraModifier_LetterBox::SetLetterBoxSize,
-        "GetLetterBoxOpacity", &UCameraModifier_LetterBox::GetLetterBoxOpacity,
-        "SetLetterBoxOpacity", &UCameraModifier_LetterBox::SetLetterBoxOpacity
+        "SetFadeIn", &UCameraModifier_LetterBox::SetFadeIn,
+        "SetFadeOut", &UCameraModifier_LetterBox::SetFadeOut,
+        "GetSize", &UCameraModifier_LetterBox::GetSize,
+        "SetSize", &UCameraModifier_LetterBox::SetSize,
+        "GetOpacity", &UCameraModifier_LetterBox::GetOpacity,
+        "SetOpacity", &UCameraModifier_LetterBox::SetOpacity
     );
 
     //ActorType["GetSceneComponents"] = &AActor::GetSceneComponents;

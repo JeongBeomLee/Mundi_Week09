@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "UCameraModifier.h"
+#include "PlayerCameraManager.h"
 
 IMPLEMENT_CLASS(UCameraModifier)
 
@@ -26,24 +27,27 @@ void UCameraModifier::ModifyCamera(
 {
     UpdateAlpha(DeltaTime);
 
-    //if (CameraOwner)
-    //{
-    //    // note: pushing these through the cached PP blend system in the camera to get
-    //    // proper layered blending, rather than letting subsequent mods stomp over each other in the 
-    //    // InOutPOV struct.
-    //    {
-    //        float PPBlendWeight = 0.f;
-    //        FPostProcessSettings PPSettings;
+    if (CameraOwner)
+    {
+        // note: pushing these through the cached PP blend system in the camera to get
+        // proper layered blending, rather than letting subsequent mods stomp over each other in the 
+        // InOutPOV struct.
+        {
+            float PPBlendWeight = 0.f;
+            FPostProcessSettings PPSettings;
 			
-    //        //  Let native code modify the post process settings.
-    //        ModifyPostProcess(DeltaTime, PPBlendWeight, PPSettings);
+            //  Let native code modify the post process settings.
+            ModifyPostProcess(
+                DeltaTime,
+                PPBlendWeight,
+                PPSettings);
 
-    //        if (PPBlendWeight > 0.f)
-    //        {
-    //            // CameraOwner->AddCachedPPBlend(PPSettings, PPBlendWeight);
-    //        }
-    //    }
-    //}
+            if (PPBlendWeight > 0.f)
+            {
+                 CameraOwner->SetPostProcessSettings(PPSettings);
+            }
+        }
+    }
 }
 
 void UCameraModifier::ModifyPostProcess(

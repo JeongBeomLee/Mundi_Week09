@@ -30,29 +30,25 @@ public:
      * @param InOpacity - 레터박스 불투명도 (0.0 ~ 1.0)
      * @param InFadeInTime - 페이드 인 시간 (초)
      */
-    void StartLetterBox(float InSize = 0.15f, float InOpacity = 1.0f, float InFadeInTime = 1.0f);
+    void SetFadeIn(float InSize, float InOpacity, float InFadeInTime);
 
-    /**
-     * 레터박스 효과를 종료합니다.
-     * @param InFadeOutTime - 페이드 아웃 시간 (초)
-     */
-    void StopLetterBox(float InFadeOutTime = 1.0f);
+    void SetFadeOut(float InFadeOutTime);
 
     // Getters / Setters
-    float GetLetterBoxSize() const { return LetterBoxSize; }
-    void SetLetterBoxSize(float InSize) { LetterBoxSize = FMath::Clamp(InSize, 0.0f, 1.0f); }
+    float GetSize() const { return CurrentLetterBoxSize; }
+    void SetSize(float InSize) { CurrentLetterBoxSize = FMath::Clamp(InSize, 0.0f, 1.0f); }
 
-    float GetLetterBoxOpacity() const { return LetterBoxOpacity; }
-    void SetLetterBoxOpacity(float InOpacity) { LetterBoxOpacity = FMath::Clamp(InOpacity, 0.0f, 1.0f); }
+    float GetOpacity() const { return CurrentLetterBoxOpacity; }
+    void SetOpacity(float InOpacity) { CurrentLetterBoxOpacity = FMath::Clamp(InOpacity, 0.0f, 1.0f); }
 
 protected:
 	// 원래 레터박스 크기 및 불투명도 (모디파이어 시작 시점 저장용)
-	float OriginalLetterBoxSize = 0.0f;
-	float OriginalLetterBoxOpacity = 1.0f;
+	float StartLetterBoxSize = 0.0f;
+	float StartLetterBoxOpacity = 1.0f;
 
 	// 현재 레터박스 크기 및 불투명도
-    float LetterBoxSize = 0.0f;
-    float LetterBoxOpacity = 1.0f;
+    float CurrentLetterBoxSize = 0.0f;
+    float CurrentLetterBoxOpacity = 1.0f;
 
 	// 목표 레터박스 크기 및 불투명도
     float TargetLetterBoxSize = 0.0f;
