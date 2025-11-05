@@ -2,9 +2,11 @@
 #include "Actor.h"
 #include "ViewTarget.h"
 #include "Color.h"
+#include "CameraTypes.h"
 
 class UCameraComponent;
-class UCameraModifier; // 전방 선언 (다른 팀원이 구현 중)
+class UCameraModifier;
+class USpringArmComponent;
 
 // 플레이어 카메라를 관리하는 매니저 클래스
 // PlayerController가 소유하며, ViewTarget의 카메라를 렌더링에 제공
@@ -40,6 +42,79 @@ public:
 	void SetCameraStyle(const FName& NewStyle) { CameraStyle = NewStyle; }
 	FName GetCameraStyle() const { return CameraStyle; }
 
+	// 블렌딩과 함께 ViewTarget 설정
+	void SetViewTargetWithBlend(
+		AActor* NewViewTarget,
+		float BlendTime = 0.0f,
+		EViewTargetBlendFunction BlendFunc = EViewTargetBlendFunction::VTBlend_Cubic,
+		float BlendExp = 2.0f,
+		bool bLockOutgoing = false
+	);
+
+	// 커스텀 베지어 커브로 ViewTarget 블렌딩
+	void SetViewTargetWithBezierBlend(
+		AActor* NewViewTarget,
+		const FViewTargetTransitionParams& CustomBlendParams
+	);
+
+	// 프리셋 이름으로 ViewTarget 블렌딩
+	void SetViewTargetWithBlendPreset(
+		AActor* NewViewTarget,
+		const FString& PresetName
+	);
+
+	// 프리셋 객체로 ViewTarget 블렌딩
+	void SetViewTargetWithBlendPreset(
+		AActor* NewViewTarget,
+		const struct FCameraBlendPreset& Preset
+	);
+
+	// 고정 위치/회전으로 블렌딩 (더미 액터 불필요)
+	void BlendToTransform(
+		const FVector& TargetLocation,
+		const FQuat& TargetRotation,
+		float TargetFOV,
+		float BlendTime,
+		EViewTargetBlendFunction BlendFunc = EViewTargetBlendFunction::VTBlend_Cubic,
+		float BlendExp = 2.0f
+	);
+
+	// 커스텀 베지어로 고정 위치 블렌딩
+	void BlendToTransformWithBezier(
+		const FVector& TargetLocation,
+		const FQuat& TargetRotation,
+		float TargetFOV,
+		const FViewTargetTransitionParams& CustomBlendParams
+	);
+
+	// 프리셋 이름으로 고정 위치 블렌딩
+	void BlendToTransformWithPreset(
+		const FVector& TargetLocation,
+		const FQuat& TargetRotation,
+		float TargetFOV,
+		const FString& PresetName
+	);
+
+	// 프리셋 객체로 고정 위치 블렌딩
+	void BlendToTransformWithPreset(
+		const FVector& TargetLocation,
+		const FQuat& TargetRotation,
+		float TargetFOV,
+		const struct FCameraBlendPreset& Preset
+	);
+
+	// 블렌딩 중단
+	void StopBlending();
+
+	// 초기 카메라 위치/회전/FOV를 즉시 설정
+	void SetCameraTransform(const FVector& Location, const FQuat& Rotation, float FOV);
+
+	// 블렌딩 진행 중인지 확인
+	bool IsBlending() const { return BlendParams.IsBlending(); }
+
+	// 현재 블렌드 파라미터 접근
+	const FViewTargetTransitionParams& GetBlendParams() const { return BlendParams; }
+
 	// Fade 효과 (구조만 구현, 실제 렌더링 연동은 추후)
 	void StartCameraFade(float FromAlpha, float ToAlpha, float Duration, const FLinearColor& Color);
 	void StopCameraFade();
@@ -70,6 +145,9 @@ protected:
 	// ViewTarget 업데이트
 	virtual void UpdateViewTarget(float DeltaTime);
 
+	// ViewTarget 블렌딩 업데이트
+	void UpdateViewTargetBlending(float DeltaTime);
+
 	// Fade 효과 업데이트
 	void UpdateFade(float DeltaTime);
 
@@ -78,6 +156,9 @@ protected:
 
 	// ViewTarget으로부터 카메라 컴포넌트를 찾아서 반환
 	UCameraComponent* FindCameraComponent(AActor* InActor) const;
+
+	// ViewTarget으로부터 SpringArm 컴포넌트를 찾아서 반환
+	USpringArmComponent* FindSpringArmComponent(AActor* InActor) const;
 
 protected:
 	// Fade 효과 관련 변수
@@ -95,6 +176,16 @@ protected:
 	// ViewTarget (현재 렌더링 대상)
 	FViewTarget ViewTarget;
 
-	// 카메라 모디파이어 리스트 (다른 팀원이 구현 중)
+	// 블렌딩 관련 변수
+	FViewTarget PendingViewTarget;              // 전환할 대상 ViewTarget
+	FViewTargetTransitionParams BlendParams;    // 블렌드 파라미터
+
+	// 블렌딩 시작 시점의 상태 저장
+	FVector BlendStartLocation;
+	FQuat BlendStartRotation;
+	float BlendStartFOV;
+	float BlendStartSpringArmLength;
+
+	// 카메라 모디파이어 리스트
 	TArray<UCameraModifier*> ModifierList;
 };

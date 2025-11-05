@@ -4,6 +4,8 @@
 #include "CameraComponent.h"
 #include "CameraActor.h"
 #include "UCameraModifier_CameraShake.h"
+#include "SpringArmComponent.h"
+#include "CameraBlendPresetLibrary.h"
 
 IMPLEMENT_CLASS(APlayerCameraManager)
 
@@ -46,6 +48,9 @@ void APlayerCameraManager::UpdateCamera(float DeltaTime)
 
 	// ViewTarget 업데이트
 	UpdateViewTarget(DeltaTime);
+
+	// ViewTarget 블렌딩 업데이트
+	UpdateViewTargetBlending(DeltaTime);
 
 	// Fade 효과 업데이트
 	UpdateFade(DeltaTime);
@@ -283,4 +288,400 @@ void APlayerCameraManager::DuplicateSubObjects()
 
 	// ViewTarget은 복제하지 않음 (런타임에 설정됨)
 	// Todo: ModifierList는 복제 필요시 추가
+}
+
+void APlayerCameraManager::SetViewTargetWithBlend(
+	AActor* NewViewTarget,
+	float BlendTime,
+	EViewTargetBlendFunction BlendFunc,
+	float BlendExp,
+	bool bLockOutgoing
+)
+{
+	// 블렌드 시간이 0이거나 음수면 즉시 전환
+	if (BlendTime <= 0.0f)
+	{
+		SetViewTarget(NewViewTarget);
+		StopBlending();
+		return;
+	}
+
+	// PendingViewTarget 설정
+	PendingViewTarget.Target = NewViewTarget;
+
+	// PendingViewTarget의 초기 POV 설정
+	if (NewViewTarget)
+	{
+		UCameraComponent* CameraComp = FindCameraComponent(NewViewTarget);
+		if (CameraComp)
+		{
+			PendingViewTarget.POV_Location = CameraComp->GetWorldLocation();
+			PendingViewTarget.POV_Rotation = CameraComp->GetWorldRotation();
+			PendingViewTarget.POV_FOV = CameraComp->GetFOV();
+		}
+		else
+		{
+			PendingViewTarget.POV_Location = NewViewTarget->GetActorLocation();
+			PendingViewTarget.POV_Rotation = NewViewTarget->GetActorRotation();
+			PendingViewTarget.POV_FOV = 60.0f;
+		}
+	}
+
+	// 블렌드 파라미터 설정
+	BlendParams = FViewTargetTransitionParams(BlendTime, BlendFunc, BlendExp, bLockOutgoing);
+
+	// 블렌딩 시작 시점의 상태 저장
+	BlendStartLocation = ViewTarget.POV_Location;
+	BlendStartRotation = ViewTarget.POV_Rotation;
+	BlendStartFOV = ViewTarget.POV_FOV;
+
+	// SpringArm 길이 저장
+	USpringArmComponent* SpringArm = FindSpringArmComponent(ViewTarget.Target);
+	if (SpringArm)
+	{
+		BlendStartSpringArmLength = SpringArm->GetTargetArmLength();
+	}
+}
+
+void APlayerCameraManager::SetViewTargetWithBezierBlend(
+	AActor* NewViewTarget,
+	const FViewTargetTransitionParams& CustomBlendParams
+)
+{
+	// 블렌드 시간이 0이거나 음수면 즉시 전환
+	if (CustomBlendParams.BlendTime <= 0.0f)
+	{
+		SetViewTarget(NewViewTarget);
+		StopBlending();
+		return;
+	}
+
+	// PendingViewTarget 설정
+	PendingViewTarget.Target = NewViewTarget;
+
+	// PendingViewTarget의 초기 POV 설정
+	if (NewViewTarget)
+	{
+		UCameraComponent* CameraComp = FindCameraComponent(NewViewTarget);
+		if (CameraComp)
+		{
+			PendingViewTarget.POV_Location = CameraComp->GetWorldLocation();
+			PendingViewTarget.POV_Rotation = CameraComp->GetWorldRotation();
+			PendingViewTarget.POV_FOV = CameraComp->GetFOV();
+		}
+		else
+		{
+			PendingViewTarget.POV_Location = NewViewTarget->GetActorLocation();
+			PendingViewTarget.POV_Rotation = NewViewTarget->GetActorRotation();
+			PendingViewTarget.POV_FOV = 60.0f;
+		}
+	}
+
+	// 커스텀 블렌드 파라미터 복사
+	BlendParams = CustomBlendParams;
+	BlendParams.BlendTimeRemaining = CustomBlendParams.BlendTime;
+
+	// 블렌딩 시작 시점의 상태 저장
+	BlendStartLocation = ViewTarget.POV_Location;
+	BlendStartRotation = ViewTarget.POV_Rotation;
+	BlendStartFOV = ViewTarget.POV_FOV;
+
+	// SpringArm 길이 저장
+	USpringArmComponent* SpringArm = FindSpringArmComponent(ViewTarget.Target);
+	if (SpringArm)
+	{
+		BlendStartSpringArmLength = SpringArm->GetTargetArmLength();
+	}
+}
+
+void APlayerCameraManager::SetViewTargetWithBlendPreset(
+	AActor* NewViewTarget,
+	const FString& PresetName
+)
+{
+	// 라이브러리에서 프리셋 검색
+	UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+	if (!Library)
+	{
+		UE_LOG("PlayerCameraManager: CameraBlendPresetLibrary가 초기화되지 않았습니다.");
+		// Fallback: Cubic 블렌드 사용
+		SetViewTargetWithBlend(NewViewTarget, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	const FCameraBlendPreset* Preset = Library->GetPreset(PresetName);
+	if (!Preset)
+	{
+		UE_LOG("PlayerCameraManager: 프리셋을 찾을 수 없음 - %s", PresetName.c_str());
+		// Fallback: Cubic 블렌드 사용
+		SetViewTargetWithBlend(NewViewTarget, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	// 프리셋 적용
+	SetViewTargetWithBlendPreset(NewViewTarget, *Preset);
+}
+
+void APlayerCameraManager::SetViewTargetWithBlendPreset(
+	AActor* NewViewTarget,
+	const FCameraBlendPreset& Preset
+)
+{
+	// 프리셋의 BlendParams를 사용하여 베지어 블렌드 호출
+	SetViewTargetWithBezierBlend(NewViewTarget, Preset.BlendParams);
+
+	UE_LOG("PlayerCameraManager: 프리셋 '%s'로 ViewTarget 블렌드 시작 (%.2fs)",
+		Preset.PresetName.c_str(),
+		Preset.BlendParams.BlendTime);
+}
+
+void APlayerCameraManager::BlendToTransform(
+	const FVector& TargetLocation,
+	const FQuat& TargetRotation,
+	float TargetFOV,
+	float BlendTime,
+	EViewTargetBlendFunction BlendFunc,
+	float BlendExp
+)
+{
+	// 블렌드 시간이 0이거나 음수면 즉시 전환
+	if (BlendTime <= 0.0f)
+	{
+		ViewTarget.POV_Location = TargetLocation;
+		ViewTarget.POV_Rotation = TargetRotation;
+		ViewTarget.POV_FOV = TargetFOV;
+		ViewTarget.Target = nullptr; // 액터 없음
+		StopBlending();
+		return;
+	}
+
+	// PendingViewTarget 설정 (액터 없이 고정 Transform 사용)
+	PendingViewTarget.Target = nullptr;
+	PendingViewTarget.POV_Location = TargetLocation;
+	PendingViewTarget.POV_Rotation = TargetRotation;
+	PendingViewTarget.POV_FOV = TargetFOV;
+
+	// 블렌드 파라미터 설정
+	BlendParams = FViewTargetTransitionParams(BlendTime, BlendFunc, BlendExp, false);
+
+	// 블렌딩 시작 시점의 상태 저장
+	BlendStartLocation = ViewTarget.POV_Location;
+	BlendStartRotation = ViewTarget.POV_Rotation;
+	BlendStartFOV = ViewTarget.POV_FOV;
+
+	// SpringArm 길이 저장 (고정 위치로 이동할 때는 SpringArm 블렌딩 비활성화)
+	USpringArmComponent* SpringArm = FindSpringArmComponent(ViewTarget.Target);
+	if (SpringArm)
+	{
+		BlendStartSpringArmLength = SpringArm->GetTargetArmLength();
+	}
+}
+
+void APlayerCameraManager::BlendToTransformWithBezier(
+	const FVector& TargetLocation,
+	const FQuat& TargetRotation,
+	float TargetFOV,
+	const FViewTargetTransitionParams& CustomBlendParams
+)
+{
+	// 블렌드 시간이 0이거나 음수면 즉시 전환
+	if (CustomBlendParams.BlendTime <= 0.0f)
+	{
+		ViewTarget.POV_Location = TargetLocation;
+		ViewTarget.POV_Rotation = TargetRotation;
+		ViewTarget.POV_FOV = TargetFOV;
+		ViewTarget.Target = nullptr;
+		StopBlending();
+		return;
+	}
+
+	// PendingViewTarget 설정 (액터 없이 고정 Transform 사용)
+	PendingViewTarget.Target = nullptr;
+	PendingViewTarget.POV_Location = TargetLocation;
+	PendingViewTarget.POV_Rotation = TargetRotation;
+	PendingViewTarget.POV_FOV = TargetFOV;
+
+	// 커스텀 블렌드 파라미터 복사
+	BlendParams = CustomBlendParams;
+	BlendParams.BlendTimeRemaining = CustomBlendParams.BlendTime;
+
+	// 블렌딩 시작 시점의 상태 저장
+	BlendStartLocation = ViewTarget.POV_Location;
+	BlendStartRotation = ViewTarget.POV_Rotation;
+	BlendStartFOV = ViewTarget.POV_FOV;
+
+	// SpringArm 길이 저장
+	USpringArmComponent* SpringArm = FindSpringArmComponent(ViewTarget.Target);
+	if (SpringArm)
+	{
+		BlendStartSpringArmLength = SpringArm->GetTargetArmLength();
+	}
+}
+
+void APlayerCameraManager::BlendToTransformWithPreset(
+	const FVector& TargetLocation,
+	const FQuat& TargetRotation,
+	float TargetFOV,
+	const FString& PresetName
+)
+{
+	// 라이브러리에서 프리셋 검색
+	UCameraBlendPresetLibrary* Library = UCameraBlendPresetLibrary::GetInstance();
+	if (!Library)
+	{
+		UE_LOG("PlayerCameraManager: CameraBlendPresetLibrary가 초기화되지 않았습니다.");
+		// Fallback: Cubic 블렌드 사용
+		BlendToTransform(TargetLocation, TargetRotation, TargetFOV, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	const FCameraBlendPreset* Preset = Library->GetPreset(PresetName);
+	if (!Preset)
+	{
+		UE_LOG("PlayerCameraManager: 프리셋을 찾을 수 없음 - %s", PresetName.c_str());
+		// Fallback: Cubic 블렌드 사용
+		BlendToTransform(TargetLocation, TargetRotation, TargetFOV, 1.0f, EViewTargetBlendFunction::VTBlend_Cubic);
+		return;
+	}
+
+	// 프리셋 적용
+	BlendToTransformWithPreset(TargetLocation, TargetRotation, TargetFOV, *Preset);
+}
+
+void APlayerCameraManager::BlendToTransformWithPreset(
+	const FVector& TargetLocation,
+	const FQuat& TargetRotation,
+	float TargetFOV,
+	const FCameraBlendPreset& Preset
+)
+{
+	// 프리셋의 BlendParams를 사용하여 베지어 블렌드 호출
+	BlendToTransformWithBezier(TargetLocation, TargetRotation, TargetFOV, Preset.BlendParams);
+
+	UE_LOG("PlayerCameraManager: 프리셋 '%s'로 고정 Transform 블렌드 시작 (%.2fs)",
+		Preset.PresetName.c_str(),
+		Preset.BlendParams.BlendTime);
+}
+
+void APlayerCameraManager::StopBlending()
+{
+	BlendParams.BlendTimeRemaining = 0.0f;
+	PendingViewTarget.Target = nullptr;
+}
+
+void APlayerCameraManager::SetCameraTransform(const FVector& Location, const FQuat& Rotation, float FOV)
+{
+	// 현재 ViewTarget의 카메라 위치/회전/FOV를 즉시 설정
+	ViewTarget.POV_Location = Location;
+	ViewTarget.POV_Rotation = Rotation;
+	ViewTarget.POV_FOV = FOV;
+}
+
+void APlayerCameraManager::UpdateViewTargetBlending(float DeltaTime)
+{
+	// 블렌딩 중이 아니면 리턴
+	if (!BlendParams.IsBlending())
+	{
+		return;
+	}
+
+	// 블렌드 파라미터 업데이트
+	BlendParams.UpdateBlend(DeltaTime);
+
+	// PendingViewTarget이 액터를 가리키는 경우, 해당 액터의 현재 POV로 업데이트
+	if (PendingViewTarget.Target)
+	{
+		// bLockOutgoing이 false인 경우, 현재 ViewTarget도 계속 업데이트
+		if (!BlendParams.bLockOutgoing && ViewTarget.Target)
+		{
+			UCameraComponent* CurrentCamera = FindCameraComponent(ViewTarget.Target);
+			if (CurrentCamera)
+			{
+				BlendStartLocation = CurrentCamera->GetWorldLocation();
+				BlendStartRotation = CurrentCamera->GetWorldRotation();
+				BlendStartFOV = CurrentCamera->GetFOV();
+			}
+		}
+
+		UCameraComponent* PendingCamera = FindCameraComponent(PendingViewTarget.Target);
+		if (PendingCamera)
+		{
+			PendingViewTarget.POV_Location = PendingCamera->GetWorldLocation();
+			PendingViewTarget.POV_Rotation = PendingCamera->GetWorldRotation();
+			PendingViewTarget.POV_FOV = PendingCamera->GetFOV();
+		}
+	}
+
+	// 블렌딩 완료 확인
+	if (!BlendParams.IsBlending())
+	{
+		// 블렌딩 완료: PendingViewTarget을 ViewTarget으로 전환
+		ViewTarget = PendingViewTarget;
+		PendingViewTarget.Target = nullptr;
+		return;
+	}
+
+	// 각 채널별 알파 계산
+	float LocationAlpha = BlendParams.CalculateLocationAlpha();
+	float RotationAlpha = BlendParams.CalculateRotationAlpha();
+	float FOVAlpha = BlendParams.CalculateFOVAlpha();
+
+	// 위치 블렌딩 (선형 보간)
+	ViewTarget.POV_Location = FVector::Lerp(
+		BlendStartLocation,
+		PendingViewTarget.POV_Location,
+		LocationAlpha
+	);
+
+	// 회전 블렌딩 (구면 선형 보간)
+	ViewTarget.POV_Rotation = FQuat::Slerp(
+		BlendStartRotation,
+		PendingViewTarget.POV_Rotation,
+		RotationAlpha
+	);
+
+	// FOV 블렌딩
+	ViewTarget.POV_FOV = FMath::Lerp(
+		BlendStartFOV,
+		PendingViewTarget.POV_FOV,
+		FOVAlpha
+	);
+
+	// SpringArm 길이 블렌딩 (옵션)
+	if (BlendParams.bBlendSpringArmLength)
+	{
+		float SpringArmAlpha = BlendParams.CalculateSpringArmAlpha();
+
+		// 현재 ViewTarget의 SpringArm (있다면)
+		USpringArmComponent* SpringArm = FindSpringArmComponent(ViewTarget.Target);
+		if (SpringArm)
+		{
+			float BlendedLength = FMath::Lerp(
+				BlendStartSpringArmLength,
+				BlendParams.TargetSpringArmLength,
+				SpringArmAlpha
+			);
+			SpringArm->SetTargetArmLength(BlendedLength);
+		}
+	}
+}
+
+USpringArmComponent* APlayerCameraManager::FindSpringArmComponent(AActor* InActor) const
+{
+	if (!InActor)
+	{
+		return nullptr;
+	}
+
+	// OwnedComponents에서 SpringArmComponent 검색
+	const TSet<UActorComponent*>& Components = InActor->GetOwnedComponents();
+	for (UActorComponent* Component : Components)
+	{
+		if (USpringArmComponent* SpringArm = Cast<USpringArmComponent>(Component))
+		{
+			return SpringArm;
+		}
+	}
+
+	return nullptr;
 }

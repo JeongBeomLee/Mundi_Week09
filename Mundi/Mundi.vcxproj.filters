@@ -556,6 +556,16 @@
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
       <Filter>Source\Runtime\Engine\CameraManagement</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
+    <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
+    <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\Components\SpringArmComponent.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
+    <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp" />
+    <ClCompile Include="Source\Slate\Windows\CameraBlendEditorWindow.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -1147,6 +1157,20 @@
     <ClInclude Include="ThirdParty\ImGui\imstb_truetype.h">
       <Filter>ThirdParty\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
+      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
+    <ClInclude Include="Source\Runtime\Core\Math\UCurveFloat.h" />
+    <ClInclude Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.h" />
+    <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
+    <ClInclude Include="Source\Runtime\Engine\Components\SpringArmComponent.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
+    <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h" />
+    <ClInclude Include="Source\Slate\Windows\CameraBlendEditorWindow.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\coin_collision.lua">

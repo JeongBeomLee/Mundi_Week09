@@ -87,7 +87,6 @@ void UCameraModifier_CameraShake::ModifyCamera(
             2.f
          ) * RotationAmplitude;
 
-         // InOutViewRotation = FQuat::MakeFromEulerZYX(ViewNewRotation);
 
          // [Alternative Unreal 방식 - 주석]
          // Base Rotation에 Shake Offset을 Euler 각도로 더하는 방식:
