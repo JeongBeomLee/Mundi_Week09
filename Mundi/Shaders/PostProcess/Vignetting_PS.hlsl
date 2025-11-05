@@ -10,12 +10,12 @@ struct PS_INPUT
 
 cbuffer VignettingCB : register(b2)
 {
-    float3 VignettingColor;      // Fade 목표 색상 (RGB)
+    float4 VignettingColor;      // Fade 목표 색상 (RGB)
+
     float Radius;
-    
     float Softness;
     float AspectRatio;
-    float2 Padding;
+    float Padding;
 }
 
 float4 mainPS(PS_INPUT input) : SV_TARGET
@@ -28,13 +28,24 @@ float4 mainPS(PS_INPUT input) : SV_TARGET
     float dist = length(position);
 
     // 페이드/감쇠 커브 계산
+    // vignette: 중심부=1 (원본 유지), 가장자리=0 (VignettingColor)
     float vignette = smoothstep(Radius, Radius - Softness, dist);
 
-    // 원본 색상과의 합성
-    float3 sceneColor = g_SceneColorTex.Sample(g_LinearClampSample, input.texCoord).rgb;
+    // 원본 색상
+    float3 sceneColor = g_SceneColorTex.Sample(g_LinearClampSample, uv).rgb;
 
-    // VignettingColor와 블렌딩: vignette가 1이면 원본, 0이면 VignettingColor
-    float3 finalColor = lerp(VignettingColor, sceneColor, vignette);
+    // Alpha를 강도로 사용: Alpha가 0이면 효과 없음, 1이면 최대 효과
+    float strength = VignettingColor.a;
+
+    // 가장자리 블렌딩 양 계산: (1-vignette)는 가장자리에서 1, 중심에서 0
+    // strength를 곱해서 전체 효과 강도 조절
+    float blendAmount = (1.0 - vignette) * strength;
+
+    // 최종 색상: sceneColor에서 VignettingColor로 블렌딩
+    // blendAmount=0 (중심): sceneColor
+    // blendAmount=1 (가장자리, strength=1): VignettingColor
+    float3 finalColor = lerp(sceneColor, VignettingColor.rgb, blendAmount);
 
     return float4(finalColor, 1.0f);
 }
+

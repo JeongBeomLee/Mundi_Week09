@@ -455,6 +455,18 @@ void UScriptManager::RegisterUserTypeToLua()
     Lua["FVector"]["Dot"] = &FVector::Dot;
     Lua["FVector"]["Lerp"] = &FVector::Lerp;
 
+    // FVector4 타입을 Lua에 등록
+    Lua.new_usertype<FVector4>("FVector4",
+        sol::call_constructor, sol::factories(
+            []() { return FVector4(); },
+            [](float x, float y, float z, float w) { return FVector4(x, y, z, w); }
+        ),
+        "X", &FVector4::X,
+        "Y", &FVector4::Y,
+        "Z", &FVector4::Z,
+        "W", &FVector4::W
+    );
+
     // FQuat 타입을 Lua에 등록
     Lua.new_usertype<FQuat>("FQuat",
         sol::call_constructor, sol::factories(
