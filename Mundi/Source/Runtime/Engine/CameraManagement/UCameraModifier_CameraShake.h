@@ -9,7 +9,7 @@ class UCameraModifier_CameraShake : public UCameraModifier
 public:
     UCameraModifier_CameraShake();
     ~UCameraModifier_CameraShake() = default;
-    
+
     void ModifyCamera(
        float DeltaTime,
        FVector& InOutViewLocation,
@@ -17,9 +17,13 @@ public:
        float& InOutFOV
    ) override;
 
+    void GetNewShake();
+
     float GetRotationAmplitude() const;
     void SetRotationAmplitude(const float InRotationAmplitude);
 
+    void SetAlphaInTime(const float InAlphaInTime) override;
+    void SetNumSamples(const float InNumSamples);
 private:
     UPerlinNoiseFloat PerlinNoiseXAxis;
     UPerlinNoiseFloat PerlinNoiseYAxis;

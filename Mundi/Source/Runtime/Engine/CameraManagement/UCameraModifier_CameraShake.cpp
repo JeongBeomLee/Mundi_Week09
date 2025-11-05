@@ -16,16 +16,14 @@ UCameraModifier_CameraShake::UCameraModifier_CameraShake()
    EnableModifier();
    SetPriority(0);
 
-   // CameraShake 기간과 Curve의 TimeDuration을 동일하게
-   PerlinNoiseXAxis.SetTimeRange(AlphaInTime);
-   PerlinNoiseYAxis.SetTimeRange(AlphaInTime);
-   PerlinNoiseZAxis.SetTimeRange(AlphaInTime);
-
-   PerlinNoiseXAxis.SetNumSamples(12);
-   PerlinNoiseYAxis.SetNumSamples(12);
-   PerlinNoiseZAxis.SetNumSamples(12);
+   SetNumSamples(12);
 
    // Curve 한 번만 생성
+   GetNewShake();
+}
+
+void UCameraModifier_CameraShake::GetNewShake()
+{
    PerlinNoiseXAxis.RenewCurve();
    PerlinNoiseYAxis.RenewCurve();
    PerlinNoiseZAxis.RenewCurve();
@@ -110,4 +108,21 @@ float UCameraModifier_CameraShake::GetRotationAmplitude() const
 void UCameraModifier_CameraShake::SetRotationAmplitude(const float InRotationAmplitude)
 {
    RotationAmplitude = InRotationAmplitude;
+}
+
+// CameraShake 기간과 Curve의 TimeDuration을 동일하게
+void UCameraModifier_CameraShake::SetAlphaInTime(const float InAlphaInTime)
+{
+   UCameraModifier::SetAlphaInTime(InAlphaInTime);
+
+   PerlinNoiseXAxis.SetTimeRange(InAlphaInTime);
+   PerlinNoiseYAxis.SetTimeRange(InAlphaInTime);
+   PerlinNoiseZAxis.SetTimeRange(InAlphaInTime);
+}
+
+void UCameraModifier_CameraShake::SetNumSamples(const float InNumSamples)
+{
+   PerlinNoiseXAxis.SetNumSamples(InNumSamples);
+   PerlinNoiseYAxis.SetNumSamples(InNumSamples);
+   PerlinNoiseZAxis.SetNumSamples(InNumSamples);
 }

@@ -164,7 +164,14 @@ local function AddCameraShake()
     end
 
     local CameraShakeModifier = UCameraModifier_CameraShake();
+    -- 흔들리는 정도 설정
     CameraShakeModifier:SetRotationAmplitude(10.0);
+    -- 흔들리는 시간 설정
+    CameraShakeModifier:SetAlphaInTime(2.0);
+    -- 흔들림 곡선의 주기 설정
+    CameraShakeModifier:SetNumSamples(6);
+    -- 앞선 설정으로 새로운 흔들림 생성
+    CameraShakeModifier:GetNewShake();
 
     PlayerCameraManager:AddCameraModifier(CameraShakeModifier);
     table.insert(ActiveCameraShakeModifiers, CameraShakeModifier);

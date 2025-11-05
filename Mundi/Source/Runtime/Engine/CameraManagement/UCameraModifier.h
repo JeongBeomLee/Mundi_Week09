@@ -63,7 +63,7 @@ public:
     virtual void UpdateAlpha(float DeltaTime);
 
     float GetAlphaInTime() const;
-    void SetAlphaInTime(const float InAlphaInTime);
+    virtual void SetAlphaInTime(const float InAlphaInTime);
     
     float GetAlphaOutTime() const;
     void SetAlphaOutTime(const float InAlphaOutTime);
