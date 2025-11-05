@@ -38,6 +38,7 @@ private:
 		CameraTransition,
 		FadeInOut,
 		CameraShake,
+		Debug,
 		COUNT
 	};
 	ECameraControlTab CurrentTab = ECameraControlTab::CameraTransition;
@@ -59,10 +60,18 @@ private:
 	// === CameraShake Tab ===
 	void RenderCameraShakeTab();
 
+	// === Debug Tab ===
+	void RenderDebugTab();
+
 	// CameraShake 파라미터
 	float ShakeRotationAmplitude = 10.0f;
 	float ShakeAlphaInTime = 2.0f;
 	int ShakeNumSamples = 6;
+
+	// CameraShake 커브 선택 (각 축마다)
+	int SelectedShakeCurveIndex_X = -1;  // -1 = Perlin Noise (no curve)
+	int SelectedShakeCurveIndex_Y = -1;
+	int SelectedShakeCurveIndex_Z = -1;
 
 	// 프리셋 관련
 	TArray<FString> AvailablePresets;
@@ -82,12 +91,21 @@ private:
 	// 베지어 커브를 Fade에 적용
 	void ApplyBezierCurveToFade(const FBezierControlPoints& BezierCurve);
 
-	// 베지어 커브를 CameraShake에 적용
-	void ApplyBezierCurveToShake(const FBezierControlPoints& BezierCurve);
+	// === Bezier Curve Visualization ===
+	void RenderBezierCurveVisualization(const FBezierControlPoints& Curve, const ImVec2& Size);
+	ImVec2 BezierCurveToScreenPos(float Time, float Value, const ImVec2& Origin, const ImVec2& Size, const ImVec2& Padding) const;
 
 	// UI 레이아웃 상수
 	static constexpr float WindowWidth = 450.0f;
 	static constexpr float WindowHeight = 650.0f;
 	static constexpr float Padding = 20.0f;
 	static constexpr float TabBarHeight = 40.0f;
+
+	// 커브 시각화 상수 (CameraBlendEditor와 동일한 비율: 520:320 = 13:8)
+	static constexpr float CurveVisualizationWidth = 390.0f;  // 13 * 30
+	static constexpr float CurveVisualizationHeight = 240.0f;  // 8 * 30
+	static constexpr float CurveVisualizationPadding = 30.0f;
+
+	// 프리셋 경로 상수
+	static constexpr const char* PresetDirectory = "Data/CameraBlendPresets";
 };

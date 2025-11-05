@@ -87,6 +87,9 @@ void UCameraControlWindow::RenderWidget()
 		case ECameraControlTab::CameraShake:
 			RenderCameraShakeTab();
 			break;
+		case ECameraControlTab::Debug:
+			RenderDebugTab();
+			break;
 		}
 
 		ImGui::PopStyleVar(2);
@@ -109,7 +112,7 @@ void UCameraControlWindow::SetPlayerCameraManager(APlayerCameraManager* InCamera
 // ========== Tab Bar ==========
 void UCameraControlWindow::RenderTabBar()
 {
-	const char* TabNames[] = { "Transition", "Fade", "Shake" };
+	const char* TabNames[] = { "Transition", "Fade", "Shake", "Debug" };
 	const float TabWidth = (WindowWidth - 40.0f) / static_cast<float>(ECameraControlTab::COUNT);
 
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 8));
@@ -254,7 +257,7 @@ void UCameraControlWindow::RenderFadeInOutTab()
 		if (ImGui::Selectable("Linear (Default)", bIsLinearSelected))
 		{
 			SelectedFadeCurveIndex = -1;
-			Manager->SetUseBezierFade(false);
+			// 주의: Apply 버튼을 눌러야 실제 적용됨
 		}
 		if (bIsLinearSelected)
 			ImGui::SetItemDefaultFocus();
@@ -310,8 +313,7 @@ void UCameraControlWindow::RenderFadeInOutTab()
 	if (ImGui::Button("Stop Camera Fade", ImVec2(ContentWidth, 35.0f)))
 	{
 		Manager->StopCameraFade();
-		Manager->SetUseBezierFade(false);
-		SelectedFadeCurveIndex = -1;
+		// 주의: 커브 설정은 유지 (Stop해도 다음 Fade에서 계속 사용)
 	}
 
 	ImGui::Spacing();
@@ -328,30 +330,51 @@ void UCameraControlWindow::RenderFadeInOutTab()
 	ImGui::Text("Fade Color: (%.2f, %.2f, %.2f)", CurrentColor.R, CurrentColor.G, CurrentColor.B);
 	ImGui::Text("Fade Mode: %s", Manager->IsUsingBezierFade() ? "Bezier Curve" : "Linear");
 
-	// ========== DEBUG INFO ==========
-	ImGui::Spacing();
-	ImGui::Spacing();
-	ImGui::SeparatorText("DEBUG - Preset Loading");
-	ImGui::Spacing();
-
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Working Dir:");
-	ImGui::TextWrapped("%s", DebugCurrentWorkingDir.c_str());
-
-	ImGui::Spacing();
-	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Absolute Preset Path:");
-	ImGui::TextWrapped("%s", DebugAbsolutePresetPath.c_str());
-
-	ImGui::Spacing();
-	ImGui::Text("Directory Exists: %s", bDebugDirectoryExists ? "YES" : "NO");
-	ImGui::Text("Presets Found: %d", AvailablePresets.Num());
-
-	if (AvailablePresets.Num() > 0)
+	// ========== Curve Visualization ==========
+	if (Manager->IsUsingBezierFade())
 	{
 		ImGui::Spacing();
-		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Preset Names:");
-		for (int i = 0; i < AvailablePresets.Num(); i++)
+		ImGui::Spacing();
+		ImGui::SeparatorText("Active Fade Curve");
+		ImGui::Spacing();
+
+		// BezierCurveFade를 가져와서 시각화
+		const UCurveFloat& CurveFade = Manager->GetBezierCurveFade();
+		if (CurveFade.GetNumSamples() > 0)
 		{
-			ImGui::Text("  %d: %s", i, AvailablePresets[i].c_str());
+			// UCurveFloat를 FBezierControlPoints로 근사 변환
+			// (UCurveFloat는 샘플링된 키 값들이므로, 시각화를 위해 대략적인 제어점 추정)
+			const FRichCurve& RichCurve = CurveFade.GetCurve();
+
+			// 첫 번째, 마지막, 중간 키들을 사용해서 대략적인 베지어 제어점 생성
+			FBezierControlPoints ApproxCurve;
+			if (RichCurve.Keys.Num() >= 4)
+			{
+				ApproxCurve.P0 = RichCurve.Keys[0].Value;
+				ApproxCurve.P1 = RichCurve.Keys[RichCurve.Keys.Num() / 3].Value;
+				ApproxCurve.P2 = RichCurve.Keys[(RichCurve.Keys.Num() * 2) / 3].Value;
+				ApproxCurve.P3 = RichCurve.Keys.Last().Value;
+			}
+			else if (RichCurve.Keys.Num() >= 2)
+			{
+				// 키가 2개 이상이면 선형 근사
+				ApproxCurve.P0 = RichCurve.Keys[0].Value;
+				ApproxCurve.P1 = RichCurve.Keys[0].Value;
+				ApproxCurve.P2 = RichCurve.Keys.Last().Value;
+				ApproxCurve.P3 = RichCurve.Keys.Last().Value;
+			}
+
+			// 커브 시각화
+			RenderBezierCurveVisualization(ApproxCurve,
+				ImVec2(CurveVisualizationWidth, CurveVisualizationHeight));
+
+			ImGui::Spacing();
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
+				"Visualizing approximation of %d-sample curve", CurveFade.GetNumSamples());
+		}
+		else
+		{
+			ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f), "No curve data available");
 		}
 	}
 }
@@ -364,61 +387,221 @@ void UCameraControlWindow::RenderCameraShakeTab()
 
 	APlayerCameraManager* Manager = CameraManager.Get();
 
-	if (ImGui::CollapsingHeader("Camera Shake", ImGuiTreeNodeFlags_DefaultOpen))
+	const float ContentWidth = WindowWidth - 40.0f;
+
+	// ========== Shake Parameters ==========
+	ImGui::SeparatorText("Shake Parameters");
+	ImGui::Spacing();
+
+	ImGui::Text("Rotation Amplitude (degrees):");
+	ImGui::SliderFloat("##ShakeAmp", &ShakeRotationAmplitude, 1.0f, 30.0f, "%.1f");
+
+	ImGui::Text("Duration (seconds):");
+	ImGui::SliderFloat("##ShakeDuration", &ShakeAlphaInTime, 0.1f, 5.0f, "%.1f");
+
+	ImGui::Text("Num Samples:");
+	ImGui::SliderInt("##ShakeSamples", &ShakeNumSamples, 2, 20);
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+
+	// ========== Curve Asset Selection (3 Axes) ==========
+	ImGui::SeparatorText("Curve Assets (Per Axis)");
+	ImGui::Spacing();
+
+	// X축 커브 선택
+	const char* CurvePreview_X = "Perlin Noise (Default)";
+	if (SelectedShakeCurveIndex_X >= 0 && SelectedShakeCurveIndex_X < AvailablePresets.Num())
 	{
-		ImGui::Indent(10.0f);
+		CurvePreview_X = AvailablePresets[SelectedShakeCurveIndex_X].c_str();
+	}
 
-		// 파라미터 입력
-		ImGui::Text("Rotation Amplitude (degrees):");
-		ImGui::SliderFloat("##ShakeAmp", &ShakeRotationAmplitude, 1.0f, 30.0f, "%.1f");
-
-		ImGui::Text("Duration (seconds):");
-		ImGui::SliderFloat("##ShakeDuration", &ShakeAlphaInTime, 0.1f, 5.0f, "%.1f");
-
-		ImGui::Text("Num Samples:");
-		ImGui::SliderInt("##ShakeSamples", &ShakeNumSamples, 2, 20);
-
-		ImGui::Spacing();
-
-		// Add Camera Shake 버튼
-		if (ImGui::Button("Add Camera Shake", ImVec2(WindowWidth - 50.0f, 30.0f)))
+	ImGui::Text("X-Axis Curve:");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(200.0f);
+	if (ImGui::BeginCombo("##ShakeCurveCombo_X", CurvePreview_X))
+	{
+		bool bIsPerlinSelected = (SelectedShakeCurveIndex_X == -1);
+		if (ImGui::Selectable("Perlin Noise (Default)", bIsPerlinSelected))
 		{
-			UCameraModifier_CameraShake* Shake = NewObject<UCameraModifier_CameraShake>();
-			Shake->SetRotationAmplitude(ShakeRotationAmplitude);
-			Shake->SetAlphaInTime(ShakeAlphaInTime);
-			Shake->SetNumSamples(ShakeNumSamples);
-			Shake->GetNewPerlinNoise();
-
-			Manager->AddCameraModifier(Shake);
+			SelectedShakeCurveIndex_X = -1;
 		}
+		if (bIsPerlinSelected)
+			ImGui::SetItemDefaultFocus();
 
-		// 활성 모디파이어 표시
-		ImGui::Spacing();
-		ImGui::Separator();
-		ImGui::Text("Active Modifiers:");
-
-		TArray<UCameraModifier*>& ModifierList = Manager->GetModifierList();
-		int activeCount = 0;
-		for (UCameraModifier* Modifier : ModifierList)
+		for (int i = 0; i < AvailablePresets.Num(); i++)
 		{
-			if (Modifier && !Modifier->IsDisabled())
+			bool bIsSelected = (SelectedShakeCurveIndex_X == i);
+			if (ImGui::Selectable(AvailablePresets[i].c_str(), bIsSelected))
 			{
-				activeCount++;
-				UCameraModifier_CameraShake* Shake = Cast<UCameraModifier_CameraShake>(Modifier);
-				if (Shake)
-				{
-					ECurveType CurveType = Shake->GetShakeCurveType();
-					const char* TypeName = (CurveType == ECurveType::ECT_PERLIN_NOISE) ? "Perlin" : "Bezier";
-					ImGui::Text("  Shake (%s) - Alpha: %.2f", TypeName, Shake->GetAlpha());
-				}
+				SelectedShakeCurveIndex_X = i;
+			}
+			if (bIsSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	// Y축 커브 선택
+	const char* CurvePreview_Y = "Perlin Noise (Default)";
+	if (SelectedShakeCurveIndex_Y >= 0 && SelectedShakeCurveIndex_Y < AvailablePresets.Num())
+	{
+		CurvePreview_Y = AvailablePresets[SelectedShakeCurveIndex_Y].c_str();
+	}
+
+	ImGui::Text("Y-Axis Curve:");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(200.0f);
+	if (ImGui::BeginCombo("##ShakeCurveCombo_Y", CurvePreview_Y))
+	{
+		bool bIsPerlinSelected = (SelectedShakeCurveIndex_Y == -1);
+		if (ImGui::Selectable("Perlin Noise (Default)", bIsPerlinSelected))
+		{
+			SelectedShakeCurveIndex_Y = -1;
+		}
+		if (bIsPerlinSelected)
+			ImGui::SetItemDefaultFocus();
+
+		for (int i = 0; i < AvailablePresets.Num(); i++)
+		{
+			bool bIsSelected = (SelectedShakeCurveIndex_Y == i);
+			if (ImGui::Selectable(AvailablePresets[i].c_str(), bIsSelected))
+			{
+				SelectedShakeCurveIndex_Y = i;
+			}
+			if (bIsSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	// Z축 커브 선택
+	const char* CurvePreview_Z = "Perlin Noise (Default)";
+	if (SelectedShakeCurveIndex_Z >= 0 && SelectedShakeCurveIndex_Z < AvailablePresets.Num())
+	{
+		CurvePreview_Z = AvailablePresets[SelectedShakeCurveIndex_Z].c_str();
+	}
+
+	ImGui::Text("Z-Axis Curve:");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(200.0f);
+	if (ImGui::BeginCombo("##ShakeCurveCombo_Z", CurvePreview_Z))
+	{
+		bool bIsPerlinSelected = (SelectedShakeCurveIndex_Z == -1);
+		if (ImGui::Selectable("Perlin Noise (Default)", bIsPerlinSelected))
+		{
+			SelectedShakeCurveIndex_Z = -1;
+		}
+		if (bIsPerlinSelected)
+			ImGui::SetItemDefaultFocus();
+
+		for (int i = 0; i < AvailablePresets.Num(); i++)
+		{
+			bool bIsSelected = (SelectedShakeCurveIndex_Z == i);
+			if (ImGui::Selectable(AvailablePresets[i].c_str(), bIsSelected))
+			{
+				SelectedShakeCurveIndex_Z = i;
+			}
+			if (bIsSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+
+	// ========== Control Buttons ==========
+	ImGui::SeparatorText("Controls");
+	ImGui::Spacing();
+
+	// 3개 축 모두 선택되었는지 확인
+	bool bAllAxesSelected = (SelectedShakeCurveIndex_X >= 0 && SelectedShakeCurveIndex_X < AvailablePresets.Num()) &&
+	                         (SelectedShakeCurveIndex_Y >= 0 && SelectedShakeCurveIndex_Y < AvailablePresets.Num()) &&
+	                         (SelectedShakeCurveIndex_Z >= 0 && SelectedShakeCurveIndex_Z < AvailablePresets.Num());
+
+	// Add Camera Shake 버튼
+	if (!bAllAxesSelected)
+	{
+		ImGui::BeginDisabled();
+	}
+
+	if (ImGui::Button("Add Shake (Bezier)", ImVec2(ContentWidth, 35.0f)))
+	{
+		// 3개 축 모두 프리셋 로드
+		FString FilePath_X = FString(PresetDirectory) + "/" + AvailablePresets[SelectedShakeCurveIndex_X] + ".json";
+		FString FilePath_Y = FString(PresetDirectory) + "/" + AvailablePresets[SelectedShakeCurveIndex_Y] + ".json";
+		FString FilePath_Z = FString(PresetDirectory) + "/" + AvailablePresets[SelectedShakeCurveIndex_Z] + ".json";
+
+		FCameraBlendPreset Preset_X, Preset_Y, Preset_Z;
+		if (FCameraBlendPreset::LoadFromFile(FilePath_X, Preset_X) &&
+		    FCameraBlendPreset::LoadFromFile(FilePath_Y, Preset_Y) &&
+		    FCameraBlendPreset::LoadFromFile(FilePath_Z, Preset_Z))
+		{
+			// 각 축의 LocationCurve를 사용
+			UCurveFloat* CurveX = ConvertBezierToUCurveFloat(Preset_X.BlendParams.LocationCurve, ShakeNumSamples);
+			UCurveFloat* CurveY = ConvertBezierToUCurveFloat(Preset_Y.BlendParams.LocationCurve, ShakeNumSamples);
+			UCurveFloat* CurveZ = ConvertBezierToUCurveFloat(Preset_Z.BlendParams.LocationCurve, ShakeNumSamples);
+
+			if (CurveX && CurveY && CurveZ)
+			{
+				UCameraModifier_CameraShake* Shake = NewObject<UCameraModifier_CameraShake>();
+				Shake->SetRotationAmplitude(ShakeRotationAmplitude);
+				Shake->SetAlphaInTime(ShakeAlphaInTime);
+				Shake->SetNumSamples(ShakeNumSamples);
+				Shake->SetBezierCurve(*CurveX, *CurveY, *CurveZ);
+				Shake->SetShakeCurveType(ECurveType::ECT_BEZIER);
+
+				Manager->AddCameraModifier(Shake);
 			}
 		}
-		if (activeCount == 0)
-		{
-			ImGui::TextDisabled("  (None)");
-		}
+	}
 
-		ImGui::Unindent(10.0f);
+	if (!bAllAxesSelected)
+	{
+		ImGui::EndDisabled();
+		ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.0f, 1.0f),
+			"All 3 axes must have curves selected");
+	}
+
+	// Add Shake (Perlin) 버튼
+	if (ImGui::Button("Add Shake (Perlin Noise)", ImVec2(ContentWidth, 35.0f)))
+	{
+		UCameraModifier_CameraShake* Shake = NewObject<UCameraModifier_CameraShake>();
+		Shake->SetRotationAmplitude(ShakeRotationAmplitude);
+		Shake->SetAlphaInTime(ShakeAlphaInTime);
+		Shake->SetNumSamples(ShakeNumSamples);
+		Shake->GetNewPerlinNoise();
+
+		Manager->AddCameraModifier(Shake);
+	}
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+
+	// ========== Active Modifiers ==========
+	ImGui::SeparatorText("Active Modifiers");
+	ImGui::Spacing();
+
+	TArray<UCameraModifier*>& ModifierList = Manager->GetModifierList();
+	int activeCount = 0;
+	for (UCameraModifier* Modifier : ModifierList)
+	{
+		if (Modifier && !Modifier->IsDisabled())
+		{
+			activeCount++;
+			UCameraModifier_CameraShake* Shake = Cast<UCameraModifier_CameraShake>(Modifier);
+			if (Shake)
+			{
+				ECurveType CurveType = Shake->GetShakeCurveType();
+				const char* TypeName = (CurveType == ECurveType::ECT_PERLIN_NOISE) ? "Perlin" : "Bezier";
+				ImGui::Text("  Shake (%s) - Alpha: %.2f", TypeName, Shake->GetAlpha());
+			}
+		}
+	}
+	if (activeCount == 0)
+	{
+		ImGui::TextDisabled("  (None)");
 	}
 }
 
@@ -431,17 +614,16 @@ void UCameraControlWindow::RefreshPresetList()
 	std::filesystem::path CurrentWorkingDir = std::filesystem::current_path();
 	DebugCurrentWorkingDir = CurrentWorkingDir.string();
 
-	FString PresetPath = "Data/CameraBlendPresets";
-	std::filesystem::path AbsolutePresetPath = std::filesystem::absolute(PresetPath.c_str());
+	std::filesystem::path AbsolutePresetPath = std::filesystem::absolute(PresetDirectory);
 	DebugAbsolutePresetPath = AbsolutePresetPath.string();
 
 	try
 	{
-		bDebugDirectoryExists = std::filesystem::exists(PresetPath.c_str());
+		bDebugDirectoryExists = std::filesystem::exists(PresetDirectory);
 
 		if (bDebugDirectoryExists)
 		{
-			for (const auto& Entry : std::filesystem::directory_iterator(PresetPath.c_str()))
+			for (const auto& Entry : std::filesystem::directory_iterator(PresetDirectory))
 			{
 				if (Entry.is_regular_file() && Entry.path().extension() == ".json")
 				{
@@ -469,8 +651,7 @@ void UCameraControlWindow::LoadAndApplyPreset(const FString& PresetName)
 	if (!CameraManager.IsValid())
 		return;
 
-	FString PresetPath = "Data/CameraBlendPresets";
-	FString FilePath = PresetPath + "/" + PresetName + ".json";
+	FString FilePath = FString(PresetDirectory) + "/" + PresetName + ".json";
 
 	FCameraBlendPreset Preset;
 	if (FCameraBlendPreset::LoadFromFile(FilePath, Preset))
@@ -509,32 +690,156 @@ void UCameraControlWindow::ApplyBezierCurveToFade(const FBezierControlPoints& Be
 	UE_LOG("UCameraControlWindow: Bezier curve applied to Fade");
 }
 
-// 베지어 커브를 CameraShake에 적용
-void UCameraControlWindow::ApplyBezierCurveToShake(const FBezierControlPoints& BezierCurve)
+// ========== Debug Tab ==========
+void UCameraControlWindow::RenderDebugTab()
 {
-	if (!CameraManager.IsValid())
-		return;
+	// ========== Preset Loading Debug ==========
+	ImGui::SeparatorText("Preset Loading");
+	ImGui::Spacing();
 
-	// 베지어 커브를 UCurveFloat로 변환 (기본 샘플 수 사용)
-	UCurveFloat* CurveFloat = ConvertBezierToUCurveFloat(BezierCurve);
-	if (!CurveFloat)
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Working Dir:");
+	ImGui::TextWrapped("%s", DebugCurrentWorkingDir.c_str());
+
+	ImGui::Spacing();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Absolute Preset Path:");
+	ImGui::TextWrapped("%s", DebugAbsolutePresetPath.c_str());
+
+	ImGui::Spacing();
+	ImGui::Text("Directory Exists: %s", bDebugDirectoryExists ? "YES" : "NO");
+	ImGui::Text("Presets Found: %d", AvailablePresets.Num());
+
+	if (AvailablePresets.Num() > 0)
 	{
-		UE_LOG("ERROR: Failed to convert bezier curve to UCurveFloat");
-		return;
+		ImGui::Spacing();
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Preset Names:");
+		for (int i = 0; i < AvailablePresets.Num(); i++)
+		{
+			ImGui::Text("  %d: %s", i, AvailablePresets[i].c_str());
+		}
 	}
 
-	// 새로운 CameraShake 생성 시 베지어 커브 적용
-	UCameraModifier_CameraShake* Shake = NewObject<UCameraModifier_CameraShake>();
-	Shake->SetRotationAmplitude(ShakeRotationAmplitude);
-	Shake->SetAlphaInTime(ShakeAlphaInTime);
-	Shake->SetNumSamples(ShakeNumSamples);
+	ImGui::Spacing();
+	ImGui::Spacing();
 
-	// 베지어 커브를 3축에 모두 적용
-	Shake->SetBezierCurve(*CurveFloat, *CurveFloat, *CurveFloat);
-	Shake->SetShakeCurveType(ECurveType::ECT_BEZIER);
+	// ========== Refresh Button ==========
+	if (ImGui::Button("Refresh Preset List", ImVec2(WindowWidth - 40.0f, 30.0f)))
+	{
+		RefreshPresetList();
+	}
 
-	APlayerCameraManager* Manager = CameraManager.Get();
-	Manager->AddCameraModifier(Shake);
+	// ========== Camera Manager Info ==========
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::SeparatorText("Camera Manager");
+	ImGui::Spacing();
 
-	UE_LOG("UCameraControlWindow: Bezier curve applied to new CameraShake");
+	if (CameraManager.IsValid())
+	{
+		APlayerCameraManager* Manager = CameraManager.Get();
+		ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Status: Connected");
+		ImGui::Text("Is Fading: %s", Manager->IsFading() ? "Yes" : "No");
+		ImGui::Text("Using Bezier Fade: %s", Manager->IsUsingBezierFade() ? "Yes" : "No");
+		ImGui::Text("Fade Amount: %.3f", Manager->GetFadeAmount());
+
+		FLinearColor FadeColor = Manager->GetFadeColor();
+		ImGui::Text("Fade Color: (%.2f, %.2f, %.2f, %.2f)",
+			FadeColor.R, FadeColor.G, FadeColor.B, FadeColor.A);
+	}
+	else
+	{
+		ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Status: Disconnected");
+	}
+}
+
+// ========== Bezier Curve Visualization ==========
+void UCameraControlWindow::RenderBezierCurveVisualization(const FBezierControlPoints& Curve, const ImVec2& Size)
+{
+	ImVec2 CursorPos = ImGui::GetCursorScreenPos();
+	ImDrawList* DrawList = ImGui::GetWindowDrawList();
+
+	const ImVec2 Padding(CurveVisualizationPadding, CurveVisualizationPadding);
+
+	// 배경 박스
+	ImVec2 BoxMin = CursorPos;
+	ImVec2 BoxMax = ImVec2(CursorPos.x + Size.x, CursorPos.y + Size.y);
+	DrawList->AddRectFilled(BoxMin, BoxMax, IM_COL32(30, 30, 30, 255));
+	DrawList->AddRect(BoxMin, BoxMax, IM_COL32(100, 100, 100, 255), 0.0f, 0, 2.0f);
+
+	// 그리드 선 그리기 (10x10) - CameraBlendEditor와 동일
+	for (int i = 0; i <= 10; ++i)
+	{
+		float T = i / 10.0f;
+
+		// 세로 그리드
+		float X = CursorPos.x + Padding.x + T * (Size.x - 2 * Padding.x);
+		DrawList->AddLine(
+			ImVec2(X, BoxMin.y),
+			ImVec2(X, BoxMax.y),
+			IM_COL32(60, 60, 60, 255),
+			1.0f
+		);
+
+		// 가로 그리드
+		float Y = CursorPos.y + Padding.y + T * (Size.y - 2 * Padding.y);
+		DrawList->AddLine(
+			ImVec2(BoxMin.x, Y),
+			ImVec2(BoxMax.x, Y),
+			IM_COL32(60, 60, 60, 255),
+			1.0f
+		);
+	}
+
+	// 축 레이블
+	DrawList->AddText(ImVec2(CursorPos.x + 5, CursorPos.y + Size.y - 20),
+		IM_COL32(200, 200, 200, 255), "Time (0-1)");
+	DrawList->AddText(ImVec2(CursorPos.x + 5, CursorPos.y + 10),
+		IM_COL32(200, 200, 200, 255), "Value (0-1)");
+
+	// 베지어 커브의 4개 제어점을 화면 좌표로 변환
+	ImVec2 P0 = BezierCurveToScreenPos(0.0f, Curve.P0, CursorPos, Size, Padding);
+	ImVec2 P1 = BezierCurveToScreenPos(0.33f, Curve.P1, CursorPos, Size, Padding);
+	ImVec2 P2 = BezierCurveToScreenPos(0.66f, Curve.P2, CursorPos, Size, Padding);
+	ImVec2 P3 = BezierCurveToScreenPos(1.0f, Curve.P3, CursorPos, Size, Padding);
+
+	// 베지어 커브 그리기 (cyan 색상)
+	DrawList->AddBezierCubic(P0, P1, P2, P3, IM_COL32(0, 255, 255, 255), 3.0f);
+
+	// 제어점 연결선 (점선 효과)
+	DrawList->AddLine(P0, P1, IM_COL32(150, 150, 150, 150), 1.0f);
+	DrawList->AddLine(P2, P3, IM_COL32(150, 150, 150, 150), 1.0f);
+
+	// 제어점 그리기
+	const float PointRadius = 5.0f;
+	DrawList->AddCircleFilled(P0, PointRadius, IM_COL32(255, 100, 100, 255));
+	DrawList->AddCircleFilled(P1, PointRadius, IM_COL32(255, 255, 100, 255));
+	DrawList->AddCircleFilled(P2, PointRadius, IM_COL32(100, 255, 100, 255));
+	DrawList->AddCircleFilled(P3, PointRadius, IM_COL32(100, 100, 255, 255));
+
+	// 제어점 값 표시
+	char Label[32];
+	snprintf(Label, sizeof(Label), "P0:%.2f", Curve.P0);
+	DrawList->AddText(ImVec2(P0.x + 8, P0.y - 8), IM_COL32(255, 255, 255, 255), Label);
+
+	snprintf(Label, sizeof(Label), "P1:%.2f", Curve.P1);
+	DrawList->AddText(ImVec2(P1.x + 8, P1.y - 8), IM_COL32(255, 255, 255, 255), Label);
+
+	snprintf(Label, sizeof(Label), "P2:%.2f", Curve.P2);
+	DrawList->AddText(ImVec2(P2.x + 8, P2.y - 8), IM_COL32(255, 255, 255, 255), Label);
+
+	snprintf(Label, sizeof(Label), "P3:%.2f", Curve.P3);
+	DrawList->AddText(ImVec2(P3.x + 8, P3.y - 8), IM_COL32(255, 255, 255, 255), Label);
+
+	// 인비저블 버튼으로 영역 차지
+	ImGui::SetCursorScreenPos(CursorPos);
+	ImGui::InvisibleButton("CurveVisualization", Size);
+}
+
+ImVec2 UCameraControlWindow::BezierCurveToScreenPos(float Time, float Value, const ImVec2& Origin, const ImVec2& Size, const ImVec2& Padding) const
+{
+	float X = Origin.x + Padding.x + Time * (Size.x - 2 * Padding.x);
+
+	// Y축은 반전 (화면 좌표는 위가 0, 커브는 위가 1)
+	float Y = Origin.y + Padding.y + (1.0f - Value) * (Size.y - 2 * Padding.y);
+
+	return ImVec2(X, Y);
 }

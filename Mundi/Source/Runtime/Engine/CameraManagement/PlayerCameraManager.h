@@ -31,7 +31,7 @@ public:
 	AActor* GetViewTarget() const { return ViewTarget.Target; }
 
 	// 베지어 곡선 Fade 관련
-	UCurveFloat GetBezierCurveFade() const;
+	const UCurveFloat& GetBezierCurveFade() const;
 	void SetBezierCurveFade(const UCurveFloat& InBezierCurveFade);
 
 	bool IsUsingBezierFade() const { return bUseBezierFade; }
