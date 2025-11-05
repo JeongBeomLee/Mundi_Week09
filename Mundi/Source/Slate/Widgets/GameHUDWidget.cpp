@@ -484,10 +484,12 @@ void UGameHUDWidget::RenderNotStartedState()
 
 void UGameHUDWidget::RenderGameOverState(bool bIsVictory)
 {
-	// 뷰포트 영역에만 어두운 배경 오버레이
+	float time = static_cast<float>(ImGui::GetTime());
+
+	// 멋진 배경 오버레이 (그라데이션 + 파티클 효과)
 	ImGui::SetNextWindowPos(ImVec2(ViewportX, ViewportY));
 	ImGui::SetNextWindowSize(ImVec2(ViewportWidth, ViewportHeight));
-	ImGui::SetNextWindowBgAlpha(0.75f);
+	ImGui::SetNextWindowBgAlpha(0.0f);
 
 	ImGuiWindowFlags overlayFlags =
 		ImGuiWindowFlags_NoTitleBar |
@@ -496,90 +498,329 @@ void UGameHUDWidget::RenderGameOverState(bool bIsVictory)
 		ImGuiWindowFlags_NoCollapse |
 		ImGuiWindowFlags_NoSavedSettings |
 		ImGuiWindowFlags_NoScrollbar |
-		ImGuiWindowFlags_NoInputs;
+		ImGuiWindowFlags_NoInputs |
+		ImGuiWindowFlags_NoBackground;
 
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.0f, 0.0f, 0.75f));
-	ImGui::Begin("##GameOverOverlay", nullptr, overlayFlags);
+	if (ImGui::Begin("##GameOverOverlay", nullptr, overlayFlags))
+	{
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+		ImVec2 overlayMin = ImVec2(ViewportX, ViewportY);
+		ImVec2 overlayMax = ImVec2(ViewportX + ViewportWidth, ViewportY + ViewportHeight);
+
+		// 그라데이션 배경
+		ImU32 topColor, bottomColor;
+		if (bIsVictory)
+		{
+			// Victory: 어두운 파랑에서 금색으로
+			topColor = IM_COL32(10, 10, 30, 220);
+			bottomColor = IM_COL32(40, 30, 10, 220);
+		}
+		else
+		{
+			// Game Over: 패배한 느낌의 짙은 어둠 (거의 검정에 약간의 빨강)
+			topColor = IM_COL32(20, 5, 5, 235);
+			bottomColor = IM_COL32(5, 0, 0, 235);
+		}
+		drawList->AddRectFilledMultiColor(overlayMin, overlayMax, topColor, topColor, bottomColor, bottomColor);
+
+		// 파티클 효과 (떠다니는 작은 점들)
+		for (int i = 0; i < 50; ++i)
+		{
+			// 각 파티클마다 고유한 움직임
+			float particleTime = time * 0.3f + i * 0.5f;
+			float x = ViewportX + fmodf(i * 137.5f + time * 50.0f, ViewportWidth);
+			float y = ViewportY + fmodf(i * 219.3f + sinf(particleTime) * 100.0f, ViewportHeight);
+			float size = 2.0f + sinf(time * 2.0f + i) * 1.5f;
+			float alpha = 0.3f + 0.3f * sinf(time * 3.0f + i * 0.7f);
+
+			ImVec4 particleColor;
+			if (bIsVictory)
+			{
+				// Victory: 금색 파티클
+				particleColor = ImVec4(1.0f, 0.9f, 0.3f, alpha);
+			}
+			else
+			{
+				// Game Over: 어두운 피빛 파티클 (패배감)
+				particleColor = ImVec4(0.6f, 0.1f, 0.05f, alpha * 0.8f);
+			}
+
+			drawList->AddCircleFilled(ImVec2(x, y), size, ImGui::ColorConvertFloat4ToU32(particleColor));
+		}
+	}
 	ImGui::End();
-	ImGui::PopStyleColor();
 
-	// 뷰포트 중앙에 팝업 창
-	const float popupWidth = 500.0f;
-	const float popupHeight = 400.0f;
+	// 뷰포트 중앙에 팝업 창 (고정 크기)
+	const float popupWidth = 600.0f;
+	const float popupHeight = 450.0f;
+
 	ImGui::SetNextWindowPos(ImVec2(ViewportX + (ViewportWidth - popupWidth) * 0.5f, ViewportY + (ViewportHeight - popupHeight) * 0.5f));
 	ImGui::SetNextWindowSize(ImVec2(popupWidth, popupHeight));
-	ImGui::SetNextWindowBgAlpha(0.95f);
+
+	// 배경색 설정
+	ImVec4 bgColor;
+	if (bIsVictory)
+	{
+		// Victory: 밝은 골드/크림색 배경
+		bgColor = ImVec4(0.95f, 0.92f, 0.85f, 0.98f);
+	}
+	else
+	{
+		// Game Over: 패배한 느낌의 어두운 배경 (거의 검정에 약간의 빨강)
+		bgColor = ImVec4(0.08f, 0.05f, 0.05f, 0.98f);
+	}
+
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, bgColor);
 
 	ImGuiWindowFlags popupFlags =
 		ImGuiWindowFlags_NoTitleBar |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoCollapse |
-		ImGuiWindowFlags_NoSavedSettings;
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoScrollbar; // 스크롤바 제거
 
 	if (ImGui::Begin("##GameEndPopup", nullptr, popupFlags))
 	{
-		// 큰 폰트로 게임 종료 메시지 표시
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 20));
+		// 멋진 테두리 그리기
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		ImVec2 windowSize = ImGui::GetWindowSize();
+		ImDrawList* borderDrawList = ImGui::GetWindowDrawList();
 
-		ImGui::Dummy(ImVec2(0, 30)); // 상단 여백
+		// 외곽 글로우 효과
+		for (float thickness = 8.0f; thickness > 0.0f; thickness -= 2.0f)
+		{
+			float alpha = (8.0f - thickness) / 8.0f * 0.4f;
+			ImVec4 glowColor;
 
-		// 타이틀 메시지
-		ImVec4 titleColor = bIsVictory ? ImVec4(0.0f, 1.0f, 0.4f, 1.0f) : ImVec4(1.0f, 0.2f, 0.2f, 1.0f);
+			if (bIsVictory)
+			{
+				// Victory: 황금빛 글로우
+				float hue = fmodf(time * 0.2f, 1.0f);
+				ImGui::ColorConvertHSVtoRGB(hue, 0.7f, 1.0f, glowColor.x, glowColor.y, glowColor.z);
+				glowColor.w = alpha;
+			}
+			else
+			{
+				// Game Over: 빨간빛 글로우
+				float pulse = 0.5f + 0.5f * sinf(time * 3.0f);
+				glowColor = ImVec4(1.0f, 0.2f + pulse * 0.3f, 0.0f, alpha);
+			}
+
+			borderDrawList->AddRect(
+				ImVec2(windowPos.x - thickness, windowPos.y - thickness),
+				ImVec2(windowPos.x + windowSize.x + thickness, windowPos.y + windowSize.y + thickness),
+				ImGui::ColorConvertFloat4ToU32(glowColor),
+				8.0f, // 둥근 모서리
+				0,
+				thickness
+			);
+		}
+
+		// 메인 테두리
+		ImVec4 borderColor;
+		if (bIsVictory)
+		{
+			// Victory: 밝은 금색 테두리
+			float hue = fmodf(time * 0.2f, 1.0f);
+			ImGui::ColorConvertHSVtoRGB(hue, 0.8f, 1.0f, borderColor.x, borderColor.y, borderColor.z);
+			borderColor.w = 1.0f;
+		}
+		else
+		{
+			// Game Over: 밝은 빨강 테두리
+			float pulse = 0.5f + 0.5f * sinf(time * 3.0f);
+			borderColor = ImVec4(1.0f, 0.2f + pulse * 0.4f, 0.1f, 1.0f);
+		}
+
+		borderDrawList->AddRect(
+			windowPos,
+			ImVec2(windowPos.x + windowSize.x, windowPos.y + windowSize.y),
+			ImGui::ColorConvertFloat4ToU32(borderColor),
+			8.0f, // 둥근 모서리
+			0,
+			3.0f // 테두리 두께
+		);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 25));
+
+		ImGui::Dummy(ImVec2(0, 40)); // 상단 여백
+
+		// 타이틀 메시지 (애니메이션 효과)
 		const char* titleText = bIsVictory ? "VICTORY!" : "GAME OVER";
-
-		// 큰 텍스트 효과 (스케일 증가)
-		ImGui::PushStyleColor(ImGuiCol_Text, titleColor);
 		ImFont* font = ImGui::GetFont();
 		float originalScale = font->Scale;
-		font->Scale = 2.5f;
+		ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+		// 타이틀 크기 및 펄스 효과
+		float titleScale = 3.0f + 0.15f * sinf(time * 4.0f);
+		font->Scale = titleScale;
 		ImGui::PushFont(font);
 
 		float titleWidth = ImGui::CalcTextSize(titleText).x;
-		ImGui::SetCursorPosX((popupWidth - titleWidth) * 0.5f);
-		ImGui::TextUnformatted(titleText);
+		ImVec2 titlePos = ImGui::GetCursorScreenPos();
+		titlePos.x = (popupWidth - titleWidth) * 0.5f + ImGui::GetWindowPos().x;
 
-		ImGui::PopFont();
-		font->Scale = originalScale;
-		ImGui::PopStyleColor();
+		// 흔들림 효과
+		float shakeX = sinf(time * 15.0f) * 2.0f;
+		float shakeY = cosf(time * 12.0f) * 1.5f;
+		titlePos.x += shakeX;
+		titlePos.y += shakeY;
 
-		ImGui::Dummy(ImVec2(0, 10));
-		ImGui::Separator();
-		ImGui::Dummy(ImVec2(0, 10));
+		float fontSize = ImGui::GetFontSize();
+		size_t textLen = strlen(titleText);
 
-		// 최종 스코어 표시
-		font->Scale = 1.5f;
-		ImGui::PushFont(font);
-		FString scoreText = "Final Score: " + std::to_string(CachedScore);
-		float scoreWidth = ImGui::CalcTextSize(scoreText.c_str()).x;
-		ImGui::SetCursorPosX((popupWidth - scoreWidth) * 0.5f);
-		ImGui::TextUnformatted(scoreText.c_str());
-		ImGui::PopFont();
-		font->Scale = originalScale;
+		// 각 글자를 애니메이션으로 그리기
+		float xOffset = 0.0f;
+		for (size_t i = 0; i < textLen; ++i)
+		{
+			char charStr[2] = { titleText[i], '\0' };
+			ImVec2 charSize = ImGui::CalcTextSize(charStr);
 
-		// 최종 시간 표시
-		font->Scale = 1.5f;
-		ImGui::PushFont(font);
-		FString timeText = "Time: " + FormatTime(CachedElapsedTime);
-		float timeWidth = ImGui::CalcTextSize(timeText.c_str()).x;
-		ImGui::SetCursorPosX((popupWidth - timeWidth) * 0.5f);
-		ImGui::TextUnformatted(timeText.c_str());
+			ImVec4 color;
+			if (bIsVictory)
+			{
+				// Victory: 무지개색 + 금색
+				float hue = fmodf(time * 0.3f + i * 0.08f, 1.0f);
+				float saturation = 0.8f;
+				float value = 0.9f + 0.1f * sinf(time * 5.0f + i * 0.5f);
+				ImGui::ColorConvertHSVtoRGB(hue, saturation, value, color.x, color.y, color.z);
+				color.w = 1.0f;
+			}
+			else
+			{
+				// Game Over: 빨강-주황 사이 펄스
+				float pulse = 0.5f + 0.5f * sinf(time * 3.0f + i * 0.4f);
+				color = ImVec4(1.0f, 0.2f + pulse * 0.3f, 0.0f, 1.0f);
+			}
+
+			ImU32 col = ImGui::ColorConvertFloat4ToU32(color);
+
+			// 강한 글로우 효과
+			for (float radius = 3.0f; radius > 0.0f; radius -= 1.0f)
+			{
+				for (float angle = 0.0f; angle < 6.28f; angle += 0.785f)
+				{
+					float offsetX = cosf(angle) * radius;
+					float offsetY = sinf(angle) * radius;
+					ImVec4 glowColor = ImVec4(color.x * 0.6f, color.y * 0.6f, color.z * 0.6f, 0.4f / radius);
+					ImU32 glowCol = ImGui::ColorConvertFloat4ToU32(glowColor);
+					drawList->AddText(font, fontSize,
+						ImVec2(titlePos.x + xOffset + offsetX, titlePos.y + offsetY),
+						glowCol, charStr, nullptr);
+				}
+			}
+
+			// 메인 글자
+			drawList->AddText(font, fontSize,
+				ImVec2(titlePos.x + xOffset, titlePos.y),
+				col, charStr, nullptr);
+
+			xOffset += charSize.x;
+		}
+
+		ImGui::Dummy(ImVec2(titleWidth, fontSize));
 		ImGui::PopFont();
 		font->Scale = originalScale;
 
 		ImGui::Dummy(ImVec2(0, 20));
 
-		// 재시작 안내 메시지
+		// 최종 스코어 표시 (글로우 효과)
+		font->Scale = 1.8f;
+		ImGui::PushFont(font);
+		FString scoreText = "Final Score: " + std::to_string(CachedScore);
+
+		float scoreWidth = ImGui::CalcTextSize(scoreText.c_str()).x;
+		ImVec2 scorePos = ImGui::GetCursorScreenPos();
+		scorePos.x = (popupWidth - scoreWidth) * 0.5f + ImGui::GetWindowPos().x;
+		fontSize = ImGui::GetFontSize();
+
+		// 글로우
+		ImVec4 scoreColor = bIsVictory ? ImVec4(0.6f, 0.45f, 0.1f, 1.0f) : ImVec4(1.0f, 0.85f, 0.85f, 1.0f);
+		for (float offsetX = -1.0f; offsetX <= 1.0f; offsetX += 1.0f)
+		{
+			for (float offsetY = -1.0f; offsetY <= 1.0f; offsetY += 1.0f)
+			{
+				if (offsetX == 0.0f && offsetY == 0.0f) continue;
+				ImVec4 glowColor = ImVec4(scoreColor.x * 0.5f, scoreColor.y * 0.5f, scoreColor.z * 0.5f, 0.5f);
+				ImU32 glowCol = ImGui::ColorConvertFloat4ToU32(glowColor);
+				drawList->AddText(font, fontSize,
+					ImVec2(scorePos.x + offsetX, scorePos.y + offsetY),
+					glowCol, scoreText.c_str(), nullptr);
+			}
+		}
+
+		ImU32 scoreCol = ImGui::ColorConvertFloat4ToU32(scoreColor);
+		drawList->AddText(font, fontSize, scorePos, scoreCol, scoreText.c_str(), nullptr);
+		ImGui::Dummy(ImVec2(scoreWidth, fontSize));
+		ImGui::PopFont();
+		font->Scale = originalScale;
+
+		// 최종 시간 표시 (글로우 효과)
+		font->Scale = 1.8f;
+		ImGui::PushFont(font);
+		FString timeText = "Time: " + FormatTime(CachedElapsedTime);
+
+		float timeWidth = ImGui::CalcTextSize(timeText.c_str()).x;
+		ImVec2 timePos = ImGui::GetCursorScreenPos();
+		timePos.x = (popupWidth - timeWidth) * 0.5f + ImGui::GetWindowPos().x;
+		fontSize = ImGui::GetFontSize();
+
+		// 글로우
+		for (float offsetX = -1.0f; offsetX <= 1.0f; offsetX += 1.0f)
+		{
+			for (float offsetY = -1.0f; offsetY <= 1.0f; offsetY += 1.0f)
+			{
+				if (offsetX == 0.0f && offsetY == 0.0f) continue;
+				ImVec4 glowColor = ImVec4(scoreColor.x * 0.5f, scoreColor.y * 0.5f, scoreColor.z * 0.5f, 0.5f);
+				ImU32 glowCol = ImGui::ColorConvertFloat4ToU32(glowColor);
+				drawList->AddText(font, fontSize,
+					ImVec2(timePos.x + offsetX, timePos.y + offsetY),
+					glowCol, timeText.c_str(), nullptr);
+			}
+		}
+
+		drawList->AddText(font, fontSize, timePos, scoreCol, timeText.c_str(), nullptr);
+		ImGui::Dummy(ImVec2(timeWidth, fontSize));
+		ImGui::PopFont();
+		font->Scale = originalScale;
+
+		ImGui::Dummy(ImVec2(0, 25));
+
+		// 재시작 안내 메시지 (깜빡임 효과)
 		const char* restartText = "Press SPACE to Play Again";
+		float blinkAlpha = 0.5f + 0.5f * sinf(time * 4.0f);
+
+		font->Scale = 1.2f;
+		ImGui::PushFont(font);
+
 		float restartWidth = ImGui::CalcTextSize(restartText).x;
-		ImGui::SetCursorPosX((popupWidth - restartWidth) * 0.5f);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 1.0f));
-		ImGui::TextUnformatted(restartText);
-		ImGui::PopStyleColor();
+		ImVec2 restartPos = ImGui::GetCursorScreenPos();
+		restartPos.x = (popupWidth - restartWidth) * 0.5f + ImGui::GetWindowPos().x;
+		fontSize = ImGui::GetFontSize();
+
+		ImVec4 restartColor;
+		if (bIsVictory)
+		{
+			// Victory: 어두운 회색
+			restartColor = ImVec4(0.3f, 0.3f, 0.3f, blinkAlpha);
+		}
+		else
+		{
+			// Game Over: 매우 밝은 회색 (어두운 배경에 잘 보이도록)
+			restartColor = ImVec4(0.95f, 0.95f, 0.95f, blinkAlpha);
+		}
+		ImU32 restartCol = ImGui::ColorConvertFloat4ToU32(restartColor);
+
+		drawList->AddText(font, fontSize, restartPos, restartCol, restartText, nullptr);
+		ImGui::Dummy(ImVec2(restartWidth, fontSize));
+		ImGui::PopFont();
+		font->Scale = originalScale;
 
 		ImGui::PopStyleVar();
 	}
 	ImGui::End();
+	ImGui::PopStyleColor(); // 배경색 복원
 
 	// 게임 오버/승리 상태에서 SPACE 키 입력 체크
 	if (ImGui::IsKeyPressed(ImGuiKey_Space))
