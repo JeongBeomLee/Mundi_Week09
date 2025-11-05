@@ -70,6 +70,16 @@ struct FFadeBufferType // b2
     FVector FadeColor; // Fade 목표 색상 (RGB)
 };
 
+struct FVignettingBufferType    // b2
+{
+    FVector VignettingColor;
+    float Radius;
+
+    float Softness;
+    float AspectRatio;
+    FVector2D Padding;
+};
+
 // b0 in PS
 struct FMaterialInPs
 {
@@ -195,6 +205,7 @@ MACRO(FogBufferType)                \
 MACRO(FXAABufferType)               \
 MACRO(GammaCorrectionBufferType)    \
 MACRO(FFadeBufferType)              \
+MACRO(FVignettingBufferType)        \
 MACRO(FPixelConstBufferType)        \
 MACRO(ViewProjBufferType)           \
 MACRO(ColorBufferType)              \
@@ -217,7 +228,8 @@ CONSTANT_BUFFER_INFO(ViewProjBufferType, 1, true, true) // b1 카메라 행렬 �
 CONSTANT_BUFFER_INFO(FogBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(FXAABufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(GammaCorrectionBufferType, 2, false, true)
-CONSTANT_BUFFER_INFO(FFadeBufferType, 2, false, true)
+CONSTANT_BUFFER_INFO(FFadeBufferType, 2, false, true)   // b2
+CONSTANT_BUFFER_INFO(FVignettingBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(ColorBufferType, 3, true, true)   // b3 color
 CONSTANT_BUFFER_INFO(FPixelConstBufferType, 4, true, true) // GOURAUD에도 사용되므로 VS도 true
 CONSTANT_BUFFER_INFO(DecalBufferType, 6, true, true)
