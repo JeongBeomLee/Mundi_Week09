@@ -10,7 +10,6 @@ class SDetailsWindow;
 class UMainToolbarWidget;
 class UConsoleWindow; // 오버레이 콘솔 윈도우
 class UGameHUDWidget; // 게임 HUD 오버레이
-class UGameControlWindow; // 게임 컨트롤 윈도우
 class SActorBlueprintEditor; // 액터 블루프린트 에디터
 class AActor; // 전방 선언
 
@@ -114,9 +113,6 @@ private:
 
     // 게임 HUD 오버레이 (PIE 전용)
     UGameHUDWidget* GameHUD = nullptr;
-
-    // 게임 컨트롤 윈도우 (PIE 전용)
-    UGameControlWindow* GameControlWindow = nullptr;
 
     // 콘솔 오버레이
     UConsoleWindow* ConsoleWindow = nullptr;

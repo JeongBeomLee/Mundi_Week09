@@ -103,9 +103,13 @@ void ARunnerGameMode::BeginPlay()
 
 void ARunnerGameMode::OnCameraBlendComplete()
 {
-	UE_LOG("[RunnerGameMode] Camera blend complete! Starting camera shake...");
+	if (GameState.Get()->IsGameStarted() == true)
+	{
+		return;
+	}
 
 	// PlayerController와 CameraManager 가져오기
+	UE_LOG("[RunnerGameMode] Camera blend complete! Starting camera shake...");
 	APlayerController* PlayerController = GetPlayerController();
 	if (!PlayerController)
 	{
