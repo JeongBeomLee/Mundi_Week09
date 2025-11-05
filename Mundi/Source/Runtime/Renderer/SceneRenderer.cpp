@@ -1575,19 +1575,28 @@ void FSceneRenderer::CompositeToBackBuffer()
 	RHIDevice->GetDeviceContext()->PSSetShaderResources(0, 1, &SourceSRV);
 	RHIDevice->GetDeviceContext()->PSSetSamplers(0, 1, &SamplerState);
 
-	// 5. 셰이더 준비
+	// 5. 셰이더 준비 - Gamma Correction 적용
 	UShader* FullScreenTriangleVS = UResourceManager::GetInstance().Load<UShader>("Shaders/Utility/FullScreenTriangle_VS.hlsl");
-	UShader* BlitPS = UResourceManager::GetInstance().Load<UShader>("Shaders/Utility/Blit_PS.hlsl");
-	if (!FullScreenTriangleVS || !FullScreenTriangleVS->GetVertexShader() || !BlitPS || !BlitPS->GetPixelShader())
+	UShader* GammaCorrectionPS = UResourceManager::GetInstance().Load<UShader>("Shaders/PostProcess/GammaCorrection_PS.hlsl");
+	if (!FullScreenTriangleVS || !FullScreenTriangleVS->GetVertexShader() || !GammaCorrectionPS || !GammaCorrectionPS->GetPixelShader())
 	{
-		UE_LOG("Blit용 셰이더 없음!\n");
+		UE_LOG("GammaCorrection용 셰이더 없음!\n");
 		return; // 가드가 자동으로 스왑을 되돌리고 SRV를 해제해줌
 	}
-	RHIDevice->PrepareShader(FullScreenTriangleVS, BlitPS);
+	RHIDevice->PrepareShader(FullScreenTriangleVS, GammaCorrectionPS);
 
-	// 6. 그리기
+	// 6. Gamma Correction 상수 버퍼 설정
+	URenderSettings& RenderSettings = World->GetRenderSettings();
+	RHIDevice->SetAndUpdateConstantBuffer(GammaCorrectionBufferType{
+		RenderSettings.GetGamma(),
+		RenderSettings.GetInvGamma(),
+		RenderSettings.GetBrightness(),
+		RenderSettings.GetSaturation()
+	});
+
+	// 7. 그리기
 	RHIDevice->DrawFullScreenQuad();
 
-	// 7. 모든 작업이 성공했으므로 Commit
+	// 8. 모든 작업이 성공했으므로 Commit
 	SwapGuard.Commit();
 }

@@ -36,7 +36,19 @@ public:
     void SetTileSize(uint32 Value) { TileSize = Value; }
     uint32 GetTileSize() const { return TileSize; }
 
+    // Gamma correction parameters
+    void SetGamma(float Value) { Gamma = Value; UpdateInvGamma(); }
+    float GetGamma() const { return Gamma; }
+    float GetInvGamma() const { return InvGamma; }
+
+    void SetBrightness(float Value) { Brightness = Value; }
+    float GetBrightness() const { return Brightness; }
+
+    void SetSaturation(float Value) { Saturation = Value; }
+    float GetSaturation() const { return Saturation; }
+
 private:
+    void UpdateInvGamma() { InvGamma = (Gamma > 0.0f) ? (1.0f / Gamma) : 1.0f; }
     EEngineShowFlags ShowFlags = EEngineShowFlags::SF_DefaultEnabled;
     EViewModeIndex ViewModeIndex = EViewModeIndex::VMI_Lit_Phong;
 
@@ -48,4 +60,10 @@ private:
 
     // Tile-based light culling
     uint32 TileSize = 16;                   // 타일 크기 (픽셀, 기본값: 16)
+
+    // Gamma correction parameters
+    float Gamma = 2.2f;                     // 감마 값 (sRGB 표준: 2.2)
+    float InvGamma = 1.0f / 2.2f;          // 1.0 / Gamma (미리 계산)
+    float Brightness = 1.0f;                // 밝기 조정 (1.0 = 변화 없음)
+    float Saturation = 1.0f;                // 채도 조정 (1.0 = 변화 없음)
 };

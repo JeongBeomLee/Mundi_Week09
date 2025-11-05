@@ -56,6 +56,14 @@ struct FXAABufferType // b2
     int32_t QualityIterations; // 엣지 탐색 반복 횟수 (12 권장)
 };
 
+struct GammaCorrectionBufferType // b2
+{
+    float Gamma;           // 감마 값 (일반적으로 2.2가 표준)
+    float InvGamma;        // 1.0 / Gamma (미리 계산해서 넘겨주면 성능 향상)
+    float Brightness;      // 추가 밝기 조정 (1.0 = 변화 없음)
+    float Saturation;      // 채도 조정 (1.0 = 변화 없음)
+};
+
 // b0 in PS
 struct FMaterialInPs
 {
@@ -179,6 +187,7 @@ MACRO(DecalBufferType)              \
 MACRO(PostProcessBufferType)        \
 MACRO(FogBufferType)                \
 MACRO(FXAABufferType)               \
+MACRO(GammaCorrectionBufferType)    \
 MACRO(FPixelConstBufferType)        \
 MACRO(ViewProjBufferType)           \
 MACRO(ColorBufferType)              \
@@ -200,6 +209,7 @@ CONSTANT_BUFFER_INFO(PostProcessBufferType, 0, false, true)
 CONSTANT_BUFFER_INFO(ViewProjBufferType, 1, true, true) // b1 카메라 행렬 고정
 CONSTANT_BUFFER_INFO(FogBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(FXAABufferType, 2, false, true)
+CONSTANT_BUFFER_INFO(GammaCorrectionBufferType, 2, false, true)
 CONSTANT_BUFFER_INFO(ColorBufferType, 3, true, true)   // b3 color
 CONSTANT_BUFFER_INFO(FPixelConstBufferType, 4, true, true) // GOURAUD에도 사용되므로 VS도 true
 CONSTANT_BUFFER_INFO(DecalBufferType, 6, true, true)

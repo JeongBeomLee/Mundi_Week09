@@ -1777,6 +1777,123 @@ void SViewportWindow::RenderShowFlagDropdownMenu()
 			ImGui::SetTooltip("FXAA 상세 설정");
 		}
 
+		ImGui::Separator();
+
+		// === Gamma Correction ===
+		ImGui::Text("감마 보정 (Gamma Correction)");
+
+		// 서브메뉴
+		if (ImGui::BeginMenu(" 감마 보정 설정"))
+		{
+			ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "감마 보정 설정");
+			ImGui::Separator();
+
+			// Gamma 슬라이더
+			float gamma = RenderSettings.GetGamma();
+			ImGui::Text("감마 값");
+			if (ImGui::SliderFloat("##Gamma", &gamma, 1.0f, 3.0f, "%.2f"))
+			{
+				RenderSettings.SetGamma(gamma);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("감마 보정 값을 조정합니다. (표준: 2.2)\n낮을수록 어두워지고, 높을수록 밝아집니다.");
+			}
+
+			ImGui::Separator();
+
+			// Brightness 슬라이더
+			float brightness = RenderSettings.GetBrightness();
+			ImGui::Text("밝기");
+			if (ImGui::SliderFloat("##Brightness", &brightness, 0.5f, 2.0f, "%.2f"))
+			{
+				RenderSettings.SetBrightness(brightness);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("전체 화면 밝기를 조정합니다. (기본: 1.0)");
+			}
+
+			ImGui::Separator();
+
+			// Saturation 슬라이더
+			float saturation = RenderSettings.GetSaturation();
+			ImGui::Text("채도");
+			if (ImGui::SliderFloat("##Saturation", &saturation, 0.0f, 2.0f, "%.2f"))
+			{
+				RenderSettings.SetSaturation(saturation);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("색상 채도를 조정합니다. (기본: 1.0, 0.0 = 흑백)");
+			}
+
+			ImGui::Separator();
+
+			// 프리셋 버튼
+			ImGui::Text("프리셋");
+
+			// 표준 sRGB 버튼
+			if (ImGui::Button("표준 sRGB", ImVec2(100, 0)))
+			{
+				RenderSettings.SetGamma(2.2f);
+				RenderSettings.SetBrightness(1.0f);
+				RenderSettings.SetSaturation(1.0f);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("표준 sRGB 설정 (Gamma: 2.2, Brightness: 1.0, Saturation: 1.0)");
+			}
+
+			ImGui::SameLine();
+
+			// 밝게 버튼
+			if (ImGui::Button("밝게", ImVec2(100, 0)))
+			{
+				RenderSettings.SetGamma(2.0f);
+				RenderSettings.SetBrightness(1.2f);
+				RenderSettings.SetSaturation(1.0f);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("밝은 설정 (Gamma: 2.0, Brightness: 1.2)");
+			}
+
+			// 어둡게 버튼
+			if (ImGui::Button("어둡게", ImVec2(100, 0)))
+			{
+				RenderSettings.SetGamma(2.4f);
+				RenderSettings.SetBrightness(0.9f);
+				RenderSettings.SetSaturation(1.0f);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("어두운 설정 (Gamma: 2.4, Brightness: 0.9)");
+			}
+
+			ImGui::SameLine();
+
+			// 흑백 버튼
+			if (ImGui::Button("흑백", ImVec2(100, 0)))
+			{
+				RenderSettings.SetGamma(2.2f);
+				RenderSettings.SetBrightness(1.0f);
+				RenderSettings.SetSaturation(0.0f);
+			}
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("흑백 모드 (Saturation: 0.0)");
+			}
+
+			ImGui::EndMenu();
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("감마 보정, 밝기, 채도 설정");
+		}
+
+		ImGui::Separator();
+
 		// Tile-Based Light Culling
 		bool bTileCulling = RenderSettings.IsShowFlagEnabled(EEngineShowFlags::SF_TileCulling);
 		if (ImGui::Checkbox("##TileCulling", &bTileCulling))
