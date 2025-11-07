@@ -5,6 +5,9 @@
     <FxCompile Include="Shaders\Effects\Decal.hlsl">
       <Filter>Shaders\Effects</Filter>
     </FxCompile>
+    <FxCompile Include="Shaders\Effects\Particle.hlsl">
+      <Filter>Shaders\Effects</Filter>
+    </FxCompile>
     <FxCompile Include="Shaders\PostProcess\HeightFog_PS.hlsl">
       <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
@@ -68,20 +71,15 @@
     <FxCompile Include="Shaders\PostProcess\GammaCorrection_PS.hlsl">
       <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
+    <FxCompile Include="Shaders\PostProcess\FadeInOut_PS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PostProcess\Vignetting_PS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
   </ItemGroup>
   <!-- Root Files -->
   <ItemGroup>
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
-      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
-    <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
-    <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\Components\SpringArmComponent.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
-    <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.cpp">
@@ -169,6 +167,9 @@
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\MovementComponent.cpp">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\Components\ParticleComponent.cpp">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\Components\PointLightComponent.cpp">
@@ -286,6 +287,9 @@
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\SpotLightActor.cpp">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Runtime\Engine\GameFramework\SpriteActor.cpp">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClCompile>
     <ClCompile Include="Source\Runtime\Engine\GameFramework\CameraActor.cpp">
@@ -582,23 +586,9 @@
     <ClCompile Include="ThirdParty\ImGui\imgui_widgets.cpp">
       <Filter>ThirdParty\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.cpp">
+    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.cpp">
       <Filter>Source\Runtime\Engine\CameraManagement</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Runtime\AssetManagement\Sound.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\Audio\SoundManager.cpp" />
-    <ClCompile Include="Source\Runtime\Core\Math\UCurveFloat.cpp" />
-    <ClCompile Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\Components\SpringArmComponent.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.cpp" />
-    <ClCompile Include="Source\Slate\Windows\SActorBlueprintEditor.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraTypes.cpp" />
-    <ClCompile Include="Source\Slate\Windows\CameraBlendEditorWindow.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.cpp" />
-    <ClCompile Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.cpp" />
   </ItemGroup>
   <!-- ThirdParty/ImGui Files -->
   <!-- Source Files -->
@@ -628,18 +618,6 @@
     <ClInclude Include="Source\Runtime\Core\Misc\Delegate.h">
       <Filter>Source\Runtime\Core\Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
-      <Filter>Source\Runtime\Engine\CameraManagement</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
-    <ClInclude Include="Source\Runtime\Core\Math\UCurveFloat.h" />
-    <ClInclude Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.h" />
-    <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
-    <ClInclude Include="Source\Runtime\Engine\Components\SpringArmComponent.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
-    <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.h">
       <Filter>Source\Runtime\Engine\CameraManagement</Filter>
@@ -744,6 +722,9 @@
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Components\LocalLightComponent.h">
+      <Filter>Source\Runtime\Engine\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\Components\ParticleComponent.h">
       <Filter>Source\Runtime\Engine\Components</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\Components\PointLightComponent.h">
@@ -852,6 +833,9 @@
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\SpotLightActor.h">
+      <Filter>Source\Runtime\Engine\GameFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Runtime\Engine\GameFramework\SpriteActor.h">
       <Filter>Source\Runtime\Engine\GameFramework</Filter>
     </ClInclude>
     <ClInclude Include="Source\Runtime\Engine\GameFramework\CameraActor.h">
@@ -1217,24 +1201,9 @@
     <ClInclude Include="ThirdParty\ImGui\imstb_truetype.h">
       <Filter>ThirdParty\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_LetterBox.h">
+    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.h">
       <Filter>Source\Runtime\Engine\CameraManagement</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Runtime\AssetManagement\Sound.h" />
-    <ClInclude Include="Source\Runtime\Core\Math\UCurveFloat.h" />
-    <ClInclude Include="Source\Runtime\Core\Math\UPerlinNoiseFloat.h" />
-    <ClInclude Include="Source\Runtime\Engine\Audio\SoundManager.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CameraShake.h" />
-    <ClInclude Include="Source\Runtime\Engine\Components\SpringArmComponent.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\PlayerCameraManager.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\ViewTarget.h" />
-    <ClInclude Include="Source\Slate\Windows\SActorBlueprintEditor.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraTypes.h" />
-    <ClInclude Include="Source\Slate\Windows\CameraBlendEditorWindow.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPreset.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\CameraBlendPresetLibrary.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_Vignetting.h" />
-    <ClInclude Include="Source\Runtime\Engine\CameraManagement\UCameraModifier_CustomBlend.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\coin_collision.lua">
@@ -1253,9 +1222,6 @@
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\CoinGenerator.lua">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="Scripts\coin_collision.lua">
       <Filter>Scripts</Filter>
     </None>
     <None Include="Scripts\CollisionUtility.lua">
@@ -1300,8 +1266,6 @@
     <None Include="Scripts\test_coroutine.lua">
       <Filter>Scripts</Filter>
     </None>
-    <None Include="Shaders\PostProcess\FadeInOut_PS.hlsl" />
-    <None Include="Shaders\PostProcess\Vignetting_PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
