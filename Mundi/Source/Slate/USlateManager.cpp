@@ -82,8 +82,8 @@ void USlateManager::Initialize(ID3D11Device* InDevice, UWorld* InWorld, const FR
 #endif
 
     // GameHUD 생성
-    GameHUD = NewObject<UGameHUDWidget>();
-    GameHUD->Initialize();
+    //GameHUD = NewObject<UGameHUDWidget>();
+    //GameHUD->Initialize();
 
     Device = InDevice;
     World = InWorld;

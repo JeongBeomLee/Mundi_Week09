@@ -122,6 +122,11 @@ public:
 	// 핸들로 제거
 	void RemoveDynamic(DelegateHandle Handle)
 	{
+		if (Functions.IsEmpty())
+		{
+			return;
+		}
+
 		Functions.erase(
 			std::remove_if(Functions.begin(), Functions.end(),
 				[Handle](const std::pair<DelegateHandle, HandlerType>& Pair)
